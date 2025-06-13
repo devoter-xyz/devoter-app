@@ -1,6 +1,6 @@
 import * as z from "zod";
 
-export const repositorySchema = z.object({
+export const createRepositorySchema = z.object({
   title: z
     .string()
     .min(1, { message: "Title is required" })
@@ -27,4 +27,4 @@ export const repositorySchema = z.object({
     ),
 });
 
-export type RepositoryFormValues = z.infer<typeof repositorySchema>; 
+export type CreateRepositoryInput = z.infer<typeof createRepositorySchema>; 

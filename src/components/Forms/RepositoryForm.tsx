@@ -17,10 +17,13 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { repositorySchema, RepositoryFormValues } from "@/lib/validations/repository";
+import { createRepositorySchema, CreateRepositoryInput } from "@/actions/repository/CreateRepository/schema";
 import { useToast } from "@/hooks/use-toast";
 import { ToastContainer } from "@/components/ui/toast-simple";
-import { SubmissionStatus } from "@/components/ui/submission-status";
+import { SubmissionStatus } from "@/components/Commons/SubmissionStatus";
+import { FormInput } from "@/components/Commons/Form/FormInput";
+import { FormTextArea } from "@/components/Commons/Form/FormTextArea";
+import { FormSubmit } from "@/components/Commons/Form/FormSubmit";
 
 interface RepositoryFormProps {
   currentSubmissions?: number;
@@ -39,8 +42,8 @@ export function RepositoryForm({
   const [isSubmitted, setIsSubmitted] = useState(false);
   const { toast, toasts, dismiss } = useToast();
 
-  const form = useForm<RepositoryFormValues>({
-    resolver: zodResolver(repositorySchema),
+  const form = useForm<CreateRepositoryInput>({
+    resolver: zodResolver(createRepositorySchema),
     defaultValues: {
       title: "",
       description: "",
@@ -51,7 +54,7 @@ export function RepositoryForm({
   const remainingSubmissions = maxSubmissions - currentSubmissions;
   const isLimitReached = remainingSubmissions <= 0;
 
-  async function onSubmit(values: RepositoryFormValues) {
+  async function onSubmit(values: CreateRepositoryInput) {
     if (isLimitReached) {
       toast({
         title: "Submission Limit Reached",
@@ -86,7 +89,7 @@ export function RepositoryForm({
         variant: "default",
       });
 
-      // Reset form and show success state
+      // Reset Form and show success state
       form.reset();
       setIsSubmitted(true);
       
@@ -157,86 +160,56 @@ export function RepositoryForm({
             <FormField
               control={form.control}
               name="title"
-              render={({ field }: { field: ControllerRenderProps<RepositoryFormValues, "title"> }) => (
-                <FormItem>
-                  <FormLabel className="text-sm font-medium text-gray-700">
-                    Repository Title
-                  </FormLabel>
-                  <FormControl>
-                    <Input 
-                      placeholder="My Awesome Project" 
-                      {...field} 
-                      disabled={isLoading || isLimitReached}
-                      className="focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
+              render={({ field }: { field: ControllerRenderProps<CreateRepositoryInput, "title"> }) => (
+                <FormInput
+                  field={field}
+                  label="Repository Title"
+                  placeholder="My Awesome Project"
+                  disabled={isLoading || isLimitReached}
+                  className="focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                />
               )}
             />
 
             <FormField
               control={form.control}
               name="description"
-              render={({ field }: { field: ControllerRenderProps<RepositoryFormValues, "description"> }) => (
-                <FormItem>
-                  <FormLabel className="text-sm font-medium text-gray-700">
-                    Description
-                  </FormLabel>
-                  <FormControl>
-                    <Textarea 
-                      placeholder="Describe what your repository does, its key features, and why it should be voted on..."
-                      {...field} 
-                      disabled={isLoading || isLimitReached}
-                      className="min-h-[100px] focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
+              render={({ field }: { field: ControllerRenderProps<CreateRepositoryInput, "description"> }) => (
+                <FormTextArea
+                  field={field}
+                  label="Description"
+                  placeholder="Describe what your repository does, its key features, and why it should be voted on..."
+                  disabled={isLoading || isLimitReached}
+                  className="min-h-[100px] focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  minHeight="100px"
+                />
               )}
             />
 
             <FormField
               control={form.control}
               name="githubUrl"
-              render={({ field }: { field: ControllerRenderProps<RepositoryFormValues, "githubUrl"> }) => (
-                <FormItem>
-                  <FormLabel className="text-sm font-medium text-gray-700">
-                    GitHub Repository URL
-                  </FormLabel>
-                  <FormControl>
-                    <div className="relative">
-                      <Github className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-                      <Input 
-                        placeholder="https://github.com/username/repository" 
-                        {...field} 
-                        disabled={isLoading || isLimitReached}
-                        className="pl-10 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                      />
-                    </div>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
+              render={({ field }: { field: ControllerRenderProps<CreateRepositoryInput, "githubUrl"> }) => (
+                <FormInput
+                  field={field}
+                  label="GitHub Repository URL"
+                  placeholder="https://github.com/username/repository"
+                  disabled={isLoading || isLimitReached}
+                  className="pl-10 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  prefixIcon={<Github className="h-4 w-4 text-gray-400" />}
+                />
               )}
             />
 
             <div className="pt-4">
-              <Button 
-                type="submit" 
-                disabled={isLoading || isLimitReached}
-                className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-md transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
+              <FormSubmit
+                isLoading={isLoading}
+                disabled={isLimitReached}
+                loadingText="Submitting..."
+                disabledText="Weekly Limit Reached"
               >
-                {isLoading ? (
-                  <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Submitting...
-                  </>
-                ) : isLimitReached ? (
-                  "Weekly Limit Reached"
-                ) : (
-                  "Submit Repository"
-                )}
-              </Button>
+                Submit Repository
+              </FormSubmit>
             </div>
 
             <div className="text-xs text-gray-500 text-center">
