@@ -17,14 +17,13 @@ export function FormSubmit({
   loadingText = "Submitting...",
   disabledText = "Disabled",
   children,
-  className = "w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-md transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
 }: FormSubmitProps) {
   return (
     <div className="pt-4">
       <Button 
         type="submit" 
         disabled={isLoading || disabled}
-        className={className}
+        className={"w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-md transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"}
       >
         {isLoading ? (
           <>

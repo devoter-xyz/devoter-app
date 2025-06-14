@@ -1,4 +1,3 @@
-import React from 'react';
 import { Calendar, GitBranch } from 'lucide-react';
 
 interface SubmissionStatusProps {
@@ -45,7 +44,7 @@ export function SubmissionStatus({
       
       {isLimitReached && (
         <div className="mt-2 text-xs text-orange-600 bg-orange-50 border border-orange-200 rounded px-2 py-1">
-          You've reached your weekly submission limit. New submissions will be available next week.
+          You&apos;ve reached your weekly submission limit. New submissions will be available next week.
         </div>
       )}
     </div>
