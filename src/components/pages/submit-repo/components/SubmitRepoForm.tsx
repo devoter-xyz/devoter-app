@@ -1,4 +1,6 @@
-import { CreateRepositoryInput, createRepositorySchema } from '@/actions/repository/createRepository/schema';
+"use client";
+
+import {CreateRepositoryInput, createRepositorySchema} from "@/actions/repository/CreateRepository/schema";
 import { FormInput } from '@/components/common/Form/FormInput';
 import { FormSubmit } from '@/components/common/Form/FormSubmit';
 import { FormTextArea } from '@/components/common/Form/FormTextArea';
