@@ -1,48 +1,16 @@
-"use server";
+'use server';
 
-import { createRepositorySchema, CreateRepositoryInput } from "./schema";
-import { createRepositoryLogic } from "./logic";
+import { authActionClient } from '@/lib/actions';
+import { createRepository } from './logic';
+import { createRepositorySchema } from './schema';
 
-export async function createRepository(formData: FormData) {
-  try {
-    // Extract Form data
-    const rawInput = {
-      title: formData.get("title") as string,
-      description: formData.get("description") as string,
-      githubUrl: formData.get("githubUrl") as string,
-    };
-
-    // Validate input using schema
-    const validatedInput = createRepositorySchema.parse(rawInput);
-
-    // Execute business logic
-    const result = await createRepositoryLogic(validatedInput);
-
-    if (!result.success) {
-      return {
-        success: false,
-        error: result.error || "Failed to create repository",
-      };
+export const createRepositoryAction = authActionClient
+  .inputSchema(createRepositorySchema)
+  .action(async ({ parsedInput, ctx }) => {
+    try {
+      const result = await createRepository(parsedInput, ctx.session.userId);
+      return result;
+    } catch (error) {
+      throw new Error('Something went wrong', { cause: error });
     }
-
-    return {
-      success: true,
-      data: result.data,
-    };
-  } catch (error) {
-    console.error("Server action error:", error);
-    
-    // Handle Zod validation errors
-    if (error instanceof Error && error.name === "ZodError") {
-      return {
-        success: false,
-        error: "Invalid Form data. Please check your inputs.",
-      };
-    }
-
-    return {
-      success: false,
-      error: "An unexpected error occurred. Please try again.",
-    };
-  }
-}
+  });

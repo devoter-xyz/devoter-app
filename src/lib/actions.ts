@@ -3,7 +3,6 @@ import { getSession } from '@/lib/session';
 import { createSafeActionClient } from 'next-safe-action';
 import { headers } from 'next/headers';
 
-
 export const actionClientBase = createSafeActionClient({
   defaultValidationErrorsShape: 'flattened'
 });

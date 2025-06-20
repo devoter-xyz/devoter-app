@@ -7,7 +7,10 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "migrate": "npx dotenv -e .env.local -- npx prisma migrate dev"
+    "prisma:reset": "npx dotenv -e .env.local -- npx prisma migrate reset",
+    "prisma:migrate": "npx dotenv -e .env.local -- npx prisma migrate dev",
+    "prisma:generate": "npx dotenv -e .env.local -- npx prisma generate",
+    "prisma:studio": "npx dotenv -e .env.local -- npx prisma studio"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.0.1",
@@ -15,7 +18,7 @@
     "@prisma/extension-accelerate": "^2.0.1",
     "@radix-ui/react-label": "^2.1.7",
     "@radix-ui/react-slot": "^1.2.3",
-    "@rainbow-me/rainbowkit": "^2.2.7",
+    "@rainbow-me/rainbowkit": "^2.2.8",
     "@tanstack/react-query": "^5.80.7",
     "@wagmi/core": "^2.17.3",
     "class-variance-authority": "^0.7.1",
@@ -29,7 +32,7 @@
     "react-hook-form": "^7.57.0",
     "siwe": "^3.0.0",
     "tailwind-merge": "^3.3.0",
-    "viem": "^2.31.2",
+    "viem": "^2.31.3",
     "wagmi": "^2.15.6",
     "zod": "^3.25.51"
   },
