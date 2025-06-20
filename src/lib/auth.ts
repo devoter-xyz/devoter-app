@@ -1,3 +1,4 @@
+import { cookies } from 'next/headers';
 import { SiweMessage } from 'siwe';
 
 export async function verifySiweSignature(message: string, signature: string, nonce: string): Promise<string | null> {
@@ -16,7 +17,6 @@ export async function verifySiweSignature(message: string, signature: string, no
 
     if (result.success) {
       const address = siwe.address.toLowerCase();
-      
       return address;
     }
     
@@ -25,4 +25,32 @@ export async function verifySiweSignature(message: string, signature: string, no
     console.error('SIWE verification error:', error);
     return null;
   }
+}
+
+export function getSession(): { walletAddress: string } | null {
+  const cookieStore = cookies();
+  const walletAddress = cookieStore.get('wallet_address')?.value;
+  // const walletAddress = "slkadjflaksjdflkajsdlfkjsadlfkj" // just a dummy walletAddress for testing
+
+  if (!walletAddress) {
+    return null;
+  }
+
+
+  return { walletAddress };
+}
+
+export function setSession(walletAddress: string) {
+  const cookieStore = cookies();
+  cookieStore.set('wallet_address', walletAddress, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'lax',
+    maxAge: 7 * 24 * 60 * 60, // 1 week
+  });
+}
+
+export function clearSession() {
+  const cookieStore = cookies();
+  cookieStore.delete('wallet_address');
 }

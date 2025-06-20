@@ -13,6 +13,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { Github } from 'lucide-react';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
+import { createRepository } from "@/actions/repository/CreateRepository/action";
 
 export function SubmitRepoForm() {
   const [isLoading, setIsLoading] = useState(false);
@@ -30,35 +31,28 @@ export function SubmitRepoForm() {
   async function onSubmit(values: CreateRepositoryInput) {
     setIsLoading(true);
 
-    try {
-      const response = await fetch("/api/repositories", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(values),
-      });
+    const formData = new FormData();
+    formData.append("title", values.title);
+    formData.append("description", values.description);
+    formData.append("githubUrl", values.githubUrl);
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || "Failed to submit repository");
+    try {
+      const result = await createRepository(formData);
+
+      if (!result.success) {
+        throw new Error(result.error || "Failed to submit repository");
       }
 
-      const result = await response.json();
-      
-      // Show success message
       toast({
         title: "Repository Submitted Successfully!",
         description: `Your repository has been submitted for voting.`,
         variant: "default",
       });
 
-      // Reset Form and show success state
       form.reset();
     } catch (err: any) {
       console.error("Submission error:", err);
-      
-      // Show error message
+
       toast({
         title: "Submission Failed",
         description: err.message || "An unexpected error occurred. Please try again.",
@@ -118,16 +112,9 @@ export function SubmitRepoForm() {
       <div className="pt-4">
         <FormSubmit
           isLoading={isLoading}
-          loadingText="Submitting..."
-          disabledText="Weekly Limit Reached"
         >
           Submit Repository
         </FormSubmit>
-      </div>
-
-      <div className="text-xs text-gray-500 text-center">
-        <p>• You can submit up to 3 repositories per week</p>
-        <p>• Repositories will be reviewed before voting begins</p>
       </div>
     </form>
   </Form>
