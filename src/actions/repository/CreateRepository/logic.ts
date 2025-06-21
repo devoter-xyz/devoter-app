@@ -22,17 +22,30 @@ export async function createRepository(input: CreateRepositoryInput, userId: str
     }
   });
 
+  const submissionCount = await prisma.repository.count({
+    where: {
+      submitterId: user.id,
+      createdAt: {
+        gte: currentWeek.start,
+        lte: currentWeek.end
+      }
+    }
+  });
+
+  if (submissionCount >= 3) {
+    throw new Error('You have reached the submission limit of 3 repositories per week.');
+  }
+
   const submissionPayment = await prisma.payment.create({
     data: {
       userId: user.id,
       walletAddress: user.walletAddress,
-      tokenAmount: 0, // No payment required for submission
-      txHash: `0x${crypto.randomBytes(32).toString('hex')}`, // going to ask reviewer for clarification
+      tokenAmount: 0,
+      txHash: `0x${crypto.randomBytes(32).toString('hex')}`,
       week: currentWeek.weekString
     }
   });
 
-  // Create the repository
   const repository = await prisma.repository.create({
     data: {
       title: input.title,
