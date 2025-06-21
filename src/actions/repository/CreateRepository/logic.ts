@@ -2,6 +2,7 @@ import { prisma } from '@/lib/prisma';
 import { getCurrentWeek } from '@/lib/utils/date';
 import crypto from 'crypto';
 import { CreateRepositoryInput } from './schema';
+import { getRepositorySubmissionCount } from '../GetRepositorySubmissionCount/logic';
 
 export interface CreateRepositoryResult {
   id: string;
@@ -22,17 +23,9 @@ export async function createRepository(input: CreateRepositoryInput, userId: str
     }
   });
 
-  const submissionCount = await prisma.repository.count({
-    where: {
-      submitterId: user.id,
-      createdAt: {
-        gte: currentWeek.start,
-        lte: currentWeek.end
-      }
-    }
-  });
+  const { count } = await getRepositorySubmissionCount(userId);
 
-  if (submissionCount >= 3) {
+  if (count >= 3) {
     throw new Error('You have reached the submission limit of 3 repositories per week.');
   }
 
