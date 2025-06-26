@@ -56,7 +56,7 @@ model Payment {
   user          User       @relation(fields: [userId], references: [id])
   walletAddress String     @db.VarChar(42)
   tokenAmount   Decimal    @db.Decimal(36, 18)
-  txHash        String
+  txHash        String     @unique
   createdAt     DateTime   @default(now())
   voteId        String?
   vote          Vote?      @relation(fields: [voteId], references: [id])

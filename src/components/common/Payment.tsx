@@ -2,7 +2,7 @@ import { ConnectButton, useActiveAccount, useSendTransaction } from "thirdweb/re
 import { createThirdwebClient, getContract, toWei } from "thirdweb";
 import { base } from "thirdweb/chains";
 import { prepareTransaction } from "thirdweb/transaction";
-import { TransactionResult } from "thirdweb/dist/types/transaction/types";
+import { TransactionResult } from "thirdweb";
 
 const client = createThirdwebClient({
   clientId: process.env.NEXT_PUBLIC_THIRDWEB_CLIENT_ID!,
@@ -39,7 +39,7 @@ export function Payment({ onPaymentSuccess, isLoading }: PaymentProps) {
 
     const transaction = prepareTransaction({
       to: "0xYourReceiverAddress", // Replace with your receiving address
-      value: toWei("1"), // 1 USDC
+      value: toWei("0.01"), // 0.01 USDC
       chain: base,
       client: client,
     });
@@ -53,7 +53,7 @@ export function Payment({ onPaymentSuccess, isLoading }: PaymentProps) {
 
   return (
     <button onClick={handlePayment} disabled={isPending || isLoading}>
-      {isPending || isLoading ? "Processing..." : "Pay 1 USDC & Submit"}
+      {isPending || isLoading ? "Processing..." : "Pay 0.01 USDC & Submit"}
     </button>
   );
 } 

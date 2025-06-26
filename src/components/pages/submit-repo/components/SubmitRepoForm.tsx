@@ -18,12 +18,12 @@ import { useAction } from 'next-safe-action/hooks';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { Payment } from '@/components/common/Payment';
-import { createPaymentRecordAction } from '@/actions/payment/CreatePaymentRecord';
+import { createPaymentAction } from '@/actions/payment/create-payment/action';
 
 export function SubmitRepoForm() {
   const { toast } = useToast();
   const { executeAsync: createRepository, status: createRepositoryStatus } = useAction(createRepositoryAction);
-  const { executeAsync: createPaymentRecord, status: createPaymentRecordStatus } = useAction(createPaymentRecordAction);
+  const { executeAsync: createPayment, status: createPaymentStatus } = useAction(createPaymentAction);
   const {
     execute: getSubmissionCount,
     result: submissionCountData,
@@ -31,7 +31,7 @@ export function SubmitRepoForm() {
   } = useAction(getRepositorySubmissionCountAction);
   const submissionCount = submissionCountData?.data?.count ?? 0;
   const canSubmit = submissionCount < 1;
-  const isLoading = createRepositoryStatus === 'executing' || createPaymentRecordStatus === 'executing';
+  const isLoading = createRepositoryStatus === 'executing' || createPaymentStatus === 'executing';
 
   useEffect(() => {
     getSubmissionCount();
@@ -46,15 +46,18 @@ export function SubmitRepoForm() {
     }
   });
 
-  async function onPaymentSuccess(txHash: string) {
+    async function onPaymentSuccess(txHash: string) {
     const values = form.getValues();
     try {
-      const repo = await createRepository(values);
-      if (repo?.data?.id) {
-        await createPaymentRecord({
-          repositoryId: repo.data.id,
-          amount: 1,
-          transactionHash: txHash,
+      const payment = await createPayment({
+        amount: 0.01,
+        transactionHash: txHash,
+      });
+
+      if (payment?.data?.paymentRecord?.id) {
+        await createRepository({
+          ...values,
+          paymentId: payment.data.paymentRecord.id,
         });
         toast({
           title: 'Repository submitted successfully!',
