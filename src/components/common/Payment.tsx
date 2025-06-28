@@ -38,7 +38,7 @@ export function Payment({ onPaymentSuccess, isLoading }: PaymentProps) {
     }
 
     const transaction = prepareTransaction({
-      to: "0xYourReceiverAddress", // Replace with your receiving address
+      to: process.env.NEXT_PUBLIC_RECIPIENT_WALLET_ADDRESS!,
       value: toWei("0.01"), // 0.01 USDC
       chain: base,
       client: client,
