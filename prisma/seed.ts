@@ -101,57 +101,6 @@ async function main() {
     if (!weeklyTotals[submissionWeek]) {
       weeklyTotals[submissionWeek] = {};
     }
-
-    // -----------------------------------------------------------------------
-    // 3. Votes & associated Payments
-    // -----------------------------------------------------------------------
-    const numVotes = faker.number.int({ min: 0, max: MAX_VOTES_PER_REPO });
-    for (let j = 0; j < numVotes; j++) {
-      const voter = faker.helpers.arrayElement(users);
-      const voteAmount = randomTokenDecimal(0.01, 1);
-      const voteDate = faker.date.between({ from: repoCreated, to: new Date() });
-      const voteWeek = weekString(voteDate);
-
-      const vote = await prisma.vote.create({
-        data: {
-          userId: voter.id,
-          repositoryId: repository.id,
-          tokenAmount: voteAmount,
-          week: voteWeek,
-          createdAt: voteDate,
-        },
-      });
-
-      await prisma.payment.create({
-        data: {
-          userId: voter.id,
-          walletAddress: voter.walletAddress,
-          tokenAmount: voteAmount,
-          txHash: `0x${crypto.randomBytes(32).toString('hex')}`,
-          week: voteWeek,
-          voteId: vote.id,
-        },
-      });
-
-      // Update repository aggregates
-      await prisma.repository.update({
-        where: { id: repository.id },
-        data: {
-          totalTokenAmount: { increment: voteAmount },
-          totalVotes: { increment: 1 },
-        },
-      });
-
-      // Aggregate for leaderboard
-      weeklyTotals[voteWeek] ??= {};
-      weeklyTotals[voteWeek][repository.id] ??= new Decimal(0);
-      weeklyTotals[voteWeek][repository.id] = weeklyTotals[voteWeek][repository.id].plus(
-        voteAmount,
-      );
-    }
-  }
-
-  console.log(`Inserted ${NUM_REPOS} repositories and votes`);
 }
 
 main()
