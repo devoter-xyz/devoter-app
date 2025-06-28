@@ -4,10 +4,10 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Analytics } from '@vercel/analytics/react';
-import { Providers as ThirdwebProviders } from '@/components/providers/ThirdwebProvider';
-import NextTopLoader from 'next-top-loader';
+import { TopLoader } from 'next-top-loader';
 import { Header } from '@/components/common/Header';
 import { Toaster } from '@/components/ui/toaster';
+import { Providers as ThirdwebProviders } from '@/components/providers/ThirdwebProvider';
 import { cn } from '@/lib/utils';
 
 const geistSans = Geist({
@@ -42,14 +42,14 @@ export default function RootLayout({
         <ThirdwebProviders>
           <SessionProvider>
             <WalletProvider>
-              <NextTopLoader color='#3b82f6' />
               <Header />
+              <TopLoader />
               <main>{children}</main>
               <Toaster />
-              <Analytics />
             </WalletProvider>
           </SessionProvider>
         </ThirdwebProviders>
+        <Analytics />
       </body>
     </html>
   );

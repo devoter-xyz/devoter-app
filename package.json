@@ -14,11 +14,13 @@
     "seed": "npx dotenv -e .env.local -- ts-node --project prisma/tsconfig.seed.json prisma/seed.ts"
   },
   "dependencies": {
+    "@faker-js/faker": "^8.4.0",
     "@hookform/resolvers": "^5.0.1",
     "@prisma/client": "^6.8.2",
     "@prisma/extension-accelerate": "^2.0.1",
     "@radix-ui/react-label": "^2.1.7",
     "@radix-ui/react-slot": "^1.2.3",
+    "@radix-ui/react-tabs": "^1.1.12",
     "@radix-ui/react-tooltip": "^1.2.7",
     "@rainbow-me/rainbowkit": "^2.2.8",
     "@tanstack/react-query": "^5.80.7",
@@ -31,6 +33,7 @@
     "next": "15.3.3",
     "next-safe-action": "^8.0.2",
     "next-top-loader": "^1.0.4",
+    "nextjs-toploader": "^3.8.16",
     "prisma": "^6.8.2",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
@@ -40,8 +43,7 @@
     "thirdweb": "^5.104.1",
     "viem": "^2.31.3",
     "wagmi": "^2.15.6",
-    "zod": "^3.25.51",
-    "@faker-js/faker": "^8.4.0"
+    "zod": "^3.25.51"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",

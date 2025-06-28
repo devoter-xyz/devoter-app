@@ -19,6 +19,9 @@ export function Header() {
             <Link href='/submit-repo'>
               <span className='text-gray-600 hover:text-gray-900'>Submit Repository</span>
             </Link>
+            <Link href='/leaderboard'>
+              <span className='text-gray-600 hover:text-gray-900'>Leaderboard</span>
+            </Link>
           </nav>
         </div>
       </div>
