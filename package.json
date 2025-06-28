@@ -10,7 +10,8 @@
     "prisma:reset": "npx dotenv -e .env.local -- npx prisma migrate reset",
     "prisma:migrate": "npx dotenv -e .env.local -- npx prisma migrate dev",
     "prisma:generate": "npx dotenv -e .env.local -- npx prisma generate",
-    "prisma:studio": "npx dotenv -e .env.local -- npx prisma studio"
+    "prisma:studio": "npx dotenv -e .env.local -- npx prisma studio",
+    "seed": "npx dotenv -e .env.local -- ts-node --project prisma/tsconfig.seed.json prisma/seed.ts"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.0.1",
@@ -39,7 +40,8 @@
     "thirdweb": "^5.104.1",
     "viem": "^2.31.3",
     "wagmi": "^2.15.6",
-    "zod": "^3.25.51"
+    "zod": "^3.25.51",
+    "@faker-js/faker": "^8.4.0"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",

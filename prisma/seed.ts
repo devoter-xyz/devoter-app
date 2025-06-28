@@ -1,184 +1,199 @@
 import { PrismaClient } from '@prisma/client';
 import { Decimal } from '@prisma/client/runtime/library';
+import { faker } from '@faker-js/faker';
 import crypto from 'crypto';
+
+/**
+ * Seed script that populates the database with realistic, random data.
+ *
+ * How to run:
+ *   pnpm seed
+ *
+ * The dataset size can be tweaked via the constants below. All generated
+ * payments remain ≤ 1 USDC (the application constraint) and all dates are
+ * in the past so the leaderboard can be rendered immediately.
+ */
 
 const prisma = new PrismaClient();
 
+// ---------------------------------------------------------------------------
+// Configuration – adjust these numbers to change dataset size
+// ---------------------------------------------------------------------------
+const NUM_USERS = 20; // total users to create
+const NUM_REPOS = 30; // repositories that will appear on the leaderboard
+const MAX_VOTES_PER_REPO = 15; // upper bound for votes per repository
+
+/** Convert a Date to the `YYYY-Www` format used in the schema */
+function weekString(date: Date): string {
+  // Calculate ISO week number without external dependencies
+  const tmpDate = new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate()));
+  const dayNum = tmpDate.getUTCDay() || 7;
+  tmpDate.setUTCDate(tmpDate.getUTCDate() + 4 - dayNum);
+  const yearStart = new Date(Date.UTC(tmpDate.getUTCFullYear(), 0, 1));
+  const week = Math.ceil(((tmpDate.getTime() - yearStart.getTime()) / 86400000 + 1) / 7)
+    .toString()
+    .padStart(2, '0');
+  const year = tmpDate.getUTCFullYear();
+  return `${year}-W${week}`;
+}
+
+/** Generate a Decimal between min and max (inclusive) with a given precision */
+function randomTokenDecimal(min: number, max: number, precision = 6) {
+  const factor = 10 ** precision;
+  const random =
+    Math.floor(faker.number.float({ min, max, precision: 1 / factor }) * factor) / factor;
+  return new Decimal(random.toString());
+}
+
 async function main() {
-  console.log(`Start seeding ...`);
+  console.log('🌱  Starting faker seed …');
 
-  // Create Users
-  const user1 = await prisma.user.create({
-    data: {
-      walletAddress: '0x1234567890123456789012345678901234567890',
-    },
-  });
+  // -------------------------------------------------------------------------
+  // 1. Users
+  // -------------------------------------------------------------------------
+  const users = await Promise.all(
+    Array.from({ length: NUM_USERS }).map(() =>
+      prisma.user.create({
+        data: {
+          walletAddress: faker.finance.ethereumAddress(),
+        },
+      }),
+    ),
+  );
+  console.log(`✅  Inserted ${users.length} users`);
 
-  const user2 = await prisma.user.create({
-    data: {
-      walletAddress: '0x0987654321098765432109876543210987654321',
-    },
-  });
+  // Keep running totals for leaderboard creation later
+  const weeklyTotals: Record<string, Record<string, Decimal>> = {};
 
-  console.log(`Created users: ${user1.id}, ${user2.id}`);
+  // -------------------------------------------------------------------------
+  // 2. Repositories (with submission Payments)
+  // -------------------------------------------------------------------------
+  for (let i = 0; i < NUM_REPOS; i++) {
+    const submitter = faker.helpers.arrayElement(users);
 
-  // Create Payments for Repository Submissions
-  const submissionPayment1 = await prisma.payment.create({
-    data: {
-      userId: user1.id,
-      walletAddress: user1.walletAddress,
-      tokenAmount: new Decimal('10'),
-      week: '2024-W23',
-      txHash: `0x${crypto.randomBytes(32).toString('hex')}`,
-    },
-  });
+    // Submission takes place within the last 120 days
+    const repoCreated = faker.date.recent({ days: 120 });
+    const submissionWeek = weekString(repoCreated);
 
-  const repo1 = await prisma.repository.create({
-    data: {
-      title: 'Awesome Project',
-      description: 'A really cool project that does amazing things.',
-      githubUrl: 'https://github.com/user/awesome-project',
-      submitterId: user1.id,
-      paymentId: submissionPayment1.id,
-      totalTokenAmount: new Decimal('1000'),
-      totalVotes: 1,
-    },
-  });
+    // Fee for submitting: ≤ 1 USDC
+    const submissionFee = randomTokenDecimal(0.01, 1);
 
-  await prisma.payment.update({
-    where: { id: submissionPayment1.id },
-    data: { repository: { connect: { id: repo1.id } } },
-  });
-
-  const submissionPayment2 = await prisma.payment.create({
-    data: {
-      userId: user2.id,
-      walletAddress: user2.walletAddress,
-      tokenAmount: new Decimal('15'),
-      week: '2024-W23',
-      txHash: `0x${crypto.randomBytes(32).toString('hex')}`,
-    },
-  });
-
-  const repo2 = await prisma.repository.create({
-    data: {
-      title: 'Another Great Repo',
-      description: 'This repository solves an important problem.',
-      githubUrl: 'https://github.com/user/another-great-repo',
-      submitterId: user2.id,
-      paymentId: submissionPayment2.id,
-      totalTokenAmount: new Decimal('500'),
-      totalVotes: 1,
-    },
-  });
-
-  await prisma.payment.update({
-    where: { id: submissionPayment2.id },
-    data: { repository: { connect: { id: repo2.id } } },
-  });
-
-  console.log(`Created repositories: ${repo1.id}, ${repo2.id} with their submission payments`);
-
-  // Create Votes
-  const vote1 = await prisma.vote.create({
-    data: {
-      userId: user1.id,
-      repositoryId: repo1.id,
-      tokenAmount: new Decimal('1000'),
-      week: '2024-W23',
-    },
-  });
-
-  const vote2 = await prisma.vote.create({
-    data: {
-      userId: user2.id,
-      repositoryId: repo2.id,
-      tokenAmount: new Decimal('500'),
-      week: '2024-W23',
-    },
-  });
-
-  const vote3 = await prisma.vote.create({
-    data: {
-      userId: user1.id,
-      repositoryId: repo2.id,
-      tokenAmount: new Decimal('250'),
-      week: '2024-W24',
-    },
-  });
-
-  console.log(`Created votes: ${vote1.id}, ${vote2.id}, ${vote3.id}`);
-
-  await prisma.repository.update({
-    where: { id: repo2.id },
-    data: {
-      totalTokenAmount: { increment: new Decimal('250') },
-      totalVotes: { increment: 1 },
-    },
-  });
-
-  console.log(`Updated repository ${repo2.id} with additional vote.`);
-
-  // Payments for Votes
-  await prisma.payment.create({
-    data: {
-      userId: user1.id,
-      walletAddress: user1.walletAddress,
-      tokenAmount: new Decimal('100'),
-      voteId: vote1.id,
-      week: '2024-W23',
-      txHash: `0x${crypto.randomBytes(32).toString('hex')}`,
-    },
-  });
-
-  await prisma.payment.create({
-    data: {
-      userId: user2.id,
-      walletAddress: user2.walletAddress,
-      tokenAmount: new Decimal('50'),
-      voteId: vote2.id,
-      week: '2024-W23',
-      txHash: `0x${crypto.randomBytes(32).toString('hex')}`,
-    },
-  });
-
-  await prisma.payment.create({
-    data: {
-      userId: user1.id,
-      walletAddress: user1.walletAddress,
-      tokenAmount: new Decimal('25'),
-      voteId: vote3.id,
-      week: '2024-W24',
-      txHash: `0x${crypto.randomBytes(32).toString('hex')}`,
-    },
-  });
-
-  console.log(`Created payments for votes`);
-
-  // Weekly Leaderboard
-  await prisma.weeklyRepoLeaderboard.createMany({
-    data: [
-      {
-        repoId: repo1.id,
-        rank: 1,
-        week: '2024-W23',
+    const submissionPayment = await prisma.payment.create({
+      data: {
+        userId: submitter.id,
+        walletAddress: submitter.walletAddress,
+        tokenAmount: submissionFee,
+        week: submissionWeek,
+        txHash: `0x${crypto.randomBytes(32).toString('hex')}`,
       },
-      {
-        repoId: repo2.id,
-        rank: 2,
-        week: '2024-W23',
-      },
-      {
-        repoId: repo2.id,
-        rank: 1,
-        week: '2024-W24',
-      },
-    ],
-  });
+    });
 
-  console.log(`Created weekly leaderboard entries`);
+    const title = `${faker.word.adjective()} ${faker.word.noun()}`;
 
-  console.log(`Seeding finished.`);
+    const repository = await prisma.repository.create({
+      data: {
+        title,
+        description: faker.lorem.sentences(2),
+        githubUrl: `https://github.com/${faker.internet.userName()}/${faker.helpers.slugify(
+          title,
+        )}`,
+        submitterId: submitter.id,
+        paymentId: submissionPayment.id,
+        createdAt: repoCreated,
+      },
+    });
+
+    // Link the payment back to the repository (two-way relation)
+    await prisma.payment.update({
+      where: { id: submissionPayment.id },
+      data: { repository: { connect: { id: repository.id } } },
+    });
+
+    // -----------------------------------------------------------------------
+    // 3. Votes & associated Payments
+    // -----------------------------------------------------------------------
+    const votesForRepo = faker.number.int({ min: 0, max: MAX_VOTES_PER_REPO });
+    const votersUsed = new Set<string>();
+
+    for (let v = 0; v < votesForRepo; v++) {
+      // Ensure one vote per (user, repo)
+      let voter;
+      let guard = 0;
+      do {
+        voter = faker.helpers.arrayElement(users);
+        guard++;
+      } while (votersUsed.has(voter.id) && guard < 10);
+
+      if (votersUsed.has(voter.id)) continue;
+      votersUsed.add(voter.id);
+
+      const voteDate = faker.date.between({ from: repoCreated, to: new Date() });
+      const voteWeek = weekString(voteDate);
+      const voteAmount = randomTokenDecimal(0.0001, 1, 8);
+
+      const vote = await prisma.vote.create({
+        data: {
+          userId: voter.id,
+          repositoryId: repository.id,
+          tokenAmount: voteAmount,
+          week: voteWeek,
+          createdAt: voteDate,
+          lastVerified: voteDate,
+        },
+      });
+
+      await prisma.payment.create({
+        data: {
+          userId: voter.id,
+          walletAddress: voter.walletAddress,
+          tokenAmount: voteAmount,
+          voteId: vote.id,
+          week: voteWeek,
+          txHash: `0x${crypto.randomBytes(32).toString('hex')}`,
+        },
+      });
+
+      // Update repository aggregates
+      await prisma.repository.update({
+        where: { id: repository.id },
+        data: {
+          totalTokenAmount: { increment: voteAmount },
+          totalVotes: { increment: 1 },
+        },
+      });
+
+      // Aggregate for leaderboard
+      weeklyTotals[voteWeek] ??= {};
+      weeklyTotals[voteWeek][repository.id] ??= new Decimal(0);
+      weeklyTotals[voteWeek][repository.id] = weeklyTotals[voteWeek][repository.id].plus(
+        voteAmount,
+      );
+    }
+  }
+
+  console.log(`✅  Inserted ${NUM_REPOS} repositories and votes`);
+
+  // -------------------------------------------------------------------------
+  // 4. Weekly Leaderboard entries
+  // -------------------------------------------------------------------------
+  for (const [week, repoTotals] of Object.entries(weeklyTotals)) {
+    const ranked = Object.entries(repoTotals)
+      .sort(([, a], [, b]) => b.toNumber() - a.toNumber())
+      .slice(0, 10); // top-10 only
+
+    const data = ranked.map(([repoId], index) => ({
+      repoId,
+      rank: index + 1,
+      week,
+    }));
+
+    await prisma.weeklyRepoLeaderboard.createMany({
+      data,
+      skipDuplicates: true,
+    });
+  }
+
+  console.log('🎉  Leaderboard created – seeding complete');
 }
 
 main()
