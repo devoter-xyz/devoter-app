@@ -12,7 +12,10 @@ export interface CreateRepositoryResult {
   createdAt: Date;
 }
 
-export async function createRepository(input: CreateRepositoryInput, userId: string): Promise<CreateRepositoryResult> {
+export async function createRepository(
+  input: CreateRepositoryInput & { tokenAmount?: number },
+  userId: string,
+): Promise<CreateRepositoryResult> {
   const currentWeek = getCurrentWeek();
 
   const user = await prisma.user.findUniqueOrThrow({
@@ -33,7 +36,7 @@ export async function createRepository(input: CreateRepositoryInput, userId: str
     data: {
       userId: user.id,
       walletAddress: user.walletAddress,
-      tokenAmount: 0,
+      tokenAmount: input.tokenAmount || 0,
       txHash: `0x${crypto.randomBytes(32).toString('hex')}`,
       week: currentWeek.weekString
     }
