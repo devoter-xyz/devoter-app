@@ -1,11 +1,11 @@
+import { faker } from '@faker-js/faker';
 import { PrismaClient } from '@prisma/client';
 import { Decimal } from '@prisma/client/runtime/library';
-import { faker } from '@faker-js/faker';
 import crypto from 'crypto';
-import { signIn } from '../src/actions/auth/signin/logic';
 import { Wallet } from 'ethers';
 import { SiweMessage } from 'siwe';
-import { createRepository } from '../src/actions/repository/CreateRepository/logic';
+import { signIn } from '../src/actions/auth/signin/logic';
+import { createRepository } from '../src/actions/repository/createRepository/logic';
 
 const prisma = new PrismaClient();
 
@@ -30,8 +30,7 @@ function weekString(date: Date): string {
 
 function randomTokenDecimal(min: number, max: number, precision = 6) {
   const factor = 10 ** precision;
-  const random =
-    Math.floor(faker.number.float({ min, max, precision: 1 / factor }) * factor) / factor;
+  const random = Math.floor(faker.number.float({ min, max, precision: 1 / factor }) * factor) / factor;
   return new Decimal(random.toString());
 }
 
@@ -52,7 +51,7 @@ async function main() {
         uri: `${process.env.NEXT_PUBLIC_APP_URL}/login`,
         version: '1',
         chainId: 1,
-        nonce: crypto.randomBytes(16).toString('hex'),
+        nonce: crypto.randomBytes(16).toString('hex')
       });
       const message = siweMessage.prepareMessage();
       const signature = await wallet.signMessage(message);
@@ -60,9 +59,9 @@ async function main() {
       return signIn({
         message,
         signature,
-        nonce: siweMessage.nonce,
+        nonce: siweMessage.nonce
       });
-    }),
+    })
   );
   console.log(`Inserted ${users.length} users`);
 
@@ -85,30 +84,33 @@ async function main() {
     const title = faker.commerce.productName();
     const description = faker.lorem.paragraph();
     const owner = faker.person.firstName().toLowerCase();
-    const repoName = title.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-._]/g, '');
+    const repoName = title
+      .toLowerCase()
+      .replace(/\s+/g, '-')
+      .replace(/[^a-z0-9-._]/g, '');
 
     const repository = await createRepository(
       {
         title,
         description,
         githubUrl: `https://github.com/${owner}/${repoName}`,
-        tokenAmount: submissionFee,
+        tokenAmount: submissionFee
       },
-      submitter.id,
+      submitter.id
     );
 
     // Keep running totals for leaderboard creation later
     if (!weeklyTotals[submissionWeek]) {
       weeklyTotals[submissionWeek] = {};
     }
-}
+  }
 
-main()
-  .catch((e) => {
-    console.error(e);
-    process.exit(1);
-  })
-  .finally(async () => {
-    await prisma.$disconnect();
-  })
+  main()
+    .catch((e) => {
+      console.error(e);
+      process.exit(1);
+    })
+    .finally(async () => {
+      await prisma.$disconnect();
+    });
 }

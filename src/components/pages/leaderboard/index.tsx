@@ -1,23 +1,13 @@
 'use client';
 
+import { LeaderboardEntry } from '@/actions/leaderboard/getLeaderboard/logic';
 import { LeaderboardCard } from '@/components/pages/leaderboard/components/LeaderboardCard';
 
-type Repository = {
-  id: string;
-  title: string;
-  description: string | null;
-  submitter: {
-    walletAddress: string;
-  };
-  githubUrl: string;
-  totalVotes: number;
-};
-
 type LeaderboardPageContentProps = {
-  repositories: Repository[];
+  leaderboard: LeaderboardEntry[];
 };
 
-export function LeaderboardPageContent({ repositories }: LeaderboardPageContentProps) {
+export function LeaderboardPageContent({ leaderboard }: LeaderboardPageContentProps) {
   return (
     <div className="container mx-auto p-4">
       <div className="mb-8 text-center">
@@ -26,18 +16,18 @@ export function LeaderboardPageContent({ repositories }: LeaderboardPageContentP
       </div>
 
       <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-        {repositories.map((repo, index) => (
+        {leaderboard.map(({ repository, rank }) => (
           <LeaderboardCard
-            key={repo.id}
+            key={repository.id}
             repository={{
-              id: repo.id,
-              name: repo.title,
-              description: repo.description ?? '',
-              author: repo.submitter.walletAddress,
-              url: repo.githubUrl,
-              votes: repo.totalVotes,
+              id: repository.id,
+              name: repository.title,
+              description: repository.description ?? '',
+              author: repository.submitter.walletAddress,
+              url: repository.githubUrl,
+              votes: repository.totalVotes,
             }}
-            rank={index + 1}
+            rank={rank}
           />
         ))}
       </div>

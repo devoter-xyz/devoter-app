@@ -1,8 +1,8 @@
 import { prisma } from '@/lib/prisma';
 import { getCurrentWeek } from '@/lib/utils/date';
 import crypto from 'crypto';
+import { getRepositorySubmissionCount } from '../getRepositorySubmissionCount/logic';
 import { CreateRepositoryInput } from './schema';
-import { getRepositorySubmissionCount } from '../GetRepositorySubmissionCount/logic';
 
 export interface CreateRepositoryResult {
   id: string;
@@ -14,7 +14,7 @@ export interface CreateRepositoryResult {
 
 export async function createRepository(
   input: CreateRepositoryInput & { tokenAmount?: number },
-  userId: string,
+  userId: string
 ): Promise<CreateRepositoryResult> {
   const currentWeek = getCurrentWeek();
 

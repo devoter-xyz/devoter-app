@@ -1,24 +1,24 @@
 'use client';
 
-import { getRepositorySubmissionCountAction } from '@/actions/repository/GetRepositorySubmissionCount/action';
-import { createRepositoryAction } from '@/actions/repository/CreateRepository/action';
+import { createPaymentAction } from '@/actions/payment/create-payment/action';
+import { createRepositoryAction } from '@/actions/repository/createRepository/action';
 import {
   CreateRepositoryInput,
   createRepositorySchema
-} from '@/actions/repository/CreateRepository/schema';
+} from '@/actions/repository/createRepository/schema';
+import { getRepositorySubmissionCountAction } from '@/actions/repository/getRepositorySubmissionCount/action';
 import { FormInput } from '@/components/common/Form/FormInput';
 import { FormSubmit } from '@/components/common/Form/FormSubmit';
 import { FormTextArea } from '@/components/common/Form/FormTextArea';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/common/Form/tooltip';
+import { Payment } from '@/components/common/Payment';
 import { Form, FormField } from '@/components/ui/form';
 import { useToast } from '@/hooks/use-toast';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/common/Form/tooltip';
 import { GitBranch, Github } from 'lucide-react';
 import { useAction } from 'next-safe-action/hooks';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
-import { Payment } from '@/components/common/Payment';
-import { createPaymentAction } from '@/actions/payment/create-payment/action';
 
 export function SubmitRepoForm() {
   const { toast } = useToast();
@@ -46,7 +46,7 @@ export function SubmitRepoForm() {
     }
   });
 
-    async function onPaymentSuccess(txHash: string) {
+  async function onPaymentSuccess(txHash: string) {
     const values = form.getValues();
     try {
       const payment = await createPayment({
