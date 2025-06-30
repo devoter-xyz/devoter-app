@@ -2,7 +2,8 @@
 
 import { actionClient } from '@/lib/actions';
 import { getRepositories } from './logic';
+import { GetRepositoriesInput } from './schema';
 
 export const getRepositoriesAction = actionClient
-  .inputSchema(getRepositories)
+  .inputSchema(GetRepositoriesInput)
   .action(getRepositories);

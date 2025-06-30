@@ -1,10 +1,18 @@
-import { db } from '@/lib/db';
+import { prisma } from '@/lib/db';
 import { getWeek } from '@/lib/utils';
 import { GetLeaderboardInput } from './schema';
+import { Prisma } from '@prisma/client';
+
+type RepositoryWithVotes = Prisma.RepositoryGetPayload<{
+  include: {
+    votes: true;
+    submitter: true;
+  };
+}>;
 
 export async function getLeaderboard(input: GetLeaderboardInput) {
-  const { week: inputWeek, page, limit } = input;
-  const week = inputWeek ?? getWeek();
+  const { week: inputWeek } = input;
+  const week = inputWeek ?? getWeek(new Date());
 
   const where = {
     votes: {
@@ -14,25 +22,22 @@ export async function getLeaderboard(input: GetLeaderboardInput) {
     },
   };
 
-  const [repositories, total] = await Promise.all([
-    db.repository.findMany({
-      where,
-      include: {
-        votes: {
-          where: {
-            week: week,
-          },
+  const repositories = await prisma.repository.findMany({
+    where,
+    include: {
+      votes: {
+        where: {
+          week: week,
         },
-        submitter: true,
       },
-      skip: (page - 1) * limit,
-      take: limit,
-    }),
-    db.repository.count({ where }),
-  ]);
+      submitter: true,
+    },
+  });
+
+  const total = repositories.length;
 
   const leaderboard = repositories
-    .map((repo) => ({
+    .map((repo: RepositoryWithVotes) => ({
       ...repo,
       voteCount: repo.votes.length,
     }))

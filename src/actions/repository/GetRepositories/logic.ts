@@ -1,5 +1,23 @@
 import { prisma } from '@/lib/prisma';
-import { GetRepositoriesInput, GetRepositoriesOutput } from './schema';
+import { Prisma } from '@prisma/client';
+import { z } from 'zod';
+
+export const GetRepositoriesInput = z.object({
+  sortBy: z.enum(['createdAt', 'totalVotes']).default('createdAt'),
+  sortOrder: z.enum(['asc', 'desc']).default('desc'),
+  limit: z.number().min(1).max(100).default(10),
+  page: z.number().min(1).default(1),
+  week: z.string().optional()
+});
+
+const repositoryWithVotes = Prisma.validator<Prisma.RepositoryDefaultArgs>()({
+  include: { submitter: true, votes: true }
+});
+
+export type GetRepositoriesOutput = {
+  repositories: Prisma.RepositoryGetPayload<typeof repositoryWithVotes>[];
+  total: number;
+};
 
 export const getRepositories = async ({
   sortBy,
@@ -7,8 +25,8 @@ export const getRepositories = async ({
   limit,
   page,
   week
-}: GetRepositoriesInput): Promise<GetRepositoriesOutput> => {
-  const whereClause = week ? { weekId: week } : {};
+}: z.infer<typeof GetRepositoriesInput>): Promise<GetRepositoriesOutput> => {
+  const whereClause = week ? { votes: { some: { week: week } } } : {};
   const skip = (page - 1) * limit;
 
   const [repositories, total] = await Promise.all([
@@ -18,7 +36,12 @@ export const getRepositories = async ({
         [sortBy]: sortOrder
       },
       include: {
-        submitter: true
+        submitter: true,
+        votes: {
+          where: {
+            week: week
+          }
+        }
       },
       skip,
       take: limit
@@ -26,19 +49,8 @@ export const getRepositories = async ({
     prisma.repository.count({ where: whereClause })
   ]);
 
-  // Manually convert Decimal to string to avoid serialization errors.
-  // This is necessary because the prisma model has a Decimal field `totalTokenAmount`
-  // that is not defined in the zod schema, but is returned by `findMany`
-  const serializedRepositories = repositories.map(repo => {
-    const { totalTokenAmount, ...rest } = repo;
-    return {
-      ...rest,
-      totalTokenAmount: totalTokenAmount.toString()
-    };
-  });
-
   return {
-    repositories: serializedRepositories,
+    repositories,
     total
   };
 };

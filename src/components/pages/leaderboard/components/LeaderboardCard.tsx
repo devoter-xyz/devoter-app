@@ -1,7 +1,7 @@
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
-interface RepositoryCardProps {
+interface LeaderboardCardProps {
   repository: {
     id: string;
     name: string;
@@ -13,7 +13,7 @@ interface RepositoryCardProps {
   rank: number;
 }
 
-export const RepositoryCard: React.FC<RepositoryCardProps> = ({ repository, rank }) => {
+export const LeaderboardCard: React.FC<LeaderboardCardProps> = ({ repository, rank }) => {
   return (
     <Card>
       <CardHeader>
@@ -31,4 +31,4 @@ export const RepositoryCard: React.FC<RepositoryCardProps> = ({ repository, rank
       </CardContent>
     </Card>
   );
-};
+}; 

@@ -30,17 +30,13 @@ export const archiveWeeklyLeaderboard = async () => {
     .sort((a, b) => b.totalTokens - a.totalTokens);
 
   // 3. Archive the results
-  const archivePromises = rankedRepositories.map((repo, index) => {
-    return prisma.weeklyRepoLeaderboard.create({
-      data: {
-        repoId: repo.id,
-        week: currentWeekId,
-        rank: index + 1,
-      },
-    });
+  await prisma.weeklyRepoLeaderboard.createMany({
+    data: rankedRepositories.map((repo, index) => ({
+      repoId: repo.id,
+      week: currentWeekId,
+      rank: index + 1,
+    })),
   });
-
-  await Promise.all(archivePromises);
 
   return { success: true };
 };

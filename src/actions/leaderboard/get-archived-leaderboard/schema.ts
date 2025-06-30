@@ -1,4 +1,7 @@
-import { getArchivedLeaderboardAction } from './action';
 import { z } from 'zod';
 
-export type GetArchivedLeaderboardOutput = z.infer<typeof getArchivedLeaderboardAction._outputSchema>;
+export const getArchivedLeaderboardSchema = z.object({
+  week: z.string(),
+});
+
+export type GetArchivedLeaderboardInput = z.infer<typeof getArchivedLeaderboardSchema>;
