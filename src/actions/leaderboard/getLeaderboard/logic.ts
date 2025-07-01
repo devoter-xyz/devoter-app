@@ -39,3 +39,12 @@ export async function getLeaderboard(input: GetLeaderboardInput): Promise<Leader
     }
   }));
 }
+
+export async function getAvailableLeaderboardWeeks(): Promise<string[]> {
+  const weeks = await prisma.weeklyRepoLeaderboard.findMany({
+    distinct: ['week'],
+    orderBy: { week: 'desc' },
+    select: { week: true }
+  });
+  return weeks.map(w => w.week);
+}
