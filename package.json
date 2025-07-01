@@ -11,7 +11,7 @@
     "prisma:migrate": "npx dotenv -e .env.local -- npx prisma migrate dev",
     "prisma:generate": "npx dotenv -e .env.local -- npx prisma generate",
     "prisma:studio": "npx dotenv -e .env.local -- npx prisma studio",
-    "seed": "npx dotenv -e .env.local -- ts-node --project prisma/tsconfig.seed.json prisma/seed.ts"
+    "prisma:seed": "npx dotenv -e .env.local -- ts-node -r tsconfig-paths/register --project prisma/tsconfig.seed.json prisma/seed.ts"
   },
   "dependencies": {
     "@faker-js/faker": "^8.4.0",
@@ -29,6 +29,7 @@
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "date-fns": "^4.1.0",
+    "ethers": "^6.14.4",
     "lucide-react": "^0.513.0",
     "next": "15.3.3",
     "next-safe-action": "^8.0.2",
@@ -56,6 +57,7 @@
     "eslint-config-next": "15.3.3",
     "tailwindcss": "^4",
     "ts-node": "^10.9.2",
+    "tsconfig-paths": "^4.2.0",
     "tw-animate-css": "^1.3.4",
     "typescript": "^5"
   },
