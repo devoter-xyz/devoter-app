@@ -4,8 +4,9 @@ import { Decimal } from '@prisma/client/runtime/library';
 import crypto from 'crypto';
 import { Wallet } from 'ethers';
 import { SiweMessage } from 'siwe';
-import { signIn } from '../src/actions/auth/signin/logic';
-import { createRepository } from '@/actions/repository/CreateRepository/logic';
+import { signIn } from '@/actions/auth/signin/logic';
+import { createRepository } from '@/actions/repository/createRepository/logic';
+import { archiveWeeklyLeaderboard } from '@/actions/leaderboard/archive/logic';
 
 const prisma = new PrismaClient();
 
@@ -78,7 +79,7 @@ async function main() {
     const submitter = faker.helpers.arrayElement(users);
 
     if (!submitter) {
-      continue;
+      return;
     }
 
     // Submission takes place within the last 120 days
@@ -123,14 +124,12 @@ async function main() {
     const voters = faker.helpers.arrayElements(users, numVotes);
 
     for (const voter of voters) {
-      if (!voter) continue;
-
       const votingWeek = weekString(repo.createdAt);
       const tokenAmount = randomTokenDecimal(0.1, 10);
 
       const vote = await prisma.vote.create({
         data: {
-          userId: voter.id,
+          userId: voter!.id,
           repositoryId: repo.id,
           tokenAmount,
           week: votingWeek,
@@ -139,8 +138,8 @@ async function main() {
 
       await prisma.payment.create({
         data: {
-          userId: voter.id,
-          walletAddress: voter.walletAddress,
+          userId: voter!.id,
+          walletAddress: voter!.walletAddress,
           tokenAmount,
           txHash: `0x${crypto.randomBytes(32).toString('hex')}`,
           week: votingWeek,
@@ -148,37 +147,13 @@ async function main() {
         },
       });
 
-      // Update running totals
-      if (!weeklyTotals[votingWeek]) {
-        weeklyTotals[votingWeek] = {};
-      }
-      if (!weeklyTotals[votingWeek][repo.id]) {
-        weeklyTotals[votingWeek][repo.id] = new Decimal(0);
-      }
-      weeklyTotals[votingWeek][repo.id] = weeklyTotals[votingWeek][repo.id].plus(tokenAmount);
     }
   }
 
   // -------------------------------------------------------------------------
   // 4. Weekly Leaderboards
   // -------------------------------------------------------------------------
-  for (const week in weeklyTotals) {
-    const weeklyRepoTotals = weeklyTotals[week];
-
-    // Sort repositories by total token amount for the week
-    const sortedRepos = Object.entries(weeklyRepoTotals).sort(([, a], [, b]) => b.comparedTo(a));
-
-    for (let i = 0; i < sortedRepos.length; i++) {
-      const [repoId] = sortedRepos[i];
-      await prisma.weeklyRepoLeaderboard.create({
-        data: {
-          repoId,
-          week,
-          rank: i + 1,
-        },
-      });
-    }
-  }
+  await archiveWeeklyLeaderboard();
 }
 
 main()

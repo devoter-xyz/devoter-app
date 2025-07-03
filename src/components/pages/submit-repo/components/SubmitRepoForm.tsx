@@ -1,6 +1,6 @@
 'use client';
 
-import { createPaymentAction } from '@/actions/payment/create-payment/action';
+import { createPaymentAction } from '@/actions/payment/createPayment/action';
 import { createRepositoryAction } from '@/actions/repository/createRepository/action';
 import {
   CreateRepositoryInput,
