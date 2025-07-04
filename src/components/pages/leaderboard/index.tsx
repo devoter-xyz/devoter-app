@@ -5,7 +5,6 @@ import { LeaderboardCard } from '@/components/pages/leaderboard/components/Leade
 import { getLeaderboardAction } from '@/actions/leaderboard/getLeaderboard/action';
 import { useState, useTransition } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { getWeek } from '@/lib/utils';
 import {
   Select,
   SelectContent,
@@ -14,10 +13,12 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { SkeletonCard } from '@/components/ui/skeleton';
+import { getWeek } from '@/lib/utils/date';
+import type { IsoWeek } from '@/lib/utils/date';
 
 type LeaderboardPageContentProps = {
   leaderboard: LeaderboardEntry[];
-  weeks: string[];
+  weeks: IsoWeek[];
 };
 
 export function LeaderboardPageContent({ leaderboard, weeks }: LeaderboardPageContentProps) {

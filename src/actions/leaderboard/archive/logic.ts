@@ -1,7 +1,7 @@
 'use server';
 
 import { prisma } from '@/lib/db';
-import { getWeek } from '@/lib/utils';
+import { getWeek } from '@/lib/utils/date';
 
 export const archiveWeeklyLeaderboard = async () => {
   const currentWeekId = getWeek(new Date());

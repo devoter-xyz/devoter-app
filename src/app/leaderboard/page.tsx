@@ -1,13 +1,13 @@
-import { getLeaderboard, getAvailableLeaderboardWeeks } from '@/actions/leaderboard/getLeaderboard/logic';
+import { getLeaderboard } from '@/actions/leaderboard/getLeaderboard/logic';
 import { LeaderboardPageContent } from '@/components/pages/leaderboard';
-import { getWeek } from '@/lib/utils';
+import { getWeeks, getWeek } from '@/lib/utils/date';
 
 export const revalidate = 60;
 
 export default async function LeaderboardPage() {
   const week = getWeek(new Date());
   const leaderboard = await getLeaderboard({ week });
-  const weeks = await getAvailableLeaderboardWeeks();
+  const weeks = getWeeks();
 
   return (
     <div className="min-h-screen bg-gray-50">
