@@ -1,6 +1,6 @@
+import { RepositoryWithVotes } from '@/actions/repository/getRepositories/logic';
 import { prisma } from '@/lib/db';
 import type { GetLeaderboardInput } from './schema';
-import { RepositoryWithVotes } from '@/actions/repository/getRepositories/logic';
 
 export type LeaderboardEntry = {
   rank: number;
@@ -31,7 +31,7 @@ export async function getLeaderboard(input: GetLeaderboardInput): Promise<Leader
     }
   });
 
-  return leaderboard.map((entry: { rank: any; repository: { totalVotes: any; }; }) => ({
+  return leaderboard.map((entry) => ({
     rank: entry.rank,
     repository: {
       ...entry.repository,

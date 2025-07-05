@@ -1,10 +1,10 @@
 import { FormControl, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { ControllerRenderProps } from "react-hook-form";
 import React from "react";
+import { ControllerRenderProps } from "react-hook-form";
 
 interface FormInputProps {
-  field: ControllerRenderProps<any, any>;
+  field: ControllerRenderProps;
   label: string;
   placeholder?: string;
   disabled?: boolean;
