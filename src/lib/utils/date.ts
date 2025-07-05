@@ -53,7 +53,6 @@ export function getCurrentWeek(): WeekRange {
   endOfWeek.setHours(23, 59, 59, 999);
 
   // Format week string as YYYY-Www (e.g., 2024-W23)
-  const year = startOfWeek.getFullYear();
   const weekString = getWeek(startOfWeek);
 
   return {
@@ -63,7 +62,7 @@ export function getCurrentWeek(): WeekRange {
   };
 }
 
-export function getWeek(date: Date): string {
+export function getWeek(date: Date): IsoWeek {
   const year = date.getUTCFullYear();
   const firstDayOfYear = new Date(Date.UTC(year, 0, 1));
   const pastDaysOfYear = (date.getTime() - firstDayOfYear.getTime()) / 86400000;
