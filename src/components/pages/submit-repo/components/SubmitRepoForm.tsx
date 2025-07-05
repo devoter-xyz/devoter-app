@@ -55,10 +55,7 @@ export function SubmitRepoForm() {
       });
 
       if (payment?.data?.paymentRecord?.id) {
-        await createRepository({
-          ...values,
-          paymentId: payment.data.paymentRecord.id,
-        });
+        await createRepository(values);
         toast({
           title: 'Repository submitted successfully!',
           description: `Your repository has been submitted for voting.`,

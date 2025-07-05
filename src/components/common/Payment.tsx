@@ -1,8 +1,7 @@
-import { ConnectButton, useActiveAccount, useSendTransaction } from "thirdweb/react";
 import { createThirdwebClient, getContract, toWei } from "thirdweb";
 import { base } from "thirdweb/chains";
+import { ConnectButton, useActiveAccount, useSendTransaction } from "thirdweb/react";
 import { prepareTransaction } from "thirdweb/transaction";
-import { TransactionResult } from "thirdweb";
 
 const client = createThirdwebClient({
   clientId: process.env.NEXT_PUBLIC_THIRDWEB_CLIENT_ID!,

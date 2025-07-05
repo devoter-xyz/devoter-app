@@ -1,20 +1,21 @@
 import { getLeaderboard } from '@/actions/leaderboard/getLeaderboard/logic';
 import { LeaderboardPageContent } from '@/components/pages/leaderboard';
-import { getWeeks, getWeek, type IsoWeek } from '@/lib/utils/date';
+import { getWeek, getWeeks, type IsoWeek } from '@/lib/utils/date';
 
 export const revalidate = 60;
 
 export default async function LeaderboardPage({
   searchParams
 }: {
-  searchParams: {
+  searchParams: Promise<{
     week?: string;
     page?: string;
-  };
+  }>;
 }) {
-  const currentPage = searchParams.page ? parseInt(searchParams.page, 10) : 1;
+  const { week: weekParam, page: pageParam } = await searchParams;
+  const currentPage = pageParam ? parseInt(pageParam, 10) : 1;
   const currentWeek = getWeek(new Date());
-  const week = (searchParams.week as IsoWeek) || currentWeek;
+  const week = (weekParam as IsoWeek) || currentWeek;
   const { leaderboard, total } = await getLeaderboard({
     week,
     page: currentPage,
@@ -32,7 +33,7 @@ export default async function LeaderboardPage({
           selectedWeek={week}
           total={total}
           page={currentPage}
-          pageSize={10}
+          count={10}
         />
       </main>
     </div>
