@@ -1,12 +1,12 @@
+import { signIn } from '@/actions/auth/signin/logic';
+import { archiveWeeklyLeaderboard } from '@/actions/leaderboard/archive/logic';
+import { createRepository } from '@/actions/repository/createRepository/logic';
 import { faker } from '@faker-js/faker';
 import { PrismaClient } from '@prisma/client';
 import { Decimal } from '@prisma/client/runtime/library';
 import crypto from 'crypto';
 import { Wallet } from 'ethers';
 import { SiweMessage } from 'siwe';
-import { signIn } from '@/actions/auth/signin/logic';
-import { createRepository } from '@/actions/repository/createRepository/logic';
-import { archiveWeeklyLeaderboard } from '@/actions/leaderboard/archive/logic';
 
 const prisma = new PrismaClient();
 
@@ -57,14 +57,11 @@ async function main() {
       const message = siweMessage.prepareMessage();
       const signature = await wallet.signMessage(message);
 
-      return signIn(
-        {
-          message: JSON.stringify(siweMessage),
-          signature,
-          nonce: siweMessage.nonce,
-        },
-        { setCookie: false }
-      );
+      return signIn({
+        message: JSON.stringify(siweMessage),
+        signature,
+        nonce: siweMessage.nonce
+      });
     })
   );
   console.log(`Inserted ${users.length} users`);
@@ -97,16 +94,22 @@ async function main() {
       .replace(/\s+/g, '-')
       .replace(/[^a-z0-9-._]/g, '');
 
-    await createRepository(
+    const repo = await createRepository(
       {
         title,
         description,
         githubUrl: `https://github.com/${owner}/${repoName}`,
         tokenAmount: submissionFee
       },
-      submitter.id,
-      { createdAt: repoCreated }
+      submitter.id
     );
+
+    await prisma.repository.update({
+      where: { id: repo.id },
+      data: {
+        createdAt: repoCreated
+      }
+    });
 
     // Keep running totals for leaderboard creation later
     if (!weeklyTotals[submissionWeek]) {
@@ -132,8 +135,8 @@ async function main() {
           userId: voter!.id,
           repositoryId: repo.id,
           tokenAmount,
-          week: votingWeek,
-        },
+          week: votingWeek
+        }
       });
 
       await prisma.payment.create({
@@ -143,10 +146,9 @@ async function main() {
           tokenAmount,
           txHash: `0x${crypto.randomBytes(32).toString('hex')}`,
           week: votingWeek,
-          voteId: vote.id,
-        },
+          voteId: vote.id
+        }
       });
-
     }
   }
 
