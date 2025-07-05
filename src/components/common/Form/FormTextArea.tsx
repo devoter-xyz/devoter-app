@@ -3,7 +3,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { ControllerRenderProps } from "react-hook-form";
 
 interface FormTextAreaProps {
-  field: ControllerRenderProps;
+  field: ControllerRenderProps<any, any>;
   label: string;
   placeholder?: string;
   disabled?: boolean;

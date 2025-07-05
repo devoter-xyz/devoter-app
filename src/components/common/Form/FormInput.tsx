@@ -4,7 +4,7 @@ import React from "react";
 import { ControllerRenderProps } from "react-hook-form";
 
 interface FormInputProps {
-  field: ControllerRenderProps;
+  field: ControllerRenderProps<any, any>;
   label: string;
   placeholder?: string;
   disabled?: boolean;

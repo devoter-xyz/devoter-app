@@ -1,4 +1,4 @@
-import { createThirdwebClient, getContract, toWei } from "thirdweb";
+import { createThirdwebClient, toWei } from "thirdweb";
 import { base } from "thirdweb/chains";
 import { ConnectButton, useActiveAccount, useSendTransaction } from "thirdweb/react";
 import { prepareTransaction } from "thirdweb/transaction";
@@ -7,11 +7,11 @@ const client = createThirdwebClient({
   clientId: process.env.NEXT_PUBLIC_THIRDWEB_CLIENT_ID!,
 });
 
-const contract = getContract({
-  client,
-  chain: base,
-  address: "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913", // USDC contract address on Base
-});
+// const contract = getContract({
+//   client,
+//   chain: base,
+//   address: "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913", // USDC contract address on Base
+// });
 
 interface PaymentProps {
   onPaymentSuccess: (txHash: string) => void;
@@ -21,14 +21,6 @@ interface PaymentProps {
 export function Payment({ onPaymentSuccess, isLoading }: PaymentProps) {
   const account = useActiveAccount();
   const { mutate: sendTransaction, isPending } = useSendTransaction();
-
-  const onSuccess = (result: TransactionResult) => {
-    onPaymentSuccess(result.transactionHash);
-  };
-
-  const onError = (error: Error) => {
-    console.error("Payment error:", error);
-  };
 
   const handlePayment = () => {
     if (!account) {
@@ -43,7 +35,13 @@ export function Payment({ onPaymentSuccess, isLoading }: PaymentProps) {
       client: client,
     });
 
-    sendTransaction(transaction, { onSuccess, onError });
+    sendTransaction(transaction, {
+      onSuccess: (result) => {
+        onPaymentSuccess(result.transactionHash);
+      }, onError: (error) => {
+        console.error("Payment error:", error);
+      }
+    });
   };
 
   if (!account) {
