@@ -6,7 +6,10 @@ import { User } from '@prisma/client';
 
 export type SigninResult = Pick<User, 'id' | 'walletAddress'> | null;
 
-export async function signIn(payload: SignInPayload): Promise<SigninResult> {
+export async function signIn(
+  payload: SignInPayload,
+  options?: { setCookie: boolean }
+): Promise<SigninResult> {
   const address = await verifySiweSignature(payload.message, payload.signature, payload.nonce);
   if (!address) {
     throw new Error('Invalid signature');
@@ -32,9 +35,11 @@ export async function signIn(payload: SignInPayload): Promise<SigninResult> {
     });
   }
 
-  await setSessionCookie({
-    userId: user.id
-  });
+  if (options?.setCookie ?? true) {
+    await setSessionCookie({
+      userId: user.id,
+    });
+  }
 
   return user;
 }

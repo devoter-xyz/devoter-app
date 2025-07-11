@@ -1,6 +1,8 @@
 import { getLeaderboard } from '@/actions/leaderboard/getLeaderboard/logic';
+import { getVotesByUser } from '@/actions/repository/getVotesByUser/logic';
 import { LeaderboardPageContent } from '@/components/pages/leaderboard';
 import { getWeek, getWeeks, type IsoWeek } from '@/lib/utils/date';
+import { getUserFromSession } from '@/actions/auth/session/logic';
 
 export const revalidate = 60;
 
@@ -22,6 +24,15 @@ export default async function LeaderboardPage({
     pageSize: 10
   });
   const weeks = getWeeks();
+  const user = await getUserFromSession();
+  const userVotes = user
+    ? await getVotesByUser(
+        {
+          week
+        },
+        user.id
+      )
+    : [];
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
@@ -34,6 +45,7 @@ export default async function LeaderboardPage({
           total={total}
           page={currentPage}
           count={10}
+          userVotes={userVotes}
         />
       </main>
     </div>

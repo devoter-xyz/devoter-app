@@ -47,7 +47,7 @@ model Vote {
   week          String
   payments      Payment[]
 
-  @@unique([userId, repositoryId])
+  @@unique([userId, repositoryId, week])
 }
 
 model Payment {

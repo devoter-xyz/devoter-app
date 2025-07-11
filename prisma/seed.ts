@@ -57,11 +57,14 @@ async function main() {
       const message = siweMessage.prepareMessage();
       const signature = await wallet.signMessage(message);
 
-      return signIn({
-        message: JSON.stringify(siweMessage),
-        signature,
-        nonce: siweMessage.nonce
-      });
+      return signIn(
+        {
+          message: JSON.stringify(siweMessage),
+          signature,
+          nonce: siweMessage.nonce,
+        },
+        { setCookie: false }
+      );
     })
   );
   console.log(`Inserted ${users.length} users`);
@@ -124,7 +127,8 @@ async function main() {
   for (const repo of repos) {
     // Each repo gets a random number of votes
     const numVotes = faker.number.int({ min: 1, max: MAX_VOTES_PER_REPO });
-    const voters = faker.helpers.arrayElements(users, numVotes);
+    const votersWithDuplicates = faker.helpers.arrayElements(users, numVotes);
+    const voters = [...new Set(votersWithDuplicates)]; // Ensure unique voters per repo
 
     for (const voter of voters) {
       const votingWeek = weekString(repo.createdAt);

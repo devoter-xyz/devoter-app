@@ -1,9 +1,8 @@
 import { LeaderboardEntry } from '@/actions/leaderboard/getLeaderboard/logic';
 import { LeaderboardCard } from '@/components/pages/leaderboard/components/LeaderboardCard';
+import { WeekSelector } from '@/components/pages/leaderboard/components/WeekSelector';
 import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from '@/components/ui/pagination';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { getWeeks, type IsoWeek } from '@/lib/utils/date';
-import Link from 'next/link';
+import { type IsoWeek } from '@/lib/utils/date';
 
 type LeaderboardPageContentProps = {
   leaderboard: LeaderboardEntry[];
@@ -13,20 +12,20 @@ type LeaderboardPageContentProps = {
   total: number;
   page: number;
   count: number;
+  userVotes: string[];
 };
 
 export function LeaderboardPageContent({
   leaderboard,
+  weeks,
   currentWeek,
   selectedWeek,
   page,
   count,
   total,
+  userVotes = []
 }: LeaderboardPageContentProps) {
-  const weeks = getWeeks();
-  const pastWeeks = weeks.filter((week) => week !== currentWeek);
   const isPastWeek = selectedWeek !== currentWeek;
-
   const totalPages = Math.ceil(total / count);
 
   return (
@@ -38,20 +37,9 @@ export function LeaderboardPageContent({
           {isPastWeek ? `week ${selectedWeek}` : 'current week'}.
         </p>
 
-        <div className="mt-6 flex justify-center">
+        <div className="mt-6">
           <div className="flex flex-col items-start gap-4 mt-4">
-            <Select value={selectedWeek}>
-              <SelectTrigger className="w-48">
-                <SelectValue placeholder="Select Past Week" />
-              </SelectTrigger>
-              <SelectContent>
-                {pastWeeks.map((week) => (
-                  <SelectItem key={week} value={week}>
-                    <Link href={`/leaderboard?week=${week}`}>{week}</Link>
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <WeekSelector weeks={weeks} currentWeek={currentWeek} selectedWeek={selectedWeek} />
             <>
               {leaderboard.length > 0 ? (
                 <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 mt-6">
@@ -67,6 +55,7 @@ export function LeaderboardPageContent({
                         votes: repository.totalVotes
                       }}
                       rank={rank}
+                      hasVoted={userVotes.includes(repository.id)}
                     />
                   ))}
                 </div>
@@ -84,6 +73,7 @@ export function LeaderboardPageContent({
           <PaginationContent>
             <PaginationItem>
               <PaginationPrevious
+                href={`/leaderboard?week=${selectedWeek}&page=${page - 1}`}
                 className={page <= 1 ? 'pointer-events-none text-gray-400' : ''}
               />
             </PaginationItem>
@@ -100,6 +90,7 @@ export function LeaderboardPageContent({
 
             <PaginationItem>
               <PaginationNext
+                href={`/leaderboard?week=${selectedWeek}&page=${page + 1}`}
                 className={page >= totalPages ? 'pointer-events-none text-gray-400' : ''}
               />
             </PaginationItem>

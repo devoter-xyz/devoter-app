@@ -4,6 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
+import { VoteButton } from './VoteButton';
 
 interface LeaderboardCardProps {
   repository: {
@@ -15,9 +16,14 @@ interface LeaderboardCardProps {
     votes: number;
   };
   rank: number;
+  hasVoted: boolean;
 }
 
-export const LeaderboardCard: React.FC<LeaderboardCardProps> = ({ repository, rank }) => {
+export const LeaderboardCard: React.FC<LeaderboardCardProps> = ({
+  repository,
+  rank,
+  hasVoted,
+}) => {
   return (
     <Card className="flex flex-col h-full hover:shadow-lg transition-shadow duration-200 cursor-pointer">
       <CardHeader className="flex-row items-center gap-4">
@@ -45,17 +51,21 @@ export const LeaderboardCard: React.FC<LeaderboardCardProps> = ({ repository, ra
           {repository.votes}
         </Badge>
       </CardHeader>
-      <CardContent className="flex-grow">
-        <p className="text-sm text-gray-600 line-clamp-3 mb-4">{repository.description}</p>
-        <Link
-          href={repository.url}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="inline-flex items-center gap-2 text-sm text-blue-500 hover:underline"
-        >
-          <Github className="h-4 w-4" />
-          <span>View on GitHub</span>
-        </Link>
+      <CardContent className="flex-grow flex flex-col justify-between">
+        <p className="text-sm text-gray-600 line-clamp-3">{repository.description}</p>
+        <div className="h-5"></div>
+        <div className="flex items-center justify-between">
+          <Link
+            href={repository.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 text-sm text-blue-500 hover:underline"
+          >
+            <Github className="h-4 w-4" />
+            <span>View on GitHub</span>
+          </Link>
+          <VoteButton repositoryId={repository.id} hasVoted={hasVoted} />
+        </div>
       </CardContent>
     </Card>
   );
