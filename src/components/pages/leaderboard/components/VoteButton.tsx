@@ -4,7 +4,7 @@ import { voteRepositoryAction } from '@/actions/repository/voteRepository/action
 import { Button } from '@/components/ui/button';
 import { Vote } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { useTransition } from 'react';
+import { useAction } from 'next-safe-action/hooks';
 import { toast } from 'sonner';
 
 interface VoteButtonProps {
@@ -13,22 +13,24 @@ interface VoteButtonProps {
 }
 
 export const VoteButton = ({ repositoryId, hasVoted }: VoteButtonProps) => {
-  const [isPending, startTransition] = useTransition();
   const router = useRouter();
 
-  const handleVote = async () => {
-    startTransition(async () => {
-      try {
-        await voteRepositoryAction({ repositoryId });
-        router.refresh();
-      } catch (error) {
-        toast.error(error instanceof Error ? error.message : 'An unexpected error occurred.');
-      }
-    });
-  };
+  const { execute, isExecuting } = useAction(voteRepositoryAction, {
+    onSuccess: () => {
+      router.refresh();
+      toast.success('Voted successfully!');
+    },
+    onError: ({ error }) => {
+      toast.error(error.serverError || 'An unexpected error occurred.');
+    }
+  });
 
   return (
-    <Button className="cursor-pointer" disabled={hasVoted || isPending} onClick={handleVote}>
+    <Button
+      className="cursor-pointer"
+      disabled={hasVoted || isExecuting}
+      onClick={() => execute({ repositoryId })}
+    >
       <Vote className="h-4 w-4" />
       {hasVoted ? 'Voted' : 'Vote'}
     </Button>

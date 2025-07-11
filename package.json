@@ -48,8 +48,7 @@
     "thirdweb": "^5.104.1",
     "viem": "^2.31.3",
     "wagmi": "^2.15.6",
-    "zod": "^3.25.51",
-    "zustand": "^5.0.6"
+    "zod": "^3.25.51"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",

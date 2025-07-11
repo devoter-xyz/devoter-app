@@ -2,43 +2,99 @@
 
 import { prisma } from '@/lib/db';
 import { getWeek } from '@/lib/utils/date';
+import crypto from 'crypto';
 import { VoteRepositoryInput } from './schema';
 
 export const voteRepository = async (input: VoteRepositoryInput, userId: string) => {
   const currentWeek = getWeek(new Date());
-  const tokenAmount = 0.01;
+  const tokenAmount = 1;
 
-  const existingVote = await prisma.vote.findFirst({
-    where: {
-      userId,
-      week: currentWeek,
-    },
-  });
+  await prisma.$transaction(async tx => {
+    const user = await tx.user.findUniqueOrThrow({
+      where: { id: userId },
+      select: { walletAddress: true }
+    });
 
-  if (existingVote) {
-    throw new Error('You can only vote for one repository per week.');
-  }
+    const vote = await tx.vote.create({
+      data: {
+        userId,
+        repositoryId: input.repositoryId,
+        week: currentWeek,
+        tokenAmount
+      }
+    });
 
-  await prisma.vote.create({
-    data: {
-      userId,
-      repositoryId: input.repositoryId,
-      week: currentWeek,
-      tokenAmount,
-    },
-  });
+    await tx.payment.create({
+      data: {
+        userId: userId,
+        walletAddress: user.walletAddress,
+        tokenAmount: tokenAmount,
+        txHash: `0x${crypto.randomBytes(32).toString('hex')}`,
+        week: currentWeek,
+        voteId: vote.id
+      }
+    });
 
-  await prisma.repository.update({
-    where: {
-      id: input.repositoryId,
-    },
-    data: {
-      totalVotes: {
-        increment: 1,
+    await tx.repository.update({
+      where: {
+        id: input.repositoryId
       },
-      totalTokenAmount: {
-        increment: tokenAmount,
+      data: {
+        totalVotes: {
+          increment: 1
+        },
+        totalTokenAmount: {
+          increment: tokenAmount
+        }
+      }
+    });
+
+    const repositoriesInWeek = await tx.repository.findMany({
+      where: {
+        votes: {
+          some: {
+            week: currentWeek
+          }
+        }
       },
-    },
+      include: {
+        votes: {
+          where: {
+            week: currentWeek
+          },
+          select: {
+            tokenAmount: true
+          }
+        }
+      }
+    });
+
+    const rankedRepositories = repositoriesInWeek
+      .map(repo => ({
+        id: repo.id,
+        weeklyTotal: repo.votes.reduce((sum, vote) => sum + vote.tokenAmount.toNumber(), 0)
+      }))
+      .sort((a, b) => b.weeklyTotal - a.weeklyTotal);
+
+    const updatePromises = rankedRepositories.map((repo, index) => {
+      return tx.weeklyRepoLeaderboard.upsert({
+        where: {
+          repoId_week: {
+            repoId: repo.id,
+            week: currentWeek
+          }
+        },
+        update: {
+          rank: index + 1
+        },
+        create: {
+          repoId: repo.id,
+          week: currentWeek,
+          rank: index + 1
+        }
+      });
+    });
+
+    await Promise.all(updatePromises);
   });
 }; 
