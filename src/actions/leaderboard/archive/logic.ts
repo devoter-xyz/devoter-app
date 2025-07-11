@@ -2,40 +2,68 @@
 
 import { prisma } from '@/lib/db';
 import { getWeek } from '@/lib/utils/date';
+import { Prisma } from '@prisma/client';
 
-export const archiveWeeklyLeaderboard = async () => {
-  const currentWeekId = getWeek(new Date());
+type PrismaTransactionClient = Prisma.TransactionClient;
 
+export const updateWeeklyLeaderboardRanks = async (tx: PrismaTransactionClient, week: string) => {
   // 1. Calculate this week's votes for all repositories
-  const repositories = await prisma.repository.findMany({
+  const repositories = await tx.repository.findMany({
+    where: {
+      votes: {
+        some: {
+          week: week
+        }
+      }
+    },
     select: {
       id: true,
       votes: {
         where: {
-          week: currentWeekId,
+          week: week
         },
         select: {
-          tokenAmount: true,
-        },
-      },
-    },
+          tokenAmount: true
+        }
+      }
+    }
   });
 
   // 2. Rank repositories by total token amount
   const rankedRepositories = repositories
     .map(repo => ({
       ...repo,
-      totalTokens: repo.votes.reduce((acc, vote) => acc + Number(vote.tokenAmount), 0),
+      totalTokens: repo.votes.reduce((acc, vote) => acc + Number(vote.tokenAmount), 0)
     }))
     .sort((a, b) => b.totalTokens - a.totalTokens);
 
   // 3. Archive the results
-  await prisma.weeklyRepoLeaderboard.createMany({
-    data: rankedRepositories.map((repo, index) => ({
-      repoId: repo.id,
-      week: currentWeekId,
-      rank: index + 1,
-    })),
+  for (let i = 0; i < rankedRepositories.length; i++) {
+    const repo = rankedRepositories[i];
+    await tx.weeklyRepoLeaderboard.upsert({
+      where: {
+        repoId_week: {
+          repoId: repo.id,
+          week: week
+        }
+      },
+      update: {
+        rank: i + 1
+      },
+      create: {
+        repoId: repo.id,
+        week: week,
+        rank: i + 1
+      }
+    });
+  }
+};
+
+export const archiveWeeklyLeaderboard = async () => {
+  const currentWeekId = getWeek(new Date());
+
+  await prisma.$transaction(async tx => {
+    await updateWeeklyLeaderboardRanks(tx, currentWeekId);
   });
 
   return { success: true };
