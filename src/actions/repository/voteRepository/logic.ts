@@ -19,7 +19,7 @@ export const voteRepository = async (input: VoteRepositoryInput, userId: string)
     throw new Error('You can only vote for one repository per week.');
   }
 
-  const vote = await prisma.vote.create({
+  await prisma.vote.create({
     data: {
       userId,
       repositoryId: input.repositoryId,
@@ -41,6 +41,4 @@ export const voteRepository = async (input: VoteRepositoryInput, userId: string)
       },
     },
   });
-
-  return vote;
 }; 

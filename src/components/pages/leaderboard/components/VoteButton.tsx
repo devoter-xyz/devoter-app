@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Vote } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useTransition } from 'react';
+import { toast } from 'sonner';
 
 interface VoteButtonProps {
   repositoryId: string;
@@ -21,8 +22,7 @@ export const VoteButton = ({ repositoryId, hasVoted }: VoteButtonProps) => {
         await voteRepositoryAction({ repositoryId });
         router.refresh();
       } catch (error) {
-        // TODO: Handle error with a toast notification
-        console.error(error);
+        toast.error(error instanceof Error ? error.message : 'An unexpected error occurred.');
       }
     });
   };

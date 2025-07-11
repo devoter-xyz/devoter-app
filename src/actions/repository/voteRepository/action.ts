@@ -8,9 +8,9 @@ export const voteRepositoryAction = authActionClient
   .inputSchema(voteRepositorySchema)
   .action(async ({ parsedInput, ctx }) => {
     try {
-      const result = await voteRepository(parsedInput, ctx.session.userId);
-      return result;
+      await voteRepository(parsedInput, ctx.session.userId);
+      return { success: true };
     } catch (error) {
-      throw new Error('Something went wrong', { cause: error });
+      throw new Error(error instanceof Error ? error.message : 'An unexpected error occurred.');
     }
   }); 
