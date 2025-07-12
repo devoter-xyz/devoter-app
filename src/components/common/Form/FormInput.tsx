@@ -1,9 +1,10 @@
-import { FormControl, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import React from "react";
-import { ControllerRenderProps } from "react-hook-form";
+import { FormControl, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import { Input } from '@/components/ui/input';
+import React from 'react';
+import { ControllerRenderProps } from 'react-hook-form';
 
 interface FormInputProps {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   field: ControllerRenderProps<any, any>;
   label: string;
   placeholder?: string;
@@ -15,12 +16,10 @@ interface FormInputProps {
 export function FormInput({ field, label, placeholder, disabled, className, prefixIcon }: FormInputProps) {
   return (
     <FormItem>
-      <FormLabel className="text-sm font-medium text-gray-700">{label}</FormLabel>
+      <FormLabel className='text-sm font-medium text-gray-700'>{label}</FormLabel>
       <FormControl>
-        <div className="relative">
-          {prefixIcon && (
-            <span className="absolute left-3 top-1/2 transform -translate-y-1/2">{prefixIcon}</span>
-          )}
+        <div className='relative'>
+          {prefixIcon && <span className='absolute left-3 top-1/2 transform -translate-y-1/2'>{prefixIcon}</span>}
           <Input
             {...field}
             placeholder={placeholder}
