@@ -2,10 +2,7 @@
 
 import { createPaymentAction } from '@/actions/payment/createPayment/action';
 import { createRepositoryAction } from '@/actions/repository/createRepository/action';
-import {
-  CreateRepositoryInput,
-  createRepositorySchema
-} from '@/actions/repository/createRepository/schema';
+import { CreateRepositoryInput, createRepositorySchema } from '@/actions/repository/createRepository/schema';
 import { getRepositorySubmissionCountAction } from '@/actions/repository/getRepositorySubmissionCount/action';
 import { FormInput } from '@/components/common/Form/FormInput';
 import { FormSubmit } from '@/components/common/Form/FormSubmit';
@@ -13,15 +10,14 @@ import { FormTextArea } from '@/components/common/Form/FormTextArea';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/common/Form/tooltip';
 import { Payment } from '@/components/common/Payment';
 import { Form, FormField } from '@/components/ui/form';
-import { useToast } from '@/hooks/use-toast';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { GitBranch, Github } from 'lucide-react';
 import { useAction } from 'next-safe-action/hooks';
 import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
+import { toast } from 'sonner';
 
 export function SubmitRepoForm() {
-  const { toast } = useToast();
   const { executeAsync: createRepository, status: createRepositoryStatus } = useAction(createRepositoryAction);
   const { executeAsync: createPayment, status: createPaymentStatus } = useAction(createPaymentAction);
   const {
@@ -51,26 +47,18 @@ export function SubmitRepoForm() {
     try {
       const payment = await createPayment({
         amount: 0.01,
-        transactionHash: txHash,
+        transactionHash: txHash
       });
 
       if (payment?.data?.paymentRecord?.id) {
         await createRepository(values);
-        toast({
-          title: 'Repository submitted successfully!',
-          description: `Your repository has been submitted for voting.`,
-          variant: 'default'
-        });
+        toast.success(`Your repository has been submitted for voting.`);
         form.reset();
         getSubmissionCount();
       }
     } catch (error) {
       console.error('Submission error:', error);
-      toast({
-        title: 'Submission failed',
-        description: error instanceof Error ? error.message : 'An unexpected error occurred. Please try again.',
-        variant: 'destructive'
-      });
+      toast.error(error instanceof Error ? error.message : 'An unexpected error occurred. Please try again.');
     }
   }
 
@@ -136,10 +124,8 @@ export function SubmitRepoForm() {
                       <div className='flex items-center text-sm text-muted-foreground'>
                         <GitBranch className='mr-2 h-4 w-4' />
                         <span>
-                          <span className='font-bold text-primary'>
-                            {submissionCount} / 1
-                          </span>{' '}
-                          repositories submitted this week.
+                          <span className='font-bold text-primary'>{submissionCount} / 1</span> repositories submitted
+                          this week.
                         </span>
                       </div>
                     )}
@@ -160,10 +146,7 @@ export function SubmitRepoForm() {
           {canSubmit ? (
             <Payment onPaymentSuccess={onPaymentSuccess} isLoading={isLoading} />
           ) : (
-            <FormSubmit
-              disabled={true}
-              isLoading={false}
-            >
+            <FormSubmit disabled={true} isLoading={false}>
               Submission Limit Reached
             </FormSubmit>
           )}

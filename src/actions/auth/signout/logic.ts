@@ -1,5 +1,5 @@
-import { clearSessionCookie, SessionData } from '@/lib/session';
+import { clearSessionCookie } from '@/lib/session';
 
-export async function signOut(session: SessionData | null) {
+export async function signOut() {
   await clearSessionCookie();
 }

@@ -1,9 +1,9 @@
 import { prisma } from '@/lib/prisma';
-import { CreatePaymentPayload } from './schema';
 import { SessionData } from '@/lib/session';
 import { ThirdwebSDK } from '@thirdweb-dev/sdk';
 import { getISOWeek, getYear } from 'date-fns';
 import { ethers } from 'ethers';
+import { CreatePaymentPayload } from './schema';
 
 // Initialize the SDK on the appropriate chain
 const sdk = new ThirdwebSDK('ethereum'); // Or your specific chain
@@ -38,15 +38,24 @@ export const createPayment = async (payload: CreatePaymentPayload, session: Sess
   const weekNumber = getISOWeek(now);
   const week = `${year}-W${String(weekNumber).padStart(2, '0')}`;
 
+  const user = await prisma.user.findUniqueOrThrow({
+    where: {
+      id: session.userId
+    },
+    select: {
+      walletAddress: true
+    }
+  });
+
   // 3. Create the payment record
   const paymentRecord = await prisma.payment.create({
     data: {
       userId: session.userId,
+      walletAddress: user.walletAddress,
       tokenAmount: payload.amount,
       txHash: payload.transactionHash,
-      walletAddress: session.walletAddress,
-      week: week,
-    },
+      week: week
+    }
   });
 
   return { paymentRecord };
