@@ -1,5 +1,5 @@
 import { signIn } from '@/actions/auth/signin/logic';
-import { archiveWeeklyLeaderboard } from '@/actions/leaderboard/archive/logic';
+import { updateWeeklyLeaderboard } from '@/actions/leaderboard/archive/logic';
 import { createRepository } from '@/actions/repository/createRepository/logic';
 import { faker } from '@faker-js/faker';
 import { PrismaClient } from '@prisma/client';
@@ -61,7 +61,7 @@ async function main() {
         {
           message: JSON.stringify(siweMessage),
           signature,
-          nonce: siweMessage.nonce,
+          nonce: siweMessage.nonce
         },
         { setCookie: false }
       );
@@ -156,10 +156,7 @@ async function main() {
     }
   }
 
-  // -------------------------------------------------------------------------
-  // 4. Weekly Leaderboards
-  // -------------------------------------------------------------------------
-  await archiveWeeklyLeaderboard();
+  await updateWeeklyLeaderboard(weekString(new Date()));
 }
 
 main()

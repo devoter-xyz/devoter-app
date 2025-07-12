@@ -1,14 +1,10 @@
 'use server';
 
 import { prisma } from '@/lib/db';
-import { getWeek } from '@/lib/utils/date';
-import { Prisma } from '@prisma/client';
 
-type PrismaTransactionClient = Prisma.TransactionClient;
-
-export const updateWeeklyLeaderboardRanks = async (tx: PrismaTransactionClient, week: string) => {
+export const updateWeeklyLeaderboard = async (week: string) => {
   // 1. Calculate this week's votes for all repositories
-  const repositories = await tx.repository.findMany({
+  const repositories = await prisma.repository.findMany({
     where: {
       votes: {
         some: {
@@ -31,16 +27,15 @@ export const updateWeeklyLeaderboardRanks = async (tx: PrismaTransactionClient, 
 
   // 2. Rank repositories by total token amount
   const rankedRepositories = repositories
-    .map(repo => ({
+    .map((repo) => ({
       ...repo,
       totalTokens: repo.votes.reduce((acc, vote) => acc + Number(vote.tokenAmount), 0)
     }))
     .sort((a, b) => b.totalTokens - a.totalTokens);
 
   // 3. Archive the results
-  for (let i = 0; i < rankedRepositories.length; i++) {
-    const repo = rankedRepositories[i];
-    await tx.weeklyRepoLeaderboard.upsert({
+  for (const [i, repo] of rankedRepositories.entries()) {
+    await prisma.weeklyRepoLeaderboard.upsert({
       where: {
         repoId_week: {
           repoId: repo.id,
@@ -57,14 +52,4 @@ export const updateWeeklyLeaderboardRanks = async (tx: PrismaTransactionClient, 
       }
     });
   }
-};
-
-export const archiveWeeklyLeaderboard = async () => {
-  const currentWeekId = getWeek(new Date());
-
-  await prisma.$transaction(async tx => {
-    await updateWeeklyLeaderboardRanks(tx, currentWeekId);
-  });
-
-  return { success: true };
 };

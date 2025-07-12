@@ -1,16 +1,16 @@
 'use server';
 
+import { updateWeeklyLeaderboard } from '@/actions/leaderboard/archive/logic';
 import { prisma } from '@/lib/db';
 import { getWeek } from '@/lib/utils/date';
 import crypto from 'crypto';
 import { VoteRepositoryInput } from './schema';
-import { updateWeeklyLeaderboardRanks } from '@/actions/leaderboard/archive/logic';
 
 export const voteRepository = async (input: VoteRepositoryInput, userId: string) => {
   const currentWeek = getWeek(new Date());
   const tokenAmount = 1;
 
-  await prisma.$transaction(async tx => {
+  await prisma.$transaction(async (tx) => {
     const user = await tx.user.findUniqueOrThrow({
       where: { id: userId },
       select: { walletAddress: true }
@@ -49,7 +49,6 @@ export const voteRepository = async (input: VoteRepositoryInput, userId: string)
         }
       }
     });
-
-    await updateWeeklyLeaderboardRanks(tx, currentWeek);
   });
-}; 
+  await updateWeeklyLeaderboard(currentWeek);
+};
