@@ -8,10 +8,10 @@ import { VoteRepositoryInput } from './schema';
 import { devTokenContract } from '@/lib/thirdweb';
 
 const MINIMUM_VOTE_TOKEN_AMOUNT = 1;
+const VOTE_COST_PERCENTAGE = 0.0025; // 0.25%
 
 export const voteRepository = async (input: VoteRepositoryInput, userId: string) => {
   const currentWeek = getWeek(new Date());
-  const tokenAmount = 1;
 
   await prisma.$transaction(async (tx) => {
     const user = await tx.user.findUniqueOrThrow({
@@ -20,12 +20,15 @@ export const voteRepository = async (input: VoteRepositoryInput, userId: string)
     });
 
     const balance = await (await devTokenContract).erc20.balanceOf(user.walletAddress);
+    const userTokenBalance = parseInt(balance.displayValue || '0');
 
-    if (parseInt(balance.displayValue || '0') < MINIMUM_VOTE_TOKEN_AMOUNT) {
+    if (userTokenBalance < MINIMUM_VOTE_TOKEN_AMOUNT) {
       throw new Error(
         'You do not have enough DEV tokens to vote. You can buy some from Uniswap: https://app.uniswap.org/explore/tokens/base/0x047157cffb8841a64db93fd4e29fa3796b78466c'
       );
     }
+
+    const tokenAmount = userTokenBalance * VOTE_COST_PERCENTAGE;
 
     const vote = await tx.vote.create({
       data: {
