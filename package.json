@@ -7,6 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
+    "typecheck": "tsc --noEmit",
     "prisma:reset": "npx dotenv -e .env.local -- npx prisma migrate reset",
     "prisma:migrate": "npx dotenv -e .env.local -- npx prisma migrate dev",
     "prisma:generate": "npx dotenv -e .env.local -- npx prisma generate --no-engine",
