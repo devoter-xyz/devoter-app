@@ -6,12 +6,12 @@ import { prisma } from '@/lib/db';
 import { InsufficientTokenBalanceError } from '@/lib/errors';
 import { devTokenContract } from '@/lib/thirdweb';
 import { getWeek } from '@/lib/utils/date';
+import { Decimal } from '@prisma/client/runtime/library';
 import crypto from 'crypto';
 import { VoteRepositoryInput } from './schema';
 
 export const voteRepository = async (input: VoteRepositoryInput, userId: string) => {
   const currentWeek = getWeek(new Date());
-  const tokenAmount = 1;
 
   await prisma.$transaction(async (tx) => {
     const user = await tx.user.findUniqueOrThrow({
@@ -24,6 +24,8 @@ export const voteRepository = async (input: VoteRepositoryInput, userId: string)
     if (parseInt(balance.displayValue || '0') < MINIMUM_VOTE_TOKEN_AMOUNT) {
       throw new InsufficientTokenBalanceError();
     }
+
+    const tokenAmount = new Decimal(balance.displayValue || '0');
 
     const vote = await tx.vote.create({
       data: {
@@ -38,7 +40,7 @@ export const voteRepository = async (input: VoteRepositoryInput, userId: string)
       data: {
         userId: userId,
         walletAddress: user.walletAddress,
-        tokenAmount: tokenAmount,
+        tokenAmount,
         txHash: `0x${crypto.randomBytes(32).toString('hex')}`,
         week: currentWeek,
         voteId: vote.id
