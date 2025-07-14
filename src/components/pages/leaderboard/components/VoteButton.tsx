@@ -1,6 +1,6 @@
 'use client';
 
-import { voteRepositoryAction } from '@/actions/repository/voteRepository/action';
+import { voteRepositoryAction } from '@/actions/vote/voteRepository/action';
 import { Button } from '@/components/ui/button';
 import { DEV_TOKEN_UNISWAP_URL } from '@/lib/constants';
 import { InsufficientTokenBalanceError } from '@/lib/errors';

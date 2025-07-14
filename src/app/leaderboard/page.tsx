@@ -1,5 +1,5 @@
 import { getLeaderboard } from '@/actions/leaderboard/getLeaderboard/logic';
-import { getVotesByUser } from '@/actions/repository/getVotesByUser/logic';
+import { getVotesByUser } from '@/actions/vote/getVotesByUser/logic';
 import { LeaderboardPageContent } from '@/components/pages/leaderboard';
 import { getWeek, getWeeks, type IsoWeek } from '@/lib/utils/date';
 import { getUserFromSession } from '@/actions/auth/session/logic';
