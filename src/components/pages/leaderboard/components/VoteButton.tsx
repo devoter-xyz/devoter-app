@@ -1,5 +1,6 @@
 'use client';
 
+import { getTokenBalanceAction } from '@/actions/user/getTokenBalance/action';
 import { voteRepositoryAction } from '@/actions/vote/voteRepository/action';
 import { Button } from '@/components/ui/button';
 import { DEV_TOKEN_UNISWAP_URL } from '@/lib/constants';
@@ -7,6 +8,7 @@ import { InsufficientTokenBalanceError } from '@/lib/errors';
 import { Vote } from 'lucide-react';
 import { useAction } from 'next-safe-action/hooks';
 import { useRouter } from 'next/navigation';
+import { useEffect } from 'react';
 import { toast } from 'sonner';
 
 interface VoteButtonProps {
@@ -17,7 +19,10 @@ interface VoteButtonProps {
 export const VoteButton = ({ repositoryId, hasVoted }: VoteButtonProps) => {
   const router = useRouter();
 
-  const { execute, isExecuting } = useAction(voteRepositoryAction, {
+  const {
+    execute: executeVote,
+    isExecuting: isVoting,
+  } = useAction(voteRepositoryAction, {
     onSuccess: () => {
       router.refresh();
       toast.success('Voted successfully!');
@@ -43,8 +48,25 @@ export const VoteButton = ({ repositoryId, hasVoted }: VoteButtonProps) => {
     }
   });
 
+  const {
+    execute: fetchTokenBalance,
+    result: tokenBalanceResult,
+    isExecuting: isFetchingBalance,
+  } = useAction(getTokenBalanceAction);
+
+  useEffect(() => {
+    fetchTokenBalance();
+  }, [fetchTokenBalance]);
+
+  const tokenBalance = tokenBalanceResult?.data;
+  const hasZeroBalance = tokenBalance !== undefined && parseFloat(tokenBalance) === 0;
+
   return (
-    <Button className='cursor-pointer' disabled={hasVoted || isExecuting} onClick={() => execute({ repositoryId })}>
+    <Button
+      className='cursor-pointer'
+      disabled={hasVoted || isVoting || hasZeroBalance || isFetchingBalance}
+      onClick={() => executeVote({ repositoryId })}
+    >
       <Vote className='h-4 w-4' />
       {hasVoted ? 'Voted' : 'Vote'}
     </Button>
