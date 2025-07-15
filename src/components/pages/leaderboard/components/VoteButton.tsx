@@ -10,6 +10,7 @@ import { useAction } from 'next-safe-action/hooks';
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 import { toast } from 'sonner';
+import { ConfirmationDialog } from '@/components/dialogs/ConfirmationDialog';
 
 interface VoteButtonProps {
   repositoryId: string;
@@ -19,10 +20,7 @@ interface VoteButtonProps {
 export const VoteButton = ({ repositoryId, hasVoted }: VoteButtonProps) => {
   const router = useRouter();
 
-  const {
-    execute: executeVote,
-    isExecuting: isVoting,
-  } = useAction(voteRepositoryAction, {
+  const { execute: executeVote, isExecuting: isVoting } = useAction(voteRepositoryAction, {
     onSuccess: () => {
       router.refresh();
       toast.success('Voted successfully!');
@@ -51,7 +49,7 @@ export const VoteButton = ({ repositoryId, hasVoted }: VoteButtonProps) => {
   const {
     execute: fetchTokenBalance,
     result: tokenBalanceResult,
-    isExecuting: isFetchingBalance,
+    isExecuting: isFetchingBalance
   } = useAction(getTokenBalanceAction);
 
   useEffect(() => {
@@ -60,15 +58,22 @@ export const VoteButton = ({ repositoryId, hasVoted }: VoteButtonProps) => {
 
   const tokenBalance = tokenBalanceResult?.data;
   const hasZeroBalance = tokenBalance !== undefined && parseFloat(tokenBalance) === 0;
+  const voteFee = tokenBalance ? (parseFloat(tokenBalance) * 0.0025).toFixed(4) : '0';
 
   return (
-    <Button
-      className='cursor-pointer'
-      disabled={hasVoted || isVoting || hasZeroBalance || isFetchingBalance}
-      onClick={() => executeVote({ repositoryId })}
-    >
-      <Vote className='h-4 w-4' />
-      {hasVoted ? 'Voted' : 'Vote'}
-    </Button>
+    <ConfirmationDialog
+      trigger={
+        <Button
+          className='cursor-pointer'
+          disabled={hasVoted || isVoting || hasZeroBalance || isFetchingBalance}
+        >
+          <Vote className='h-4 w-4' />
+          {hasVoted ? 'Voted' : 'Vote'}
+        </Button>
+      }
+      title='Are you sure you want to vote?'
+      description={`This action cannot be undone. This will vote for the repository and transfer ${voteFee} DEV tokens from your account.`}
+      onConfirm={() => executeVote({ repositoryId })}
+    />
   );
 };
