@@ -3,7 +3,7 @@
 import { getTokenBalanceAction } from '@/actions/user/getTokenBalance/action';
 import { voteRepositoryAction } from '@/actions/vote/voteRepository/action';
 import { Button } from '@/components/ui/button';
-import { DEV_TOKEN_UNISWAP_URL } from '@/lib/constants';
+import { DEV_TOKEN_ADDRESS, DEV_TOKEN_UNISWAP_URL } from '@/lib/constants';
 import { InsufficientTokenBalanceError } from '@/lib/errors';
 import { Vote } from 'lucide-react';
 import { useAction } from 'next-safe-action/hooks';
@@ -71,7 +71,7 @@ export const VoteButton = ({ repositoryId, hasVoted }: VoteButtonProps) => {
     try {
       const txHash = await transferDevTokens(
         walletClient,
-        process.env.NEXT_PUBLIC_DEV_TOKEN_CONTRACT_ADDRESS!,
+        DEV_TOKEN_ADDRESS,
         voteFee
       );
       executeVote({ repositoryId, txHash });
