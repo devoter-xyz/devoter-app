@@ -43,7 +43,7 @@ export const voteRepository = async (input: VoteRepositoryInput, userId: string)
         userId,
         repositoryId: input.repositoryId,
         week: currentWeek,
-        tokenAmount
+        tokenAmount: userBalance.toNumber()
       }
     });
 

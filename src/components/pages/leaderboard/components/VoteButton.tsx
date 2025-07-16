@@ -75,7 +75,7 @@ export const VoteButton = ({ repositoryId, hasVoted }: VoteButtonProps) => {
         voteFee
       );
       executeVote({ repositoryId, txHash });
-    } catch (error) {
+    } catch {
       toast.error('Transaction failed or was rejected.');
     }
   };
