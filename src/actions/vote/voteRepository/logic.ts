@@ -1,14 +1,11 @@
 'use server';
 
 import { updateWeeklyLeaderboard } from '@/actions/leaderboard/archive/logic';
-import { MINIMUM_VOTE_TOKEN_AMOUNT } from '@/lib/constants';
 import { prisma } from '@/lib/db';
-import { InsufficientTokenBalanceError } from '@/lib/errors';
 import { getWeek } from '@/lib/utils/date';
 import { Decimal } from '@prisma/client/runtime/library';
 import { getTokenBalance } from '../../user/getTokenBalance/logic';
 import { VoteRepositoryInput } from './schema';
-import { transferTokens } from '@/lib/utils/transfer';
 
 export const voteRepository = async (input: VoteRepositoryInput, userId: string) => {
   const currentWeek = getWeek(new Date());
@@ -21,14 +18,7 @@ export const voteRepository = async (input: VoteRepositoryInput, userId: string)
 
     const balance = await getTokenBalance(user.walletAddress);
     const userBalance = new Decimal(balance || '0');
-
-    if (userBalance.lessThan(MINIMUM_VOTE_TOKEN_AMOUNT)) {
-      throw new InsufficientTokenBalanceError();
-    }
-
     const tokenAmount = userBalance.mul(0.0025);
-
-    const txResult = await transferTokens(user.walletAddress, tokenAmount.toNumber());
 
     const vote = await tx.vote.create({
       data: {
@@ -44,7 +34,7 @@ export const voteRepository = async (input: VoteRepositoryInput, userId: string)
         userId: userId,
         walletAddress: user.walletAddress,
         tokenAmount,
-        txHash: txResult.transactionHash,
+        txHash: input.txHash,
         week: currentWeek,
         voteId: vote.id
       }

@@ -11,6 +11,8 @@ import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 import { toast } from 'sonner';
 import { ConfirmationDialog } from '@/components/dialogs/ConfirmationDialog';
+import { useWalletClient } from 'wagmi';
+import { transferDevTokens } from '@/lib/utils/wallet-transfer';
 
 interface VoteButtonProps {
   repositoryId: string;
@@ -19,6 +21,7 @@ interface VoteButtonProps {
 
 export const VoteButton = ({ repositoryId, hasVoted }: VoteButtonProps) => {
   const router = useRouter();
+  const { data: walletClient } = useWalletClient();
 
   const { execute: executeVote, isExecuting: isVoting } = useAction(voteRepositoryAction, {
     onSuccess: () => {
@@ -60,6 +63,23 @@ export const VoteButton = ({ repositoryId, hasVoted }: VoteButtonProps) => {
   const hasZeroBalance = tokenBalance !== undefined && parseFloat(tokenBalance) === 0;
   const voteFee = tokenBalance ? (parseFloat(tokenBalance) * 0.0025).toFixed(4) : '0';
 
+  const handleVote = async () => {
+    if (!walletClient) {
+      toast.error('Please connect your wallet to vote.');
+      return;
+    }
+    try {
+      const txHash = await transferDevTokens(
+        walletClient,
+        process.env.NEXT_PUBLIC_DEV_TOKEN_CONTRACT_ADDRESS!,
+        voteFee
+      );
+      executeVote({ repositoryId, txHash });
+    } catch (error) {
+      toast.error('Transaction failed or was rejected.');
+    }
+  };
+
   return (
     <ConfirmationDialog
       trigger={
@@ -72,8 +92,8 @@ export const VoteButton = ({ repositoryId, hasVoted }: VoteButtonProps) => {
         </Button>
       }
       title='Are you sure you want to vote?'
-      description={`This action cannot be undone. This will vote for the repository and transfer ${voteFee} DEV tokens from your account.`}
-      onConfirm={() => executeVote({ repositoryId })}
+      description={`You will be charged ${voteFee} DEV tokens for this vote.`}
+      onConfirm={handleVote}
     />
   );
 };
