@@ -4,9 +4,10 @@ export async function verifySiweSignature(message: string, signature: string, no
   try {
     const siwe = new SiweMessage(JSON.parse(message));
 
+    const domain = process.env.NEXT_PUBLIC_APP_URL || 'localhost:3000';
     const result = await siwe.verify({
       signature,
-      domain: process.env.NEXT_PUBLIC_APP_URL || 'localhost:3000',
+      domain: domain.includes('://') ? domain : `http://${domain}`,
       nonce
     });
 
