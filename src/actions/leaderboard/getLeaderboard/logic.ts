@@ -13,7 +13,7 @@ export type GetLeaderboardOutput = {
 };
 
 export async function getLeaderboard(input: GetLeaderboardInput): Promise<GetLeaderboardOutput> {
-  const { week, page = 1, pageSize = 1 } = input;
+  const { week, page = 1, pageSize = 10 } = input;
   const skip = (page - 1) * pageSize;
 
   const leaderboard = await prisma.weeklyRepoLeaderboard.findMany({
@@ -29,7 +29,6 @@ export async function getLeaderboard(input: GetLeaderboardInput): Promise<GetLea
           title: true,
           description: true,
           githubUrl: true,
-          totalVotes: true,
           submitter: {
             select: {
               walletAddress: true
@@ -44,12 +43,40 @@ export async function getLeaderboard(input: GetLeaderboardInput): Promise<GetLea
     where: { week }
   });
 
+  if (leaderboard.length === 0) {
+    return {
+      leaderboard: [],
+      total
+    };
+  }
+
+  const repoIds = leaderboard.map(entry => entry.repository.id);
+
+  const voteCounts = await prisma.vote.groupBy({
+    by: ['repositoryId'],
+    where: {
+      repositoryId: { in: repoIds },
+      week: week
+    },
+    _count: {
+      userId: true
+    }
+  });
+
+  const voteCountMap = voteCounts.reduce(
+    (acc, curr) => {
+      acc[curr.repositoryId] = curr._count.userId;
+      return acc;
+    },
+    {} as Record<string, number>
+  );
+
   return {
-    leaderboard: leaderboard.map((entry) => ({
+    leaderboard: leaderboard.map(entry => ({
       rank: entry.rank,
       repository: {
         ...entry.repository,
-        votes: entry.repository.totalVotes
+        totalVotes: voteCountMap[entry.repository.id] || 0
       }
     })),
     total
