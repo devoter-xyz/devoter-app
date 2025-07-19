@@ -1,10 +1,11 @@
-import { Github, Medal, Trophy } from 'lucide-react';
+import { Github, Medal, Users } from 'lucide-react';
 import React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
 import { VoteButton } from './VoteButton';
+import { DevTokenLogo } from '@/components/ui/DevTokenLogo';
 
 interface LeaderboardCardProps {
   repository: {
@@ -13,7 +14,8 @@ interface LeaderboardCardProps {
     description: string;
     author: string;
     url: string;
-    votes: number;
+    uniqueVoteCount: number;
+    totalVotingPower: number;
   };
   rank: number;
   hasVoted: boolean;
@@ -22,7 +24,7 @@ interface LeaderboardCardProps {
 export const LeaderboardCard: React.FC<LeaderboardCardProps> = ({
   repository,
   rank,
-  hasVoted,
+  hasVoted
 }) => {
   return (
     <Card className="flex flex-col h-full hover:shadow-lg transition-shadow duration-200 cursor-pointer">
@@ -33,7 +35,7 @@ export const LeaderboardCard: React.FC<LeaderboardCardProps> = ({
               className={cn('h-8 w-8', {
                 'text-yellow-400': rank === 1,
                 'text-gray-400': rank === 2,
-                'text-orange-400': rank === 3,
+                'text-orange-400': rank === 3
               })}
             />
           ) : (
@@ -46,10 +48,16 @@ export const LeaderboardCard: React.FC<LeaderboardCardProps> = ({
             by {repository.author}
           </CardDescription>
         </div>
-        <Badge variant="secondary" className="flex items-center gap-1">
-          <Trophy className="h-4 w-4" />
-          {repository.votes}
-        </Badge>
+        <div className="flex flex-col gap-2">
+          <Badge variant="secondary" className="flex items-center gap-1">
+            <Users className="h-4 w-4" />
+            {repository.uniqueVoteCount} Unique Votes
+          </Badge>
+          <Badge variant="secondary" className="flex items-center gap-1">
+            <DevTokenLogo size={16} />
+            {repository.totalVotingPower.toFixed(2)} Total Votes
+          </Badge>
+        </div>
       </CardHeader>
       <CardContent className="flex-grow flex flex-col justify-between">
         <p className="text-sm text-gray-600 line-clamp-3">{repository.description}</p>

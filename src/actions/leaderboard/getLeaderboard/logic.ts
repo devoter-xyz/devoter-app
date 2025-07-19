@@ -1,10 +1,20 @@
-import { RepositoryWithVotes } from '@/actions/repository/getRepositories/logic';
 import { prisma } from '@/lib/db';
+import { Decimal } from '@prisma/client/runtime/library';
 import type { GetLeaderboardInput } from './schema';
 
 export type LeaderboardEntry = {
   rank: number;
-  repository: RepositoryWithVotes;
+  repository: {
+    id: string;
+    title: string;
+    description: string;
+    githubUrl: string;
+    submitter: {
+      walletAddress: string;
+    };
+    uniqueVoteCount: number;
+    totalVotingPower: Decimal;
+  };
 };
 
 export type GetLeaderboardOutput = {
@@ -52,33 +62,52 @@ export async function getLeaderboard(input: GetLeaderboardInput): Promise<GetLea
 
   const repoIds = leaderboard.map(entry => entry.repository.id);
 
-  const voteCounts = await prisma.vote.groupBy({
-    by: ['repositoryId'],
+  const votes = await prisma.vote.findMany({
     where: {
       repositoryId: { in: repoIds },
       week: week
     },
-    _count: {
-      userId: true
+    select: {
+      repositoryId: true,
+      userId: true,
+      tokenAmount: true
     }
   });
 
-  const voteCountMap = voteCounts.reduce(
-    (acc, curr) => {
-      acc[curr.repositoryId] = curr._count.userId;
+  const repoStats = votes.reduce(
+    (acc, vote) => {
+      if (!acc[vote.repositoryId]) {
+        acc[vote.repositoryId] = {
+          uniqueVoters: new Set<string>(),
+          totalVotingPower: new Decimal(0)
+        };
+      }
+      acc[vote.repositoryId].uniqueVoters.add(vote.userId);
+      acc[vote.repositoryId].totalVotingPower = acc[vote.repositoryId].totalVotingPower.add(
+        vote.tokenAmount
+      );
       return acc;
     },
-    {} as Record<string, number>
+    {} as Record<string, { uniqueVoters: Set<string>; totalVotingPower: Decimal }>
   );
 
-  return {
-    leaderboard: leaderboard.map(entry => ({
+  const leaderboardWithStats: LeaderboardEntry[] = leaderboard.map(entry => {
+    const stats = repoStats[entry.repository.id] || {
+      uniqueVoters: new Set(),
+      totalVotingPower: new Decimal(0)
+    };
+    return {
       rank: entry.rank,
       repository: {
         ...entry.repository,
-        totalVotes: voteCountMap[entry.repository.id] || 0
+        uniqueVoteCount: stats.uniqueVoters.size,
+        totalVotingPower: stats.totalVotingPower
       }
-    })),
+    };
+  });
+
+  return {
+    leaderboard: leaderboardWithStats,
     total
   };
 }

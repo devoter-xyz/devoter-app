@@ -52,7 +52,8 @@ export function LeaderboardPageContent({
                         description: repository.description ?? '',
                         author: repository.submitter.walletAddress,
                         url: repository.githubUrl,
-                        votes: repository.totalVotes
+                        uniqueVoteCount: repository.uniqueVoteCount,
+                        totalVotingPower: repository.totalVotingPower.toNumber()
                       }}
                       rank={rank}
                       hasVoted={userVotes.includes(repository.id)}
