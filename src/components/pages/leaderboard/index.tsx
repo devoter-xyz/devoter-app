@@ -46,14 +46,7 @@ export function LeaderboardPageContent({
                   {leaderboard.map(({ repository, rank }) => (
                     <LeaderboardCard
                       key={repository.id}
-                      repository={{
-                        id: repository.id,
-                        name: repository.title,
-                        description: repository.description ?? '',
-                        author: repository.submitter.walletAddress,
-                        url: repository.githubUrl,
-                        votes: repository.totalVotes
-                      }}
+                      repository={repository}
                       rank={rank}
                       hasVoted={userVotes.includes(repository.id)}
                     />
