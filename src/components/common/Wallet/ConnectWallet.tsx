@@ -38,7 +38,7 @@ export function ConnectWallet() {
       try {
         // Create the SIWE message
         const messageObject = {
-          domain: window.location.host,
+          domain: window.location.origin,
           address: getAddress(_address),
           uri: window.location.origin,
           version: '1',

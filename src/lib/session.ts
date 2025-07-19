@@ -42,11 +42,19 @@ export function decryptSession(encryptedData: string): SessionData {
 }
 
 export async function getSession(): Promise<SessionData | null> {
-
   const cookieStore = await cookies();
   const session = cookieStore.get(COOKIE_NAME);
+  const NODE_ENV = process.env.NODE_ENV;
   try {
-    return session ? decryptSession(session.value) : null;
+    const OVERRIDEN_USER_ID = process.env.OVERRIDEN_USER_ID;
+    if (OVERRIDEN_USER_ID && NODE_ENV === 'development') {
+      return {
+        userId: OVERRIDEN_USER_ID
+      };
+    }
+
+    const decryptedSession = session ? decryptSession(session.value) : null;
+    return decryptedSession;
   } catch (error) {
     console.warn('Failed to decrypt session:', error);
     return null;
@@ -60,11 +68,11 @@ export async function setSessionCookie(session: SessionData): Promise<void> {
     secure: process.env.NODE_ENV === 'production',
     sameSite: 'lax',
     maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
-    path: '/',
+    path: '/'
   });
 }
 
 export async function clearSessionCookie(): Promise<void> {
   const cookieStore = await cookies();
   cookieStore.delete(COOKIE_NAME);
-} 
+}
