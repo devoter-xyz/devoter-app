@@ -26,7 +26,7 @@ export async function getLeaderboard(input: GetLeaderboardInput): Promise<GetLea
   const { week, page = 1, pageSize = 10 } = input;
   const skip = (page - 1) * pageSize;
 
-  const leaderboard = await prisma.weeklyRepoLeaderboard.findMany({
+  const leaderboardWithVotes = await prisma.weeklyRepoLeaderboard.findMany({
     where: { week },
     orderBy: { rank: 'asc' },
     skip,
@@ -43,6 +43,15 @@ export async function getLeaderboard(input: GetLeaderboardInput): Promise<GetLea
             select: {
               walletAddress: true
             }
+          },
+          votes: {
+            where: {
+              week: week
+            },
+            select: {
+              userId: true,
+              tokenAmount: true
+            }
           }
         }
       }
@@ -53,53 +62,29 @@ export async function getLeaderboard(input: GetLeaderboardInput): Promise<GetLea
     where: { week }
   });
 
-  if (leaderboard.length === 0) {
+  if (leaderboardWithVotes.length === 0) {
     return {
       leaderboard: [],
       total
     };
   }
 
-  const repoIds = leaderboard.map(entry => entry.repository.id);
+  const leaderboardWithStats: LeaderboardEntry[] = leaderboardWithVotes.map(entry => {
+    const stats = entry.repository.votes.reduce(
+      (acc, vote) => {
+        acc.uniqueVoters.add(vote.userId);
+        acc.totalVotingPower = acc.totalVotingPower.add(vote.tokenAmount);
+        return acc;
+      },
+      { uniqueVoters: new Set<string>(), totalVotingPower: new Decimal(0) }
+    );
 
-  const votes = await prisma.vote.findMany({
-    where: {
-      repositoryId: { in: repoIds },
-      week: week
-    },
-    select: {
-      repositoryId: true,
-      userId: true,
-      tokenAmount: true
-    }
-  });
+    const { votes, ...repositoryData } = entry.repository;
 
-  const repoStats = votes.reduce(
-    (acc, vote) => {
-      if (!acc[vote.repositoryId]) {
-        acc[vote.repositoryId] = {
-          uniqueVoters: new Set<string>(),
-          totalVotingPower: new Decimal(0)
-        };
-      }
-      acc[vote.repositoryId].uniqueVoters.add(vote.userId);
-      acc[vote.repositoryId].totalVotingPower = acc[vote.repositoryId].totalVotingPower.add(
-        vote.tokenAmount
-      );
-      return acc;
-    },
-    {} as Record<string, { uniqueVoters: Set<string>; totalVotingPower: Decimal }>
-  );
-
-  const leaderboardWithStats: LeaderboardEntry[] = leaderboard.map(entry => {
-    const stats = repoStats[entry.repository.id] || {
-      uniqueVoters: new Set(),
-      totalVotingPower: new Decimal(0)
-    };
     return {
       rank: entry.rank,
       repository: {
-        ...entry.repository,
+        ...repositoryData,
         uniqueVoteCount: stats.uniqueVoters.size,
         totalVotingPower: stats.totalVotingPower
       }

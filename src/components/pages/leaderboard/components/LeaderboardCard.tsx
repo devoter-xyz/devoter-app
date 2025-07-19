@@ -5,18 +5,11 @@ import { Badge } from '@/components/ui/badge';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
 import { VoteButton } from './VoteButton';
-import { DevTokenLogo } from '@/components/ui/DevTokenLogo';
+import { DevTokenLogo } from '@/components/common/DevTokenLogo';
+import { LeaderboardEntry } from '@/actions/leaderboard/getLeaderboard/logic';
 
 interface LeaderboardCardProps {
-  repository: {
-    id: string;
-    name: string;
-    description: string;
-    author: string;
-    url: string;
-    uniqueVoteCount: number;
-    totalVotingPower: number;
-  };
+  repository: LeaderboardEntry['repository'];
   rank: number;
   hasVoted: boolean;
 }
@@ -43,9 +36,9 @@ export const LeaderboardCard: React.FC<LeaderboardCardProps> = ({
           )}
         </div>
         <div className="flex-1 min-w-0">
-          <CardTitle className="truncate text-lg font-semibold">{repository.name}</CardTitle>
+          <CardTitle className="truncate text-lg font-semibold">{repository.title}</CardTitle>
           <CardDescription className="truncate text-sm text-gray-500">
-            by {repository.author}
+            by {repository.submitter.walletAddress}
           </CardDescription>
         </div>
         <div className="flex flex-col gap-2">
@@ -55,7 +48,7 @@ export const LeaderboardCard: React.FC<LeaderboardCardProps> = ({
           </Badge>
           <Badge variant="secondary" className="flex items-center gap-1">
             <DevTokenLogo size={16} />
-            {repository.totalVotingPower.toFixed(2)} Total Votes
+            {repository.totalVotingPower.toNumber().toFixed(2)} Total Votes
           </Badge>
         </div>
       </CardHeader>
@@ -64,7 +57,7 @@ export const LeaderboardCard: React.FC<LeaderboardCardProps> = ({
         <div className="h-5"></div>
         <div className="flex items-center justify-between">
           <Link
-            href={repository.url}
+            href={repository.githubUrl}
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center gap-2 text-sm text-blue-500 hover:underline"
