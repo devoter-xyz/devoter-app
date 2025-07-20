@@ -69,7 +69,7 @@ export async function getLeaderboard(input: GetLeaderboardInput): Promise<GetLea
     };
   }
 
-  const leaderboardWithStats: LeaderboardEntry[] = leaderboardWithVotes.map(entry => {
+  const leaderboardWithStats: LeaderboardEntry[] = leaderboardWithVotes.map((entry) => {
     const stats = entry.repository.votes.reduce(
       (acc, vote) => {
         acc.uniqueVoters.add(vote.userId);
@@ -79,7 +79,7 @@ export async function getLeaderboard(input: GetLeaderboardInput): Promise<GetLea
       { uniqueVoters: new Set<string>(), totalVotingPower: new Decimal(0) }
     );
 
-    const { votes, ...repositoryData } = entry.repository;
+    const { votes: _votes, ...repositoryData } = entry.repository;
 
     return {
       rank: entry.rank,
