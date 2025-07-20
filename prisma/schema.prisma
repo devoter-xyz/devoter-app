@@ -8,77 +8,78 @@ datasource db {
 }
 
 model User {
-  id             String          @id @default(uuid()) @unique
-  walletAddress  String          @unique @db.VarChar(42)
-  createdAt      DateTime        @default(now())
-  updatedAt      DateTime        @updatedAt
-  repositories   Repository[]
-  votes          Vote[]
-  payments       Payment[]
+  id            String       @id @unique @default(uuid())
+  walletAddress String       @unique @db.VarChar(42)
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+  repositories  Repository[]
+  votes         Vote[]
+  payments      Payment[]
 }
 
 model Repository {
-  id               String    @id @default(uuid())
-  title            String    @db.VarChar(255)
-  description      String
-  githubUrl        String    @db.VarChar(255)
-  submitterId      String
-  submitter        User      @relation(fields: [submitterId], references: [id])
-  totalVotes       Int       @default(0)
-  totalTokenAmount Decimal   @default(0) @db.Decimal(36, 18)
-  paymentId        String    @unique
-  payment          Payment   @relation("RepoPayment", fields: [paymentId], references: [id])
-  createdAt        DateTime  @default(now())
-  updatedAt        DateTime  @updatedAt
-  votes            Vote[]
+  id                 String                  @id @default(uuid())
+  title              String                  @db.VarChar(255)
+  description        String
+  githubUrl          String                  @db.VarChar(255)
+  submitterId        String
+  submitter          User                    @relation(fields: [submitterId], references: [id])
+  totalVotes         Int                     @default(0)
+  totalTokenAmount   Decimal                 @default(0) @db.Decimal(36, 18)
+  paymentId          String                  @unique
+  payment            Payment                 @relation("RepoPayment", fields: [paymentId], references: [id])
+  featured           Boolean                 @default(false)
+  createdAt          DateTime                @default(now())
+  updatedAt          DateTime                @updatedAt
+  votes              Vote[]
   leaderboardEntries WeeklyRepoLeaderboard[]
 }
 
 model Vote {
-  id            String     @id @default(uuid())
-  userId        String
-  repositoryId  String
-  user          User       @relation(fields: [userId], references: [id])
-  repository    Repository @relation(fields: [repositoryId], references: [id])
-  tokenAmount   Decimal    @db.Decimal(36, 18)
-  lastVerified  DateTime   @default(now())
-  createdAt     DateTime   @default(now())
-  updatedAt     DateTime   @updatedAt
-  week          String
-  payments      Payment[]
+  id           String     @id @default(uuid())
+  userId       String
+  repositoryId String
+  user         User       @relation(fields: [userId], references: [id])
+  repository   Repository @relation(fields: [repositoryId], references: [id])
+  tokenAmount  Decimal    @db.Decimal(36, 18)
+  lastVerified DateTime   @default(now())
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+  week         String
+  payments     Payment[]
 
   @@unique([userId, repositoryId, week])
 }
 
 model Payment {
-  id            String     @id @default(uuid())
+  id            String      @id @default(uuid())
   userId        String
-  user          User       @relation(fields: [userId], references: [id])
-  walletAddress String     @db.VarChar(42)
-  tokenAmount   Decimal    @db.Decimal(36, 18)
-  txHash        String     @unique
-  createdAt     DateTime   @default(now())
+  user          User        @relation(fields: [userId], references: [id])
+  walletAddress String      @db.VarChar(42)
+  tokenAmount   Decimal     @db.Decimal(36, 18)
+  txHash        String      @unique
+  createdAt     DateTime    @default(now())
   voteId        String?
-  vote          Vote?      @relation(fields: [voteId], references: [id])
+  vote          Vote?       @relation(fields: [voteId], references: [id])
   repository    Repository? @relation("RepoPayment")
   week          String
 }
 
 model WeeklyRepoLeaderboard {
-  id          String     @id @default(uuid())
-  repoId      String
-  repository  Repository @relation(fields: [repoId], references: [id])
-  rank        Int
-  week        String
-  createdAt   DateTime   @default(now())
-  updatedAt   DateTime   @updatedAt
+  id         String     @id @default(uuid())
+  repoId     String
+  repository Repository @relation(fields: [repoId], references: [id])
+  rank       Int
+  week       String
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @updatedAt
 
   @@unique([week, rank])
   @@unique([repoId, week])
 }
 
 model AdminUser {
-  id            String   @id @default(uuid()) @unique
+  id            String   @id @unique @default(uuid())
   walletAddress String   @unique
   createdAt     DateTime @default(now())
 }
