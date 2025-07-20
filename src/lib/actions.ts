@@ -39,3 +39,17 @@ export const authActionClient = actionClient.use(async ({ next, ctx }) => {
 
   return next({ ctx: { ...ctx, session: { ...ctx.session, userId } } });
 });
+
+export const adminActionClient = authActionClient.use(async ({ next, ctx }) => {
+  const userId = ctx.session.userId;
+
+  const admin = await prisma.adminUser.findUnique({
+    where: { id: userId }
+  });
+
+  if (!admin) {
+    throw new Error('You do not have permission to perform this action');
+  }
+
+  return next({ ctx });
+});

@@ -73,6 +73,35 @@ npx dotenv -e .env.local -- npx prisma migrate reset
 npx dotenv -e .env.local -- ts-node --compiler-options {\"module\":\"CommonJS\"} prisma/seed.ts
 ```
 
+## 🔐 Admin Actions
+
+To create actions restricted to admin users, use the `adminActionClient` from `src/lib/actions.ts`. This client will verify that the user is authenticated and is present in the `AdminUser` table.
+
+### Example Usage
+
+```typescript
+// src/actions/admin/someAdminAction.ts
+import { adminActionClient } from '@/lib/actions';
+
+export const someAdminAction = adminActionClient.action(async ({ ctx }) => {
+  // This code will only execute if the user is an admin
+  console.log('Admin user ID:', ctx.session.userId);
+  // ... your admin logic here
+});
+```
+
+### Adding an Admin User
+
+To add an admin user, you need to manually add their user ID to the `AdminUser` table in the database. You can do this using Prisma Studio:
+
+1.  Start Prisma Studio:
+    ```bash
+    npx dotenv -e .env.local -- npx prisma studio
+    ```
+2.  Open your browser to `http://localhost:5555`.
+3.  Navigate to the `AdminUser` model.
+4.  Click "Add record" and enter the `id` and `walletAddress` of the user you want to make an admin. The `id` should be the user's ID from the `User` table.
+
 ## 🚀 Deployment
 
 | Component | Platform | Auto-Deploy |

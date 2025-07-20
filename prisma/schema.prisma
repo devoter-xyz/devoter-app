@@ -76,3 +76,9 @@ model WeeklyRepoLeaderboard {
   @@unique([week, rank])
   @@unique([repoId, week])
 }
+
+model AdminUser {
+  id            String   @id @default(uuid()) @unique
+  walletAddress String   @unique
+  createdAt     DateTime @default(now())
+}
