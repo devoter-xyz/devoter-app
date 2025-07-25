@@ -13,7 +13,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { SiweMessage } from 'siwe';
 import { toast } from 'sonner';
 import { getAddress } from 'viem';
-import { useAccount, useSignMessage, useDisconnect } from 'wagmi';
+import { useAccount, useDisconnect, useSignMessage } from 'wagmi';
 
 export function ConnectWallet() {
   const { executeAsync: signIn } = useAction(signInAction);
@@ -135,11 +135,11 @@ export function ConnectWallet() {
   if (user) {
     return (
       <div className='flex items-center gap-2'>
-        <Button className='text-sm text-black bg-purple-200 hover:bg-purple-400 border border-orange-500'>
+        <Button>
           <Wallet2Icon className='mr-1 h-4 w-4' />
           {user.walletAddress.slice(0, 6)}...{user.walletAddress.slice(-4)}
         </Button>
-        <Button onClick={handleSignOut} variant='outline' size='sm'>
+        <Button onClick={handleSignOut} variant='secondary' size='sm'>
           Sign Out
         </Button>
       </div>
@@ -148,7 +148,7 @@ export function ConnectWallet() {
 
   return (
     <div className='flex items-center gap-2'>
-      <Button onClick={handleClick} disabled={isConnecting} className='min-w-[200px] cursor-pointer'>
+      <Button onClick={handleClick} disabled={isConnecting} className='min-w-[200px]'>
         {isConnecting ? 'Connecting...' : 'Connect Wallet'}
       </Button>
       {isConnecting && <span className='text-sm text-gray-500'>Signing...</span>}
