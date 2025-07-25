@@ -6,22 +6,24 @@ import { signOutAction } from '@/actions/auth/signout/action';
 import { useSession } from '@/components/providers/SessionProvider';
 import { Button } from '@/components/ui/button';
 import { useConnectModal } from '@rainbow-me/rainbowkit';
+import { Wallet2Icon } from 'lucide-react';
 import { useAction } from 'next-safe-action/hooks';
 import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
 import { SiweMessage } from 'siwe';
 import { toast } from 'sonner';
 import { getAddress } from 'viem';
-import { useAccount, useSignMessage } from 'wagmi';
+import { useAccount, useSignMessage, useDisconnect } from 'wagmi';
 
 export function ConnectWallet() {
   const { executeAsync: signIn } = useAction(signInAction);
   const { executeAsync: signOut } = useAction(signOutAction);
   const { address, chainId, isConnected } = useAccount();
-  const { user, isLoading } = useSession();
+  const { user, isLoading, refetchSession, clearSession } = useSession();
   const { signMessageAsync } = useSignMessage();
   const [isConnecting, setIsConnecting] = useState(false);
   const { openConnectModal } = useConnectModal();
+  const { disconnect } = useDisconnect();
   const router = useRouter();
 
   const handleSignIn = useCallback(
@@ -66,7 +68,7 @@ export function ConnectWallet() {
 
         if (success.data) {
           toast.success(`Welcome! You're now signed in with ${_address.slice(0, 6)}...${_address.slice(-4)}`);
-
+          refetchSession();
           router.push('/');
         } else {
           toast.error('Failed to sign in with your wallet.');
@@ -84,6 +86,8 @@ export function ConnectWallet() {
   const handleSignOut = async () => {
     try {
       await signOut();
+      clearSession();
+      disconnect();
       toast.success('You have been successfully signed out.');
     } catch (error) {
       toast.error(error instanceof Error ? error.message : 'Failed to sign out.');
@@ -131,9 +135,10 @@ export function ConnectWallet() {
   if (user) {
     return (
       <div className='flex items-center gap-2'>
-        <span className='text-sm text-gray-600'>
+        <Button className='text-sm text-black bg-purple-200 hover:bg-purple-400 border border-orange-500'>
+          <Wallet2Icon className='mr-1 h-4 w-4' />
           {user.walletAddress.slice(0, 6)}...{user.walletAddress.slice(-4)}
-        </span>
+        </Button>
         <Button onClick={handleSignOut} variant='outline' size='sm'>
           Sign Out
         </Button>

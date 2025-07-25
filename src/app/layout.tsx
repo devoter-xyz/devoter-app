@@ -23,6 +23,14 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Devoter App",
   description: "A decentralized voting application for GitHub repositories",
+  icons: {
+    icon: [
+      { url: '/dev-token-logo.png' },
+      { url: '/dev-token-logo.png', sizes: '16x16', type: 'image/png' },
+      { url: '/dev-token-logo.png', sizes: '32x32', type: 'image/png' },
+    ],
+    apple: '/dev-token-logo.png',
+  },
 };
 
 export default function RootLayout({

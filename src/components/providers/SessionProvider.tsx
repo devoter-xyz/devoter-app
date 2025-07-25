@@ -8,6 +8,8 @@ import { createContext, ReactNode, useContext, useEffect, useState } from 'react
 interface SessionContextType {
   user: GetUserFromSessionResult | null;
   isLoading: boolean;
+  refetchSession: () => void;
+  clearSession: () => void;
 }
 
 const SessionContext = createContext<SessionContextType | undefined>(undefined);
@@ -20,18 +22,29 @@ export function SessionProvider({ children }: SessionProviderProps) {
   const [user, setUser] = useState<GetUserFromSessionResult | null>(null);
   const { executeAsync: getUserFromSession, isExecuting } = useAction(getUserFromSessionAction);
 
-  useEffect(() => {
+  const fetchUser = () => {
     getUserFromSession().then((result) => {
-      if (result?.data) {
-        setUser(result.data);
-      }
+      setUser(result?.data ?? null);
     });
+  };
+
+  useEffect(() => {
+    fetchUser();
   }, [getUserFromSession]);
 
+  const refetchSession = () => {
+    fetchUser();
+  };
+
+  const clearSession = () => {
+    setUser(null);
+  };
 
   const value: SessionContextType = {
     user,
     isLoading: isExecuting,
+    refetchSession,
+    clearSession,
   };
 
   return (
