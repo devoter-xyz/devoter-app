@@ -1,6 +1,5 @@
 'use client';
 
-import { Logo } from '@/components/common/Logo';
 import { SIDEBAR_LINKS, SidebarLink } from './data';
 import { SidebarItem } from './SidebarItem';
 import { SubmitRepositoryButton } from './SubmitRepositoryButton';
