@@ -6,6 +6,7 @@ import "./globals.css";
 import { Analytics } from '@vercel/analytics/react';
 import { TopLoader } from 'next-top-loader';
 import { Header } from '@/components/common/Header';
+import { Sidebar } from '@/components/common/Sidebar';
 import { Toaster as SonnerToaster } from '@/components/ui/sonner';
 import { Providers as ThirdwebProviders } from '@/components/providers/ThirdwebProvider';
 import { cn } from '@/lib/utils';
@@ -51,8 +52,13 @@ export default function RootLayout({
           <SessionProvider>
             <WalletProvider>
               <Header />
-              <TopLoader />
-              <main>{children}</main>
+              <div className="flex">
+                <Sidebar />
+                <div className="flex-1">
+                  <TopLoader />
+                  <main className="p-8">{children}</main>
+                </div>
+              </div>
               <SonnerToaster />
             </WalletProvider>
           </SessionProvider>
