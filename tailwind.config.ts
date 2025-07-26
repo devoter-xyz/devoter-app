@@ -1,4 +1,5 @@
 import type { Config } from 'tailwindcss';
+import plugin from 'tailwindcss/plugin';
 
 const config: Config = {
   content: [
@@ -20,12 +21,12 @@ const config: Config = {
           foreground: 'hsl(var(--popover-foreground))'
         },
         primary: {
-          DEFAULT: '#5637D1',
-          foreground: '#ffffff'
+          DEFAULT: 'hsl(var(--primary))',
+          foreground: 'hsl(var(--primary-foreground))',
         },
         secondary: {
-          DEFAULT: '#FF7300',
-          foreground: '#ffffff'
+          DEFAULT: 'hsl(var(--secondary))',
+          foreground: 'hsl(var(--secondary-foreground))',
         },
         muted: {
           DEFAULT: 'hsl(var(--muted))',
@@ -37,11 +38,20 @@ const config: Config = {
         },
         destructive: {
           DEFAULT: 'hsl(var(--destructive))',
-          foreground: 'hsl(var(--destructive-foreground))'
+          foreground: 'hsl(var(--destructive-foreground))',
         },
         border: 'hsl(var(--border))',
         input: 'hsl(var(--input))',
         ring: 'hsl(var(--ring))',
+        gold: '#FFD700',
+        silver: '#C0C0C0',
+        bronze: '#CD7F32',
+        'gradient-1': '#F4A261',
+        'gradient-2': '#E76F51',
+        'gradient-3': '#2A9D8F',
+        'gradient-4': '#264653',
+        'brand-purple': '#6B46C1',
+        'brand-orange': '#F56565',
         chart: {
           '1': 'hsl(var(--chart-1))',
           '2': 'hsl(var(--chart-2))',
@@ -71,7 +81,30 @@ const config: Config = {
       }
     }
   },
-  plugins: []
+  plugins: [
+    require('tailwindcss-animate'),
+    plugin(function ({ addUtilities, theme }) {
+      const newUtilities = {
+        '.border-gradient-gold': {
+          border: '2px solid transparent',
+          background: `linear-gradient(${theme('colors.background')}, ${theme('colors.background')}) padding-box, linear-gradient(to right, #FFD700, #FDB813) border-box`,
+        },
+        '.border-gradient-silver': {
+          border: '2px solid transparent',
+          background: `linear-gradient(${theme('colors.background')}, ${theme('colors.background')}) padding-box, linear-gradient(to right, #C0C0C0, #A9A9A9) border-box`,
+        },
+        '.border-gradient-bronze': {
+          border: '2px solid transparent',
+          background: `linear-gradient(${theme('colors.background')}, ${theme('colors.background')}) padding-box, linear-gradient(to right, #CD7F32, #A0522D) border-box`,
+        },
+        '.border-gradient-featured': {
+          border: '2px solid transparent',
+          background: `linear-gradient(${theme('colors.background')}, ${theme('colors.background')}) padding-box, linear-gradient(to right, #E76F51, #F4A261) border-box`,
+        },
+      };
+      addUtilities(newUtilities);
+    }),
+  ],
 } satisfies Config;
 
 export default config;
