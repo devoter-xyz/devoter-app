@@ -22,7 +22,7 @@ export default async function WeeklyRepoList() {
           description={repo.description || ''}
           tags={repo.tags}
           votes={repo.votes}
-          variant={index < 3 ? ['first', 'second', 'third'][index] as any : 'default'}
+          variant={index < 3 ? (['first', 'second', 'third'] as const)[index] : 'default'}
         />
       ))}
     </>
