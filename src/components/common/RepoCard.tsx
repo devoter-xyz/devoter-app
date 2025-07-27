@@ -1,9 +1,8 @@
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card';
 import { cva, type VariantProps } from 'class-variance-authority';
 import { cn } from '@/lib/utils';
-import { Coins, Heart } from 'lucide-react';
+import { Coins, Heart, VerifiedIcon } from 'lucide-react';
 import { Badge } from '@/components/common/Badge';
-import VerifiedIcon from '@/components/common/VerifiedIcon';
 
 const cardVariants = cva('h-full w-full rounded-2xl', {
   variants: {
