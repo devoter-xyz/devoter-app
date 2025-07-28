@@ -21,7 +21,7 @@ export async function getWeeklyTopReposLogic() {
         _count: 'desc',
       },
     },
-    take: 10, // Adjust as needed
+    take: 10,
   });
 
   return repos.map((repo: Repository & { _count: { votes: number } }) => {
@@ -33,7 +33,7 @@ export async function getWeeklyTopReposLogic() {
       owner: owner,
       name: repo.title,
       description: repo.description,
-      tags: [], // Assuming no tags are available on the Repository model for now
+      tags: [],
       votes: repo._count.votes,
     };
   });

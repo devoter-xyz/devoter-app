@@ -57,7 +57,7 @@ const RepoCard = ({ className, variant, name, owner, description, tags, votes, i
             <div className="flex h-6 w-6 items-center justify-center rounded-full bg-brand-purple/10">
               <Coins className="h-4 w-4 text-brand-purple" />
             </div>
-            <p className="font-bold text-brand-purple">{votes}k Votes <span className="text-muted-foreground">This Week</span></p>
+            <p className="font-bold text-brand-purple">{votes} Votes <span className="text-muted-foreground">This Week</span></p>
           </div>
           <p className="text-lg text-muted-foreground">{description}</p>
         </CardContent>
