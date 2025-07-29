@@ -2,8 +2,7 @@ import { signIn } from '@/actions/auth/signin/logic';
 import { updateWeeklyLeaderboard } from '@/actions/leaderboard/archive/logic';
 import { createRepository } from '@/actions/repository/createRepository/logic';
 import { faker } from '@faker-js/faker';
-import { PrismaClient } from '@prisma/client';
-import { Decimal } from '@prisma/client/runtime/library';
+import { Prisma, PrismaClient } from '@prisma/client';
 import crypto from 'crypto';
 import { Wallet } from 'ethers';
 import { SiweMessage } from 'siwe';
@@ -32,14 +31,24 @@ function weekString(date: Date): string {
 function randomTokenDecimal(min: number, max: number, precision = 6) {
   const multipleOf = 1 / 10 ** precision;
   const random = faker.number.float({ min, max, multipleOf });
-  return new Decimal(random.toString());
+  return new Prisma.Decimal(random.toString());
 }
 
 async function main() {
   console.log('🌱  Starting faker seed …');
 
   // -------------------------------------------------------------------------
-  // 1. Users
+  // 1. Admin User
+  // -------------------------------------------------------------------------
+  await prisma.adminUser.upsert({
+    where: { walletAddress: '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266' },
+    update: {},
+    create: { walletAddress: '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266' }
+  });
+  console.log('✓ Upserted admin user');
+
+  // -------------------------------------------------------------------------
+  // 2. Users
   // -------------------------------------------------------------------------
   const users = await Promise.all(
     Array.from({ length: NUM_USERS }).map(async () => {
@@ -67,24 +76,27 @@ async function main() {
       );
     })
   );
-  console.log(`Inserted ${users.length} users`);
+  console.log(`✓ Inserted ${users.length} users`);
 
-  // Keep running totals for leaderboard creation later
-  const weeklyTotals: Record<string, Record<string, Decimal>> = {};
+  // Keep track of which weeks have had activity
+  const activeWeeks = new Set<string>();
 
   // -------------------------------------------------------------------------
-  // 2. Repositories (with submission Payments)
+  // 3. Repositories (with submission Payments)
   // -------------------------------------------------------------------------
+  console.log('⎋ Creating repositories…');
   for (let i = 0; i < NUM_REPOS; i++) {
     const submitter = faker.helpers.arrayElement(users);
 
     if (!submitter) {
-      return;
+      // Should not happen with the current logic, but good practice
+      continue;
     }
 
     // Submission takes place within the last 120 days
     const repoCreated = faker.date.recent({ days: 120 });
     const submissionWeek = weekString(repoCreated);
+    activeWeeks.add(submissionWeek);
 
     // Fee for submitting: = 1 USDC
     const submissionFee = 1;
@@ -113,17 +125,15 @@ async function main() {
         createdAt: repoCreated
       }
     });
-
-    // Keep running totals for leaderboard creation later
-    if (!weeklyTotals[submissionWeek]) {
-      weeklyTotals[submissionWeek] = {};
-    }
   }
+  console.log(`✓ Inserted ${NUM_REPOS} repositories`);
 
   // -------------------------------------------------------------------------
-  // 3. Votes (with Payments)
+  // 4. Votes (with Payments)
   // -------------------------------------------------------------------------
+  console.log('⎋ Creating votes…');
   const repos = await prisma.repository.findMany();
+  let totalVotesCreated = 0;
   for (const repo of repos) {
     // Each repo gets a random number of votes
     const numVotes = faker.number.int({ min: 1, max: MAX_VOTES_PER_REPO });
@@ -132,6 +142,7 @@ async function main() {
 
     for (const voter of voters) {
       const votingWeek = weekString(repo.createdAt);
+      activeWeeks.add(votingWeek);
       const tokenAmount = randomTokenDecimal(0.1, 10);
 
       const vote = await prisma.vote.create({
@@ -153,10 +164,40 @@ async function main() {
           voteId: vote.id
         }
       });
+      totalVotesCreated++;
     }
   }
+  console.log(`✓ Inserted ${totalVotesCreated} votes`);
 
-  await updateWeeklyLeaderboard(weekString(new Date()));
+  // -------------------------------------------------------------------------
+  // 5. Update Repository Vote Counts
+  // -------------------------------------------------------------------------
+  console.log('⎋ Updating repository vote counts…');
+  const reposWithVotes = await prisma.repository.findMany({
+    include: {
+      _count: {
+        select: { votes: true }
+      }
+    }
+  });
+
+  for (const repo of reposWithVotes) {
+    await prisma.repository.update({
+      where: { id: repo.id },
+      data: { totalVotes: repo._count.votes }
+    });
+  }
+  console.log(`✓ Updated vote counts for ${reposWithVotes.length} repositories`);
+
+  // -------------------------------------------------------------------------
+  // 6. Leaderboards
+  // -------------------------------------------------------------------------
+  console.log('⎋ Updating weekly leaderboards…');
+  for (const week of activeWeeks) {
+    await updateWeeklyLeaderboard(week);
+    console.log(`  - Updated leaderboard for ${week}`);
+  }
+  console.log(`✓ Updated ${activeWeeks.size} leaderboards`);
 }
 
 main()

@@ -18,6 +18,7 @@ CREATE TABLE "Repository" (
     "totalVotes" INTEGER NOT NULL DEFAULT 0,
     "totalTokenAmount" DECIMAL(36,18) NOT NULL DEFAULT 0,
     "paymentId" TEXT NOT NULL,
+    "featured" BOOLEAN NOT NULL DEFAULT false,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
@@ -64,6 +65,15 @@ CREATE TABLE "WeeklyRepoLeaderboard" (
     CONSTRAINT "WeeklyRepoLeaderboard_pkey" PRIMARY KEY ("id")
 );
 
+-- CreateTable
+CREATE TABLE "AdminUser" (
+    "id" TEXT NOT NULL,
+    "walletAddress" TEXT NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "AdminUser_pkey" PRIMARY KEY ("id")
+);
+
 -- CreateIndex
 CREATE UNIQUE INDEX "User_id_key" ON "User"("id");
 
@@ -74,7 +84,7 @@ CREATE UNIQUE INDEX "User_walletAddress_key" ON "User"("walletAddress");
 CREATE UNIQUE INDEX "Repository_paymentId_key" ON "Repository"("paymentId");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "Vote_userId_repositoryId_key" ON "Vote"("userId", "repositoryId");
+CREATE UNIQUE INDEX "Vote_userId_repositoryId_week_key" ON "Vote"("userId", "repositoryId", "week");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Payment_txHash_key" ON "Payment"("txHash");
@@ -84,6 +94,12 @@ CREATE UNIQUE INDEX "WeeklyRepoLeaderboard_week_rank_key" ON "WeeklyRepoLeaderbo
 
 -- CreateIndex
 CREATE UNIQUE INDEX "WeeklyRepoLeaderboard_repoId_week_key" ON "WeeklyRepoLeaderboard"("repoId", "week");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "AdminUser_id_key" ON "AdminUser"("id");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "AdminUser_walletAddress_key" ON "AdminUser"("walletAddress");
 
 -- AddForeignKey
 ALTER TABLE "Repository" ADD CONSTRAINT "Repository_submitterId_fkey" FOREIGN KEY ("submitterId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
