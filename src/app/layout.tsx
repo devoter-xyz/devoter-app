@@ -51,12 +51,11 @@ export default function RootLayout({
         <ThirdwebProviders>
           <SessionProvider>
             <WalletProvider>
-              <Header />
               <div className="flex">
                 <Sidebar />
-                <div className="flex-1">
+                <div className='flex-1'>
                   <TopLoader />
-                  <main className="p-8">{children}</main>
+                  <main>{children}</main>
                 </div>
               </div>
               <SonnerToaster />

@@ -5,7 +5,7 @@ import RepoCardSkeleton from '@/components/common/RepoCardSkeleton';
 
 export default function HeroSection() {
   return (
-    <section className="py-10">
+    <section className="py-10 px-6">
       <h1 className="mb-8 flex items-center gap-3 text-3xl font-bold">
         <ChartLine className="h-7 w-7" />
         Top Repositories
