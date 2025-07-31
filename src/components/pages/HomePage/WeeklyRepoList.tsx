@@ -1,8 +1,43 @@
-import { getWeeklyTopRepos } from '@/actions/repository/getTopUniqueVotedRepositories/action';
 import RepoCard from '@/components/common/RepoCard';
 
+const fakeRepos = [
+  {
+    id: '1',
+    owner: 'openai',
+    name: 'gpt-repo',
+    description: 'A test repo for GPT functionality.',
+    tags: ['AI', 'NLP', 'Machine Learning'],
+    votes: 42,
+  },
+  {
+    id: '2',
+    owner: 'vercel',
+    name: 'next.js',
+    description: 'The React Framework for the Web.',
+    tags: ['React', 'Framework', 'SSR'],
+    votes: 35,
+  },
+  {
+    id: '3',
+    owner: 'facebook',
+    name: 'react',
+    description: 'A declarative, efficient, and flexible JavaScript library for building UI.',
+    tags: ['JavaScript', 'Library', 'UI'],
+    votes: 50,
+  },
+  {
+    id: '4',
+    owner: 'd3',
+    name: 'd3',
+    description: 'Bring data to life with SVG, Canvas and HTML.',
+    tags: ['DataViz', 'JavaScript', 'Charts'],
+    votes: 20,
+  },
+];
+
 export default async function WeeklyRepoList() {
-  const repos = await getWeeklyTopRepos();
+  // const repos = await getWeeklyTopRepos();
+  const repos = fakeRepos;
 
   if (repos.length === 0) {
     return (
