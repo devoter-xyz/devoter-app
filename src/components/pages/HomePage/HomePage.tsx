@@ -1,7 +1,61 @@
-import { Suspense } from 'react';
-import { ChartLine, Star } from 'lucide-react';
-import WeeklyRepoList from './WeeklyRepoList';
+import RepoCard from '@/components/common/RepoCard';
 import RepoCardSkeleton from '@/components/common/RepoCardSkeleton';
+import { ChartLine, Star } from 'lucide-react';
+import { Suspense } from 'react';
+
+const topRepo = [
+  {
+    id: '1',
+    owner: 'openai',
+    name: 'gpt-repo',
+    description: 'A test repo for GPT functionality.',
+    tags: ['AI', 'NLP', 'Machine Learning'],
+    votes: 42
+  },
+  {
+    id: '2',
+    owner: 'vercel',
+    name: 'next.js',
+    description: 'The React Framework for the Web.',
+    tags: ['React', 'Framework', 'SSR'],
+    votes: 35
+  },
+  {
+    id: '3',
+    owner: 'facebook',
+    name: 'react',
+    description: 'A declarative, efficient, and flexible JavaScript library for building UI.',
+    tags: ['JavaScript', 'Library', 'UI'],
+    votes: 50
+  }
+];
+
+const featuredRepo = [
+  {
+    id: '4',
+    owner: 'microsoft',
+    name: 'vscode',
+    description: 'Visual Studio Code - Code editing. Redefined.',
+    tags: ['Editor', 'TypeScript', 'Developer Tools'],
+    votes: 61
+  },
+  {
+    id: '5',
+    owner: 'torvalds',
+    name: 'linux',
+    description: 'Linux kernel source tree.',
+    tags: ['Kernel', 'Operating System', 'C'],
+    votes: 78
+  },
+  {
+    id: '6',
+    owner: 'tensorflow',
+    name: 'tensorflow',
+    description: 'An open-source machine learning framework for everyone.',
+    tags: ['Machine Learning', 'Deep Learning', 'Python'],
+    votes: 55
+  }
+];
 
 export default function HomePage() {
   return (
@@ -21,7 +75,17 @@ export default function HomePage() {
               </>
             }
           >
-            <WeeklyRepoList />
+            {topRepo.map((repo) => (
+              <RepoCard
+                key={repo.id}
+                owner={repo.owner}
+                name={repo.name}
+                description={repo.description || ''}
+                tags={repo.tags}
+                votes={repo.votes}
+                cardType='featured'
+              />
+            ))}
           </Suspense>
         </div>
       </div>
@@ -40,7 +104,18 @@ export default function HomePage() {
               </>
             }
           >
-            <WeeklyRepoList />
+            {featuredRepo.map((repo, index) => (
+              <RepoCard
+                key={repo.id}
+                owner={repo.owner}
+                name={repo.name}
+                description={repo.description || ''}
+                tags={repo.tags}
+                votes={repo.votes}
+                cardType='default'
+                variant={index < 3 ? (['first', 'second', 'third'] as const)[index] : 'default'}
+              />
+            ))}
           </Suspense>
         </div>
       </div>
