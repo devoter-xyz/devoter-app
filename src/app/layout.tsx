@@ -46,7 +46,7 @@ export default function RootLayout({
             <WalletProvider>
               <div className='flex'>
                 <Sidebar />
-                <div className='flex-1'>
+                <div className='flex-1 ml-64'>
                   <TopLoader />
                   <main>{children}</main>
                 </div>

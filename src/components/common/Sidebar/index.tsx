@@ -7,7 +7,7 @@ import { SubmitRepositoryButton } from './SubmitRepositoryButton';
 
 export const Sidebar = () => {
   return (
-    <aside className='h-screen w-64'>
+    <aside className='fixed top-0 left-0 h-screen w-64 z-50'>
       <div className='h-full flex flex-col bg-background border-r overflow-y-auto p-4'>
         <div className='my-6'>
         <Logo />
