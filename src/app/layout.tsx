@@ -25,11 +25,11 @@ export const metadata: Metadata = {
   description: 'A decentralized voting application for GitHub repositories',
   icons: {
     icon: [
-      { url: '/dev-token-logo.png' },
-      { url: '/dev-token-logo.png', sizes: '16x16', type: 'image/png' },
-      { url: '/dev-token-logo.png', sizes: '32x32', type: 'image/png' }
+      { url: '/logo.svg' },
+      { url: '/logo.svg', sizes: '16x16', type: 'image/png' },
+      { url: '/logo.svg', sizes: '32x32', type: 'image/png' }
     ],
-    apple: '/dev-token-logo.png'
+    apple: '/logo.svg'
   }
 };
 
