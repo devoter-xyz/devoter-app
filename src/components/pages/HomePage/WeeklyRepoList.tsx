@@ -41,7 +41,7 @@ export default async function WeeklyRepoList() {
 
   return (
     <>
-      {repos.map((repo, index) => (
+      {repos.map((repo) => (
         <RepoCard
           key={repo.id}
           owner={repo.owner}
