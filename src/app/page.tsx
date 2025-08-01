@@ -1,11 +1,11 @@
 import { Header } from '@/components/common/Header';
-import HeroSection from '@/components/pages/HomePage/HeroSection';
+import HomePage from '@/components/pages/HomePage/HomePage';
 
 export default function Home() {
   return (
     <main>
-      <Header/>
-      <HeroSection />
+      <Header />
+      <HomePage />
     </main>
   );
 }

@@ -30,6 +30,7 @@ export interface RepoCardProps extends React.HTMLAttributes<HTMLDivElement>, Var
   votes: number;
   isFavorited?: boolean;
   isVerified?: boolean;
+  cardType?: 'default' | 'featured';
 }
 
 const RepoCard = ({
@@ -42,13 +43,14 @@ const RepoCard = ({
   votes,
   isFavorited,
   isVerified,
+  cardType = 'default',
   ...props
 }: RepoCardProps) => {
   const showBadge = variant === 'first' || variant === 'second' || variant === 'third';
 
   return (
     <div className='relative'>
-      <Card className={cn(cardVariants({ variant }), 'p-6 justify-between', className)} {...props}>
+      <Card className={cn(cardVariants({ variant }), `p-6 justify-between ${ cardType == 'featured' ? "bg-amber-100/30 border-orange-300" : "bg-background" } `, className)} {...props}>
         <CardHeader className='flex items-start justify-between p-0'>
           <div className='flex w-full items-start justify-between gap-4'>
             <div className='flex items-center gap-4'>

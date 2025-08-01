@@ -25,14 +25,6 @@ const fakeRepos = [
     tags: ['JavaScript', 'Library', 'UI'],
     votes: 50,
   },
-  {
-    id: '4',
-    owner: 'd3',
-    name: 'd3',
-    description: 'Bring data to life with SVG, Canvas and HTML.',
-    tags: ['DataViz', 'JavaScript', 'Charts'],
-    votes: 20,
-  },
 ];
 
 export default async function WeeklyRepoList() {
@@ -57,7 +49,7 @@ export default async function WeeklyRepoList() {
           description={repo.description || ''}
           tags={repo.tags}
           votes={repo.votes}
-          variant={index < 3 ? (['first', 'second', 'third'] as const)[index] : 'default'}
+          cardType='featured'
         />
       ))}
     </>
