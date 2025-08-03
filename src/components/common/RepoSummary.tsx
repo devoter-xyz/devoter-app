@@ -6,7 +6,6 @@ import {
   Coins,
   FileText,
   GitFork,
-  Github,
   Globe,
   Heart,
   Star,
