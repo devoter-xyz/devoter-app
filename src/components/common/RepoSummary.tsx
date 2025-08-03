@@ -2,7 +2,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
-import { Heart, VerifiedIcon, ExternalLink, Star, GitFork, TrendingUp, Globe, FileText, Coins } from 'lucide-react';
+import { Heart, VerifiedIcon, ExternalLink, Star, GitFork, TrendingUp, Globe, FileText, Coins, Github } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 
@@ -135,7 +135,7 @@ const RepoSummary: React.FC<RepoSummaryProps> = ({
 
               {/* Links */}
               <div className='flex items-center gap-4'>
-                <ExternalLink className='w-4 h-4 text-gray-500' />
+                <Github className='w-4 h-4 text-gray-500' />
                 <Globe className='w-4 h-4 text-gray-500' />
                 <FileText className='w-4 h-4 text-gray-500' />
               </div>
