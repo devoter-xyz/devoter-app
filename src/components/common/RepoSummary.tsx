@@ -37,13 +37,13 @@ export interface RepoSummaryProps {
 }
 
 const RepoSummary: React.FC<RepoSummaryProps> = ({
-  id,
+  // id,
   name,
   owner,
   description,
-  githubUrl,
-  websiteUrl,
-  docsUrl,
+  // githubUrl,
+  // websiteUrl,
+  // docsUrl,
   tags = [],
   totalVotes,
   githubStars,
@@ -63,12 +63,12 @@ const RepoSummary: React.FC<RepoSummaryProps> = ({
     return num.toString();
   };
 
-  const formatRank = (rank?: number) => {
-    if (!rank) return 'N/A';
-    const suffix = ['th', 'st', 'nd', 'rd'];
-    const v = rank % 100;
-    return rank + (suffix[(v - 20) % 10] || suffix[v] || suffix[0]);
-  };
+  // const formatRank = (rank?: number) => {
+  //   if (!rank) return 'N/A';
+  //   const suffix = ['th', 'st', 'nd', 'rd'];
+  //   const v = rank % 100;
+  //   return rank + (suffix[(v - 20) % 10] || suffix[v] || suffix[0]);
+  // };
 
   return (
     <div className={cn('w-full max-w-5xl mx-auto', className)}>
