@@ -1,10 +1,19 @@
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
+import { Card } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
-import { Heart, VerifiedIcon, ExternalLink, Star, GitFork, TrendingUp, Globe, FileText, Coins, Github } from 'lucide-react';
+import {
+  Coins,
+  FileText,
+  GitFork,
+  Github,
+  Globe,
+  Heart,
+  Star,
+  TrendingUp,
+  VerifiedIcon
+} from 'lucide-react';
 import Image from 'next/image';
-import Link from 'next/link';
 
 export interface RepoSummaryProps {
   id: string;
