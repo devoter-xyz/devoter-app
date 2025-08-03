@@ -9,6 +9,7 @@ import {
   Globe,
   Heart,
   Star,
+  Github,
   TrendingUp,
   VerifiedIcon
 } from 'lucide-react';
