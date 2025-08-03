@@ -31,6 +31,7 @@ export interface RepoCardProps extends React.HTMLAttributes<HTMLDivElement>, Var
   isFavorited?: boolean;
   isVerified?: boolean;
   cardType?: 'default' | 'featured';
+  appLogo: string;
 }
 
 const RepoCard = ({
@@ -43,6 +44,7 @@ const RepoCard = ({
   votes,
   isFavorited,
   isVerified,
+  appLogo,
   cardType = 'default',
   ...props
 }: RepoCardProps) => {
@@ -54,7 +56,9 @@ const RepoCard = ({
         <CardHeader className='flex items-start justify-between p-0'>
           <div className='flex w-full items-start justify-between gap-4'>
             <div className='flex items-center gap-4'>
-              <div className='h-12 w-12 rounded-lg bg-muted' />
+              <div>
+                <Image src={appLogo} alt='dev' height={48} width={48} className='h-12 w-12 rounded-lg' />
+              </div>
               <div>
                 <h3 className='text-xl font-bold'>{name}</h3>
                 <p className='text-muted-foreground'>@{owner}</p>

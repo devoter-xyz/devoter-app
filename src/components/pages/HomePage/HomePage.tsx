@@ -10,7 +10,8 @@ const topRepo = [
     name: 'gpt-repo',
     description: 'A test repo for GPT functionality.',
     tags: ['AI', 'NLP', 'Machine Learning'],
-    votes: 42
+    votes: 42,
+    appLogo: '/logo.svg'
   },
   {
     id: '2',
@@ -18,7 +19,8 @@ const topRepo = [
     name: 'next.js',
     description: 'The React Framework for the Web.',
     tags: ['React', 'Framework', 'SSR'],
-    votes: 35
+    votes: 35,
+    appLogo: '/logo.svg'
   },
   {
     id: '3',
@@ -26,7 +28,8 @@ const topRepo = [
     name: 'react',
     description: 'A declarative, efficient, and flexible JavaScript library for building UI.',
     tags: ['JavaScript', 'Library', 'UI'],
-    votes: 50
+    votes: 50,
+    appLogo: '/logo.svg'
   }
 ];
 
@@ -35,9 +38,10 @@ const featuredRepo = [
     id: '4',
     owner: 'microsoft',
     name: 'vscode',
-    description: 'Visual Studio Code - Code editing. Redefined.',
+    description: 'Visual Studio Code – Code editing. Redefined.',
     tags: ['Editor', 'TypeScript', 'Developer Tools'],
-    votes: 61
+    votes: 61,
+    appLogo: '/logo.svg'
   },
   {
     id: '5',
@@ -45,7 +49,8 @@ const featuredRepo = [
     name: 'linux',
     description: 'Linux kernel source tree.',
     tags: ['Kernel', 'Operating System', 'C'],
-    votes: 78
+    votes: 78,
+    appLogo: '/logo.svg'
   },
   {
     id: '6',
@@ -53,7 +58,8 @@ const featuredRepo = [
     name: 'tensorflow',
     description: 'An open-source machine learning framework for everyone.',
     tags: ['Machine Learning', 'Deep Learning', 'Python'],
-    votes: 55
+    votes: 55,
+    appLogo: '/logo.svg'
   }
 ];
 
@@ -84,6 +90,7 @@ export default function HomePage() {
                 tags={repo.tags}
                 votes={repo.votes}
                 cardType='featured'
+                appLogo={repo.appLogo}
               />
             ))}
           </Suspense>
@@ -114,6 +121,8 @@ export default function HomePage() {
                 votes={repo.votes}
                 cardType='default'
                 variant={index < 3 ? (['first', 'second', 'third'] as const)[index] : 'default'}
+                appLogo={repo.appLogo}
+                isFavorited={index % 2 === 0}
               />
             ))}
           </Suspense>
