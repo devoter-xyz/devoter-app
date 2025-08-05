@@ -4,6 +4,7 @@ import { cn } from '@/lib/utils';
 import { cva, type VariantProps } from 'class-variance-authority';
 import { Heart, VerifiedIcon } from 'lucide-react';
 import Image from 'next/image';
+import Link from 'next/link';
 import { Badge } from '../ui/badge';
 import { Button } from '../ui/button';
 
@@ -23,6 +24,7 @@ const cardVariants = cva('h-full w-full rounded-2xl', {
 });
 
 export interface RepoCardProps extends React.HTMLAttributes<HTMLDivElement>, VariantProps<typeof cardVariants> {
+  id: string;
   name: string;
   owner: string;
   description: string;
@@ -37,6 +39,7 @@ export interface RepoCardProps extends React.HTMLAttributes<HTMLDivElement>, Var
 const RepoCard = ({
   className,
   variant,
+  id,
   name,
   owner,
   description,
@@ -52,46 +55,61 @@ const RepoCard = ({
 
   return (
     <div className='relative'>
-      <Card className={cn(cardVariants({ variant }), `p-6 justify-between ${ cardType == 'featured' ? "bg-amber-100/30 border-orange-300" : "bg-background" } `, className)} {...props}>
-        <CardHeader className='flex items-start justify-between p-0'>
-          <div className='flex w-full items-start justify-between gap-4'>
-            <div className='flex items-center gap-4'>
-              <div>
-                <Image src={appLogo} alt='dev' height={48} width={48} className='h-12 w-12 rounded-lg' />
+      <Link href={`/repository/${id}`}>
+        <Card
+          className={cn(
+            cardVariants({ variant }),
+            `p-6 justify-between cursor-pointer hover:shadow-lg transition-shadow ${
+              cardType == 'featured' ? 'bg-amber-100/30 border-orange-300' : 'bg-background'
+            } `,
+            className
+          )}
+          {...props}
+        >
+          <CardHeader className='flex items-start justify-between p-0'>
+            <div className='flex w-full items-start justify-between gap-4'>
+              <div className='flex items-center gap-4'>
+                <div>
+                  <Image src={appLogo} alt='dev' height={48} width={48} className='h-12 w-12 rounded-lg' />
+                </div>
+                <div>
+                  <h3 className='text-xl font-bold'>{name}</h3>
+                  <p className='text-muted-foreground'>@{owner}</p>
+                </div>
               </div>
-              <div>
-                <h3 className='text-xl font-bold'>{name}</h3>
-                <p className='text-muted-foreground'>@{owner}</p>
+              <div className='flex items-center flex-col gap-2'>
+                <Button
+                  variant={'ghost'}
+                  className='hover:bg-red-100 hover:text-red-500'
+                  onClick={(e) => e.preventDefault()}
+                >
+                  <Heart className={cn('h-6 w-6', { 'fill-red-500 text-red-500': isFavorited })} />
+                </Button>
+                {isVerified && <VerifiedIcon />}
               </div>
             </div>
-            <div className='flex items-center flex-col gap-2'>
-              <Button variant={'ghost'} className='hover:bg-red-100 hover:text-red-500'>
-                <Heart className={cn('h-6 w-6', { 'fill-red-500 text-red-500': isFavorited })} />
-              </Button>
-              {isVerified && <VerifiedIcon />}
+          </CardHeader>
+          <CardContent className='flex flex-col gap-4 p-0 pt-6'>
+            <div className='flex items-center gap-2'>
+              <div>
+                <Image src={'/dev-token-logo.png'} alt='dev' height={10} width={10} className='h-5 w-5' />
+              </div>
+              <p className='font-bold text-brand-purple'>
+                {votes} Votes <span className='text-muted-foreground font-normal'>This Week</span>
+              </p>
             </div>
-          </div>
-        </CardHeader>
-        <CardContent className='flex flex-col gap-4 p-0 pt-6'>
-          <div className='flex items-center gap-2'>
-            <div>
-              <Image src={'/dev-token-logo.png'} alt='dev' height={10} width={10} className='h-5 w-5' />
+            <p className='text-lg text-muted-foreground'>{description}</p>
+          </CardContent>
+          <CardFooter className='p-0 pt-6'>
+            <div className='-ml-1 flex flex-wrap gap-2'>
+              {tags.slice(0, 3).map((tag) => (
+                <Badge key={tag}>{tag}</Badge>
+              ))}
+              {tags.length > 3 && <Badge>+{tags.length - 3}</Badge>}
             </div>
-            <p className='font-bold text-brand-purple'>
-              {votes} Votes <span className='text-muted-foreground font-normal'>This Week</span>
-            </p>
-          </div>
-          <p className='text-lg text-muted-foreground'>{description}</p>
-        </CardContent>
-        <CardFooter className='p-0 pt-6'>
-          <div className='-ml-1 flex flex-wrap gap-2'>
-            {tags.slice(0, 3).map((tag) => (
-              <Badge key={tag}>{tag}</Badge>
-            ))}
-            {tags.length > 3 && <Badge>+{tags.length - 3}</Badge>}
-          </div>
-        </CardFooter>
-      </Card>
+          </CardFooter>
+        </Card>
+      </Link>
       {showBadge && (
         <div className='absolute right-10 -top-3'>
           <CustomBadge className='absolute top-1 right-1' variant={variant} />
