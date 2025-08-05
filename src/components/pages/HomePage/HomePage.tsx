@@ -1,3 +1,4 @@
+'use client';
 import RepoCard from '@/components/common/RepoCard';
 import RepoCardSkeleton from '@/components/common/RepoCardSkeleton';
 import { ChartLine, Star } from 'lucide-react';
