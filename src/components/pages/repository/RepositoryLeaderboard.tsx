@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { formatDistanceToNow } from 'date-fns';
 import { Coins, User, Clock, Trophy, ChevronLeft, ChevronRight } from 'lucide-react';
-import { useState } from 'react';
+
 
 export interface RepositoryVote {
   id: string;
@@ -46,13 +46,7 @@ const RepositoryLeaderboard: React.FC<RepositoryLeaderboardProps> = ({
     return `${address.slice(0, 6)}...${address.slice(-4)}`;
   };
 
-  const getRankIcon = (index: number) => {
-    const rank = (currentPage - 1) * 10 + index + 1;
-    if (rank === 1) return '🥇';
-    if (rank === 2) return '🥈';
-    if (rank === 3) return '🥉';
-    return null;
-  };
+ 
 
   if (isLoading) {
     return (
@@ -101,9 +95,8 @@ const RepositoryLeaderboard: React.FC<RepositoryLeaderboardProps> = ({
 
       {/* Votes List */}
       <div className='space-y-3'>
-        {votes.map((vote, index) => {
-          const rank = (currentPage - 1) * 10 + index + 1;
-          const rankIcon = getRankIcon(index);
+        {votes.map((vote) => {
+         
 
           return (
             <div
