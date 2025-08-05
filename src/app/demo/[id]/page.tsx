@@ -75,6 +75,7 @@ export default function DemoRepositoryPage() {
     console.log(`Voted for repository ${id}`);
   };
 
+  
   const handleFavorite = () => {
     setIsFavorited((prev) => !prev);
     console.log(`Toggled favorite for repository ${id}`);
