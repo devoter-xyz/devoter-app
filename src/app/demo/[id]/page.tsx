@@ -2,6 +2,7 @@
 
 import { useParams } from 'next/navigation';
 import RepoSummary from '@/components/common/RepoSummary';
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { useState } from 'react';
 
 // Mock data for demo purposes
@@ -74,6 +75,7 @@ export default function DemoRepositoryPage() {
     console.log(`Voted for repository ${id}`);
   };
 
+  
   const handleFavorite = () => {
     setIsFavorited((prev) => !prev);
     console.log(`Toggled favorite for repository ${id}`);
@@ -89,7 +91,56 @@ export default function DemoRepositoryPage() {
         isFavorited={isFavorited}
         onVote={handleVote}
         onFavorite={handleFavorite}
+        className='w-full'
       />
+
+      {/* Tab switch implementation */}
+      <div className='mt-8 max-w-5xl mx-auto'>
+        <Tabs defaultValue='leader-board' className='w-full'>
+          <TabsList className='grid w-2xl grid-cols-4 bg-transparent h-auto p-0 gap-0'>
+            <TabsTrigger
+              value='leader-board'
+              className='relative bg-transparent border-0 rounded-none px-4 py-3 text-gray-600 hover:text-gray-900 data-[state=active]:bg-transparent data-[state=active]:text-primary data-[state=active]:shadow-none data-[state=active]:after:absolute data-[state=active]:after:bottom-0 data-[state=active]:after:left-0 data-[state=active]:after:right-0 data-[state=active]:after:h-0.5 data-[state=active]:after:bg-primary hover:cursor-pointer'
+            >
+              Leader Board
+            </TabsTrigger>
+            <TabsTrigger
+              value='discussion'
+              className='relative bg-transparent border-0 rounded-none px-4 py-3 text-gray-600 hover:text-gray-900 data-[state=active]:bg-transparent data-[state=active]:text-primary data-[state=active]:shadow-none data-[state=active]:after:absolute data-[state=active]:after:bottom-0 data-[state=active]:after:left-0 data-[state=active]:after:right-0 data-[state=active]:after:h-0.5 data-[state=active]:after:bg-primary hover:cursor-pointer'
+            >
+              Discussion
+            </TabsTrigger>
+            <TabsTrigger
+              value='socials'
+              className='relative bg-transparent border-0 rounded-none px-4 py-3 text-gray-600 hover:text-gray-900 data-[state=active]:bg-transparent data-[state=active]:text-primary data-[state=active]:shadow-none data-[state=active]:after:absolute data-[state=active]:after:bottom-0 data-[state=active]:after:left-0 data-[state=active]:after:right-0 data-[state=active]:after:h-0.5 data-[state=active]:after:bg-primary hover:cursor-pointer'
+            >
+              Socials
+            </TabsTrigger>
+            <TabsTrigger
+              value='about'
+              className='relative bg-transparent border-0 rounded-none px-4 py-3 text-gray-600 hover:text-gray-900 data-[state=active]:bg-transparent data-[state=active]:text-primary data-[state=active]:shadow-none data-[state=active]:after:absolute data-[state=active]:after:bottom-0 data-[state=active]:after:left-0 data-[state=active]:after:right-0 data-[state=active]:after:h-0.5 data-[state=active]:after:bg-primary hover:cursor-pointer'
+            >
+              About Repository
+            </TabsTrigger>
+          </TabsList>
+
+          <TabsContent value='leader-board' className='mt-0'>
+            <div className='border rounded-md p-4 shadow-xs'>Leader Board Content</div>
+          </TabsContent>
+
+          <TabsContent value='discussion' className='mt-0'>
+            <div className='border rounded-md p-4 shadow-xs'>Discussion Content</div>
+          </TabsContent>
+
+          <TabsContent value='socials' className='mt-0'>
+            <div className='border rounded-md p-4 shadow-xs'>Socials Content</div>
+          </TabsContent>
+
+          <TabsContent value='about' className='mt-0'>
+            <div className='border rounded-md p-4 shadow-xs'>About Repository Content</div>
+          </TabsContent>
+        </Tabs>
+      </div>
     </div>
   );
 }

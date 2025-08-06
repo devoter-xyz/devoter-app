@@ -2,17 +2,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
-import {
-  Coins,
-  FileText,
-  GitFork,
-  Globe,
-  Heart,
-  Star,
-  Github,
-  TrendingUp,
-  VerifiedIcon
-} from 'lucide-react';
+import { Coins, FileText, GitFork, Globe, Heart, Star, Github, TrendingUp, VerifiedIcon } from 'lucide-react';
 import Image from 'next/image';
 
 export interface RepoSummaryProps {
@@ -144,15 +134,15 @@ const RepoSummary: React.FC<RepoSummaryProps> = ({
 
               {/* Links */}
               <div className='flex items-center gap-4'>
-                <Github className='w-4 h-4 text-muted-foreground' />
-                <Globe className='w-4 h-4 text-muted-foreground' />
-                <FileText className='w-4 h-4 text-muted-foreground' />
+                <Github className='w-4 h-4 text-muted-foreground hover:cursor-pointer hover:text-primary hover:fill-accent' />
+                <Globe className='w-4 h-4 text-muted-foreground hover:cursor-pointer hover:text-primary hover:fill-accent' />
+                <FileText className='w-4 h-4 text-muted-foreground hover:cursor-pointer hover:text-primary hover:fill-accent' />
               </div>
             </div>
           </div>
         </div>
         <div className='grid grid-cols-4 gap-4'>
-          <Card className='p-6 flex flex-col items-center text-center bg-card border-border rounded-xl'>
+          <Card className='p-6 flex flex-col items-center text-center'>
             <div className='mb-4'>
               <Coins className='w-6 h-6 text-muted-foreground' />
             </div>
@@ -160,7 +150,7 @@ const RepoSummary: React.FC<RepoSummaryProps> = ({
             <div className='text-sm text-muted-foreground'>Total Votes</div>
           </Card>
 
-          <Card className='p-6 flex flex-col items-center text-center bg-card border-border rounded-xl'>
+          <Card className='p-6 flex flex-col items-center text-center'>
             <div className='mb-4'>
               <Star className='w-6 h-6 text-muted-foreground' />
             </div>
@@ -168,7 +158,7 @@ const RepoSummary: React.FC<RepoSummaryProps> = ({
             <div className='text-sm text-muted-foreground'>Github Stars</div>
           </Card>
 
-          <Card className='p-6 flex flex-col items-center text-center bg-card border-border rounded-xl'>
+          <Card className='p-6 flex flex-col items-center text-center'>
             <div className='mb-4'>
               <GitFork className='w-6 h-6 text-muted-foreground' />
             </div>
@@ -176,7 +166,7 @@ const RepoSummary: React.FC<RepoSummaryProps> = ({
             <div className='text-sm text-muted-foreground'>Forks</div>
           </Card>
 
-          <Card className='p-6 flex flex-col items-center text-center bg-card border-border rounded-xl'>
+          <Card className='p-6 flex flex-col items-center text-center'>
             <div className='mb-4'>
               <TrendingUp className='w-6 h-6 text-muted-foreground' />
             </div>
