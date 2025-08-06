@@ -1,3 +1,4 @@
+'use client';
 import RepoCard from '@/components/common/RepoCard';
 import RepoCardSkeleton from '@/components/common/RepoCardSkeleton';
 import { ChartLine, Star } from 'lucide-react';
@@ -84,6 +85,7 @@ export default function HomePage() {
             {topRepo.map((repo) => (
               <RepoCard
                 key={repo.id}
+                id={repo.id}
                 owner={repo.owner}
                 name={repo.name}
                 description={repo.description || ''}
@@ -114,6 +116,7 @@ export default function HomePage() {
             {featuredRepo.map((repo, index) => (
               <RepoCard
                 key={repo.id}
+                id={repo.id}
                 owner={repo.owner}
                 name={repo.name}
                 description={repo.description || ''}
