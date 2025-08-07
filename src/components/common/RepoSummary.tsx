@@ -106,7 +106,7 @@ const RepoSummary: React.FC<RepoSummaryProps> = ({
                 </Button>
                 <Button
                   onClick={onVote}
-                  className='flex items-center gap-2 px-6 py-2 border border-primary text-primary bg-card hover:bg-primary hover:text-primary-foreground rounded-lg font-medium transition-colors'
+                  className='flex items-center gap-2 px-6 py-2'
                 >
                   <Coins className='w-4 h-4' /> Vote {name}
                 </Button>
@@ -123,8 +123,7 @@ const RepoSummary: React.FC<RepoSummaryProps> = ({
                   {tags.map((tag) => (
                     <Badge
                       key={tag}
-                      variant='secondary'
-                      className='bg-primary/10 text-primary border border-primary hover:bg-primary/20 rounded-md px-3 py-1'
+                      variant='transparent'
                     >
                       {tag}
                     </Badge>
@@ -142,41 +141,39 @@ const RepoSummary: React.FC<RepoSummaryProps> = ({
           </div>
         </div>
         <div className='grid grid-cols-4 gap-4'>
-          <Card className='p-6 flex flex-col items-center text-center'>
-            <div className='mb-4'>
-              <Coins className='w-6 h-6 text-muted-foreground' />
+          <Card className='p-4 flex flex-col items-center text-center'>
+            <div className='mb-2'>
+              <Coins className='w-5 h-5 text-secondary' />
             </div>
-            <div className='text-3xl font-bold text-foreground mb-1'>{formatNumber(totalVotes)}</div>
-            <div className='text-sm text-muted-foreground'>Total Votes</div>
+            <div className='text-2xl font-bold text-foreground mb-1'>{formatNumber(totalVotes)}</div>
+            <div className='text-xs text-muted-foreground'>Total Votes</div>
           </Card>
 
-          <Card className='p-6 flex flex-col items-center text-center'>
-            <div className='mb-4'>
-              <Star className='w-6 h-6 text-muted-foreground' />
+          <Card className='p-4 flex flex-col items-center text-center'>
+            <div className='mb-2'>
+              <Star className='w-5 h-5 text-secondary' />
             </div>
-            <div className='text-3xl font-bold text-foreground mb-1'>{formatNumber(githubStars)}</div>
-            <div className='text-sm text-muted-foreground'>Github Stars</div>
+            <div className='text-2xl font-bold text-foreground mb-1'>{formatNumber(githubStars)}</div>
+            <div className='text-xs text-muted-foreground'>Github Stars</div>
           </Card>
 
-          <Card className='p-6 flex flex-col items-center text-center'>
-            <div className='mb-4'>
-              <GitFork className='w-6 h-6 text-muted-foreground' />
+          <Card className='p-4 flex flex-col items-center text-center'>
+            <div className='mb-2'>
+              <GitFork className='w-5 h-5 text-secondary' />
             </div>
-            <div className='text-3xl font-bold text-foreground mb-1'>{formatNumber(githubForks)}</div>
-            <div className='text-sm text-muted-foreground'>Forks</div>
+            <div className='text-2xl font-bold text-foreground mb-1'>{formatNumber(githubForks)}</div>
+            <div className='text-xs text-muted-foreground'>Forks</div>
           </Card>
 
-          <Card className='p-6 flex flex-col items-center text-center'>
-            <div className='mb-4'>
-              <TrendingUp className='w-6 h-6 text-muted-foreground' />
+          <Card className='p-4 flex flex-col items-center text-center'>
+            <div className='mb-2'>
+              <TrendingUp className='w-5 h-5 text-secondary' />
             </div>
-            <div className='text-3xl font-bold text-foreground mb-1'>{weeklyRank || 1}</div>
-            <div className='text-sm text-muted-foreground'>This Week</div>
+            <div className='text-2xl font-bold text-foreground mb-1'>{weeklyRank || 1}</div>
+            <div className='text-xs text-muted-foreground'>This Week</div>
           </Card>
         </div>
       </Card>
-
-      {/* Statistics Cards */}
     </div>
   );
 };
