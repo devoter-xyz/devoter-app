@@ -2,6 +2,7 @@
 
 import { useParams } from 'next/navigation';
 import RepoSummary from '@/components/common/RepoSummary';
+import RepositoryLeaderboard from '@/components/pages/repository/RepositoryLeaderboard';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { useState } from 'react';
 
@@ -63,6 +64,7 @@ export default function DemoRepositoryPage() {
 
   const [votes, setVotes] = useState<number>(0);
   const [isFavorited, setIsFavorited] = useState<boolean>(false);
+  const [leaderboardPage, setLeaderboardPage] = useState(1);
 
   // Get repository data - now using the single mock repository with the ID from params
   const repo = {
@@ -75,10 +77,13 @@ export default function DemoRepositoryPage() {
     console.log(`Voted for repository ${id}`);
   };
 
-  
   const handleFavorite = () => {
     setIsFavorited((prev) => !prev);
     console.log(`Toggled favorite for repository ${id}`);
+  };
+
+  const handleLeaderboardPageChange = (newPage: number) => {
+    setLeaderboardPage(newPage);
   };
 
   return (
@@ -125,7 +130,14 @@ export default function DemoRepositoryPage() {
           </TabsList>
 
           <TabsContent value='leader-board' className='mt-0'>
-            <div className='border rounded-md p-4 shadow-xs'>Leader Board Content</div>
+            <RepositoryLeaderboard
+              votes={repo.votes}
+              totalCount={repo.votes.length}
+              hasMore={false}
+              currentPage={leaderboardPage}
+              onPageChange={handleLeaderboardPageChange}
+              isLoading={false}
+            />
           </TabsContent>
 
           <TabsContent value='discussion' className='mt-0'>

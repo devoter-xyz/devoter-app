@@ -6,7 +6,6 @@ import { Badge } from '@/components/ui/badge';
 import { formatDistanceToNow } from 'date-fns';
 import { Coins, User, Clock, Trophy, ChevronLeft, ChevronRight } from 'lucide-react';
 
-
 export interface RepositoryVote {
   id: string;
   tokenAmount: string; // Changed from Decimal to string for better compatibility
@@ -46,8 +45,6 @@ const RepositoryLeaderboard: React.FC<RepositoryLeaderboardProps> = ({
     return `${address.slice(0, 6)}...${address.slice(-4)}`;
   };
 
- 
-
   if (isLoading) {
     return (
       <Card className='p-6'>
@@ -83,7 +80,7 @@ const RepositoryLeaderboard: React.FC<RepositoryLeaderboardProps> = ({
   return (
     <Card className='p-6'>
       {/* Header */}
-      <div className='flex items-center justify-between mb-6'>
+      {/* <div className='flex items-center justify-between mb-6'>
         <div className='flex items-center gap-3'>
           <Trophy className='w-6 h-6 text-primary' />
           <h2 className='text-xl font-semibold text-foreground'>Repository Leaderboard</h2>
@@ -91,13 +88,11 @@ const RepositoryLeaderboard: React.FC<RepositoryLeaderboardProps> = ({
         <Badge variant='outline' className='text-sm'>
           {totalCount} {totalCount === 1 ? 'vote' : 'votes'}
         </Badge>
-      </div>
+      </div> */}
 
       {/* Votes List */}
       <div className='space-y-3'>
         {votes.map((vote) => {
-         
-
           return (
             <div
               key={vote.id}
