@@ -77,7 +77,6 @@ export default function DemoRepositoryPage() {
     console.log(`Voted for repository ${id}`);
   };
 
-  
   const handleFavorite = () => {
     setIsFavorited((prev) => !prev);
     console.log(`Toggled favorite for repository ${id}`);
@@ -131,7 +130,7 @@ export default function DemoRepositoryPage() {
           </TabsList>
 
           <TabsContent value='leader-board' className='mt-0'>
-            <div className='border rounded-md p-4 shadow-xs'>
+
               <RepositoryLeaderboard
                 votes={repo.votes}
                 totalCount={repo.votes.length}
@@ -140,7 +139,7 @@ export default function DemoRepositoryPage() {
                 onPageChange={handleLeaderboardPageChange}
                 isLoading={false}
               />
-            </div>
+
           </TabsContent>
 
           <TabsContent value='discussion' className='mt-0'>
