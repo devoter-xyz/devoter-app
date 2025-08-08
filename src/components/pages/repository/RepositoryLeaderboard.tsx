@@ -79,16 +79,8 @@ const RepositoryLeaderboard: React.FC<RepositoryLeaderboardProps> = ({
 
   return (
     <Card className='p-6'>
-      {/* Header */}
-      {/* <div className='flex items-center justify-between mb-6'>
-        <div className='flex items-center gap-3'>
-          <Trophy className='w-6 h-6 text-primary' />
-          <h2 className='text-xl font-semibold text-foreground'>Repository Leaderboard</h2>
-        </div>
-        <Badge variant='outline' className='text-sm'>
-          {totalCount} {totalCount === 1 ? 'vote' : 'votes'}
-        </Badge>
-      </div> */}
+
+     
 
       {/* Votes List */}
       <div className='space-y-3'>
@@ -98,14 +90,7 @@ const RepositoryLeaderboard: React.FC<RepositoryLeaderboardProps> = ({
               key={vote.id}
               className='grid grid-cols-3 gap-4 items-center p-4 border border-border rounded-lg hover:bg-accent/50 transition-colors'
             >
-              {/* Rank */}
-              {/* <div className='flex items-center justify-center w-12 h-12 bg-primary/10 rounded-full'>
-                {rankIcon ? (
-                  <span className='text-lg'>{rankIcon}</span>
-                ) : (
-                  <span className='text-sm font-semibold text-primary'>#{rank}</span>
-                )}
-              </div> */}
+             
 
               {/* User Info */}
               <div className='flex flex-row items-center gap-3'>
