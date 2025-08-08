@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 
 import { formatDistanceToNow } from 'date-fns';
 import { Coins, User, Clock, Trophy, ChevronLeft, ChevronRight } from 'lucide-react';
+import { DevTokenLogo } from '@/components/common/DevTokenLogo';
 
 export interface RepositoryVote {
   id: string;
@@ -79,9 +80,6 @@ const RepositoryLeaderboard: React.FC<RepositoryLeaderboardProps> = ({
 
   return (
     <Card className='p-6'>
-
-     
-
       {/* Votes List */}
       <div className='space-y-3'>
         {votes.map((vote) => {
@@ -90,8 +88,6 @@ const RepositoryLeaderboard: React.FC<RepositoryLeaderboardProps> = ({
               key={vote.id}
               className='grid grid-cols-3 gap-4 items-center p-4 border border-border rounded-lg hover:bg-accent/50 transition-colors'
             >
-             
-
               {/* User Info */}
               <div className='flex flex-row items-center gap-3'>
                 <div className='flex items-center justify-center w-10 h-10 bg-primary/10 rounded-full'>
@@ -118,7 +114,7 @@ const RepositoryLeaderboard: React.FC<RepositoryLeaderboardProps> = ({
               {/* Token Amount */}
               <div className='flex flex-col items-end'>
                 <div className='flex items-center gap-1 text-lg font-semibold text-foreground mb-1'>
-                  <Coins className='w-4 h-4 text-primary' />
+                  <DevTokenLogo />
                   <span>{formatTokenAmount(vote.tokenAmount)}</span>
                 </div>
                 <div className='text-xs text-muted-foreground'>DEV tokens</div>
