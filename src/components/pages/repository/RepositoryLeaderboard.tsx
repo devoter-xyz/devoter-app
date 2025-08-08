@@ -1,11 +1,11 @@
 'use client';
 
-import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
 
-import { formatDistanceToNow } from 'date-fns';
-import { Coins, User, Clock, Trophy, ChevronLeft, ChevronRight } from 'lucide-react';
 import { DevTokenLogo } from '@/components/common/DevTokenLogo';
+import { formatDistanceToNow } from 'date-fns';
+import { ChevronLeft, ChevronRight, Clock, Trophy, User } from 'lucide-react';
 
 export interface RepositoryVote {
   id: string;
