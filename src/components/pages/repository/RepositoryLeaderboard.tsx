@@ -1,11 +1,11 @@
 'use client';
 
-import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { formatDistanceToNow } from 'date-fns';
-import { Coins, User, Clock, Trophy, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Card } from '@/components/ui/card';
 
+import { DevTokenLogo } from '@/components/common/DevTokenLogo';
+import { formatDistanceToNow } from 'date-fns';
+import { ChevronLeft, ChevronRight, Clock, Trophy, User } from 'lucide-react';
 
 export interface RepositoryVote {
   id: string;
@@ -46,8 +46,6 @@ const RepositoryLeaderboard: React.FC<RepositoryLeaderboardProps> = ({
     return `${address.slice(0, 6)}...${address.slice(-4)}`;
   };
 
- 
-
   if (isLoading) {
     return (
       <Card className='p-6'>
@@ -82,36 +80,14 @@ const RepositoryLeaderboard: React.FC<RepositoryLeaderboardProps> = ({
 
   return (
     <Card className='p-6'>
-      {/* Header */}
-      {/* <div className='flex items-center justify-between mb-6'>
-        <div className='flex items-center gap-3'>
-          <Trophy className='w-6 h-6 text-primary' />
-          <h2 className='text-xl font-semibold text-foreground'>Repository Leaderboard</h2>
-        </div>
-        <Badge variant='outline' className='text-sm'>
-          {totalCount} {totalCount === 1 ? 'vote' : 'votes'}
-        </Badge>
-      </div> */}
-
       {/* Votes List */}
       <div className='space-y-3'>
         {votes.map((vote) => {
-         
-
           return (
             <div
               key={vote.id}
               className='grid grid-cols-3 gap-4 items-center p-4 border border-border rounded-lg hover:bg-accent/50 transition-colors'
             >
-              {/* Rank */}
-              {/* <div className='flex items-center justify-center w-12 h-12 bg-primary/10 rounded-full'>
-                {rankIcon ? (
-                  <span className='text-lg'>{rankIcon}</span>
-                ) : (
-                  <span className='text-sm font-semibold text-primary'>#{rank}</span>
-                )}
-              </div> */}
-
               {/* User Info */}
               <div className='flex flex-row items-center gap-3'>
                 <div className='flex items-center justify-center w-10 h-10 bg-primary/10 rounded-full'>
@@ -138,7 +114,7 @@ const RepositoryLeaderboard: React.FC<RepositoryLeaderboardProps> = ({
               {/* Token Amount */}
               <div className='flex flex-col items-end'>
                 <div className='flex items-center gap-1 text-lg font-semibold text-foreground mb-1'>
-                  <Coins className='w-4 h-4 text-primary' />
+                  <DevTokenLogo />
                   <span>{formatTokenAmount(vote.tokenAmount)}</span>
                 </div>
                 <div className='text-xs text-muted-foreground'>DEV tokens</div>
