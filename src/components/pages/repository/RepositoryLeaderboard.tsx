@@ -1,189 +1,173 @@
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
-import { cn } from '@/lib/utils';
-import { Coins, FileText, GitFork, Globe, Heart, Star, Github, TrendingUp, VerifiedIcon } from 'lucide-react';
-import Image from 'next/image';
+'use client';
 
-export interface RepoSummaryProps {
+import { Card } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { formatDistanceToNow } from 'date-fns';
+import { Coins, User, Clock, Trophy, ChevronLeft, ChevronRight } from 'lucide-react';
+
+export interface RepositoryVote {
   id: string;
-  name: string;
-  owner: string;
-  description: string;
-  githubUrl: string;
-  websiteUrl?: string;
-  docsUrl?: string;
-  tags?: string[];
-  totalVotes: number;
-  githubStars?: number;
-  githubForks?: number;
-  weeklyRank?: number;
-  isFavorited?: boolean;
-  isVerified?: boolean;
-  logoUrl?: string;
-  className?: string;
-  onVote?: () => void;
-  onFavorite?: () => void;
+  tokenAmount: string; // Changed from Decimal to string for better compatibility
+  createdAt: Date;
+  user: {
+    walletAddress: string;
+  };
 }
 
-const RepoSummary: React.FC<RepoSummaryProps> = ({
-  // id,
-  name,
-  owner,
-  description,
-  // githubUrl,
-  // websiteUrl,
-  // docsUrl,
-  tags = [],
-  totalVotes,
-  githubStars,
-  githubForks,
-  weeklyRank,
-  isFavorited = false,
-  isVerified = false,
-  logoUrl,
-  className,
-  onVote,
-  onFavorite
+export interface RepositoryLeaderboardProps {
+  votes: RepositoryVote[];
+  totalCount: number;
+  hasMore: boolean;
+  currentPage: number;
+  onPageChange: (page: number) => void;
+  isLoading?: boolean;
+}
+
+const RepositoryLeaderboard: React.FC<RepositoryLeaderboardProps> = ({
+  votes,
+  totalCount,
+  hasMore,
+  currentPage,
+  onPageChange,
+  isLoading = false
 }) => {
-  const formatNumber = (num?: number) => {
-    if (!num) return '0';
+  const formatTokenAmount = (amount: string) => {
+    const num = parseFloat(amount);
+    if (isNaN(num)) return '0.00';
     if (num >= 1000000) return `${(num / 1000000).toFixed(1)}M`;
     if (num >= 1000) return `${(num / 1000).toFixed(1)}K`;
-    return num.toString();
+    return num.toFixed(2);
   };
 
-  // const formatRank = (rank?: number) => {
-  //   if (!rank) return 'N/A';
-  //   const suffix = ['th', 'st', 'nd', 'rd'];
-  //   const v = rank % 100;
-  //   return rank + (suffix[(v - 20) % 10] || suffix[v] || suffix[0]);
-  // };
+  const formatWalletAddress = (address: string) => {
+    if (address.length <= 10) return address;
+    return `${address.slice(0, 6)}...${address.slice(-4)}`;
+  };
 
-  return (
-    <div className={cn('w-full max-w-5xl mx-auto', className)}>
-       <div className='mb-6'>
-              <a
-                href='/'
-                className='inline-flex items-center text-sm text-muted-foreground hover:text-foreground transition-colors font-bold text-lg'
-              >
-                ← Back to Home
-              </a>
-            </div>
-      {/* Main Repository Info */}
-      <Card className='p-6 mb-6 bg-card border-border rounded-2xl shadow-sm'>
-        <div className='flex w-full'>
-          <div className='flex flex-col gap-4 w-full'>
-            {/* Repository Icon */}
-            <div className='relative flex flex-row justify-between items-center flex-grow'>
-              <div className='flex flex-row gap-4 items-center'>
-                <div className='w-14 h-14 bg-primary rounded-xl flex items-center justify-center'>
-                  <Image
-                    src={logoUrl || '/dev-token-logo.png'}
-                    alt={`${name} logo`}
-                    width={32}
-                    height={32}
-                    className='w-8 h-8 object-cover'
-                  />
-                </div>
-                <div>
-                  <div className='flex items-center gap-3 mb-1'>
-                    <h1 className='text-2xl font-bold text-foreground'>{name}</h1>
-                    {isVerified && <VerifiedIcon className='w-5 h-5 text-primary fill-primary' />}
-                  </div>
-                  <p className='text-muted-foreground mb-3'>@{owner}</p>
-                </div>
+  if (isLoading) {
+    return (
+      <Card className='p-6'>
+        <div className='space-y-4'>
+          {[...Array(5)].map((_, i) => (
+            <div key={i} className='flex items-center space-x-4 p-4 border border-border rounded-lg animate-pulse'>
+              <div className='w-12 h-12 bg-muted rounded-full'></div>
+              <div className='flex-1 space-y-2'>
+                <div className='h-4 bg-muted rounded w-1/4'></div>
+                <div className='h-3 bg-muted rounded w-1/3'></div>
               </div>
-
-              {/* Action Buttons */}
-              <div className='flex items-center gap-3'>
-                <Button
-                  onClick={onFavorite}
-                  variant='outline'
-                  className={cn(
-                    'flex items-center gap-2 px-4 py-2 border-border rounded-lg hover:bg-accent transition-colors',
-                    isFavorited && 'border-destructive text-destructive bg-destructive/10'
-                  )}
-                >
-                  <Heart
-                    className={cn('w-4 h-4', {
-                      'fill-destructive text-destructive': isFavorited,
-                      'text-muted-foreground': !isFavorited
-                    })}
-                  />
-                </Button>
-                <Button
-                  onClick={onVote}
-                  className='flex items-center gap-2 px-6 py-2'
-                >
-                  <Coins className='w-4 h-4' /> Vote {name}
-                </Button>
+              <div className='space-y-2'>
+                <div className='h-4 bg-muted rounded w-16'></div>
+                <div className='h-3 bg-muted rounded w-20'></div>
               </div>
             </div>
-
-            {/* Repository Details */}
-            <div className='flex-1'>
-              <p className='text-foreground mb-4 max-w-3xl leading-relaxed'>{description}</p>
-
-              {/* Tags */}
-              {tags.length > 0 && (
-                <div className='flex flex-wrap gap-2 mb-4'>
-                  {tags.map((tag) => (
-                    <Badge
-                      key={tag}
-                      variant='transparent'
-                    >
-                      {tag}
-                    </Badge>
-                  ))}
-                </div>
-              )}
-
-              {/* Links */}
-              <div className='flex items-center gap-4'>
-                <Github className='w-4 h-4 text-muted-foreground hover:cursor-pointer hover:text-primary hover:fill-accent' />
-                <Globe className='w-4 h-4 text-muted-foreground hover:cursor-pointer hover:text-primary hover:fill-accent' />
-                <FileText className='w-4 h-4 text-muted-foreground hover:cursor-pointer hover:text-primary hover:fill-accent' />
-              </div>
-            </div>
-          </div>
-        </div>
-        <div className='grid grid-cols-4 gap-4'>
-          <Card className='p-4 flex flex-col items-center text-center'>
-            <div className='mb-2'>
-              <Coins className='w-5 h-5 text-secondary' />
-            </div>
-            <div className='text-2xl font-bold text-foreground mb-1'>{formatNumber(totalVotes)}</div>
-            <div className='text-xs text-muted-foreground'>Total Votes</div>
-          </Card>
-
-          <Card className='p-4 flex flex-col items-center text-center'>
-            <div className='mb-2'>
-              <Star className='w-5 h-5 text-secondary' />
-            </div>
-            <div className='text-2xl font-bold text-foreground mb-1'>{formatNumber(githubStars)}</div>
-            <div className='text-xs text-muted-foreground'>Github Stars</div>
-          </Card>
-
-          <Card className='p-4 flex flex-col items-center text-center'>
-            <div className='mb-2'>
-              <GitFork className='w-5 h-5 text-secondary' />
-            </div>
-            <div className='text-2xl font-bold text-foreground mb-1'>{formatNumber(githubForks)}</div>
-            <div className='text-xs text-muted-foreground'>Forks</div>
-          </Card>
-
-          <Card className='p-4 flex flex-col items-center text-center'>
-            <div className='mb-2'>
-              <TrendingUp className='w-5 h-5 text-secondary' />
-            </div>
-            <div className='text-2xl font-bold text-foreground mb-1'>{weeklyRank || 1}</div>
-            <div className='text-xs text-muted-foreground'>This Week</div>
-          </Card>
+          ))}
         </div>
       </Card>
-    </div>
+    );
+  }
+
+  if (votes.length === 0) {
+    return (
+      <Card className='p-8 text-center'>
+        <Trophy className='w-12 h-12 mx-auto mb-4 text-muted-foreground' />
+        <h3 className='text-lg font-semibold text-foreground mb-2'>No votes yet</h3>
+        <p className='text-muted-foreground'>Be the first to vote for this repository and claim the top spot!</p>
+      </Card>
+    );
+  }
+
+  return (
+    <Card className='p-6'>
+      {/* Header */}
+      {/* <div className='flex items-center justify-between mb-6'>
+        <div className='flex items-center gap-3'>
+          <Trophy className='w-6 h-6 text-primary' />
+          <h2 className='text-xl font-semibold text-foreground'>Repository Leaderboard</h2>
+        </div>
+        <Badge variant='outline' className='text-sm'>
+          {totalCount} {totalCount === 1 ? 'vote' : 'votes'}
+        </Badge>
+      </div> */}
+
+      {/* Votes List */}
+      <div className='space-y-3'>
+        {votes.map((vote) => {
+          return (
+            <div
+              key={vote.id}
+              className='grid grid-cols-3 gap-4 items-center p-4 border border-border rounded-lg hover:bg-accent/50 transition-colors'
+            >
+              {/* Rank */}
+              {/* <div className='flex items-center justify-center w-12 h-12 bg-primary/10 rounded-full'>
+                {rankIcon ? (
+                  <span className='text-lg'>{rankIcon}</span>
+                ) : (
+                  <span className='text-sm font-semibold text-primary'>#{rank}</span>
+                )}
+              </div> */}
+
+              {/* User Info */}
+              <div className='flex flex-row items-center gap-3'>
+                <div className='flex items-center justify-center w-10 h-10 bg-primary/10 rounded-full'>
+                  <User className='w-4 h-4 text-primary' />
+                </div>
+                <div className='flex flex-col'>
+                  <div className='flex items-center gap-2 mb-1'>
+                    <span className='font-medium text-foreground'>John Doe</span>
+                  </div>
+                  <div className='text-sm text-muted-foreground'>
+                    <span>{formatWalletAddress(vote.user.walletAddress)}</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Time Info - Centered */}
+              <div className='flex items-center justify-center'>
+                <div className='flex items-center gap-2 text-sm text-muted-foreground'>
+                  <Clock className='w-3 h-3' />
+                  <span>{formatDistanceToNow(new Date(vote.createdAt), { addSuffix: true })}</span>
+                </div>
+              </div>
+
+              {/* Token Amount */}
+              <div className='flex flex-col items-end'>
+                <div className='flex items-center gap-1 text-lg font-semibold text-foreground mb-1'>
+                  <Coins className='w-4 h-4 text-primary' />
+                  <span>{formatTokenAmount(vote.tokenAmount)}</span>
+                </div>
+                <div className='text-xs text-muted-foreground'>DEV tokens</div>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+
+      {/* Pagination */}
+      {totalCount > 10 && (
+        <div className='flex items-center justify-between mt-6 pt-4 border-t border-border'>
+          <div className='text-sm text-muted-foreground'>
+            Showing {(currentPage - 1) * 10 + 1} to {Math.min(currentPage * 10, totalCount)} of {totalCount} votes
+          </div>
+          <div className='flex items-center gap-2'>
+            <Button
+              variant='outline'
+              size='sm'
+              onClick={() => onPageChange(currentPage - 1)}
+              disabled={currentPage === 1}
+            >
+              <ChevronLeft className='w-4 h-4' />
+              Previous
+            </Button>
+            <Button variant='outline' size='sm' onClick={() => onPageChange(currentPage + 1)} disabled={!hasMore}>
+              Next
+              <ChevronRight className='w-4 h-4' />
+            </Button>
+          </div>
+        </div>
+      )}
+    </Card>
   );
 };
 
-export default RepoSummary;
+export default RepositoryLeaderboard;
