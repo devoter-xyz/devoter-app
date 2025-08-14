@@ -4,6 +4,9 @@ import { useParams } from 'next/navigation';
 import RepoSummary from '@/components/common/RepoSummary';
 import RepositoryLeaderboard from '@/components/pages/repository/RepositoryLeaderboard';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
+import { Button } from '@/components/ui/button';
+import { formatDistanceToNow } from 'date-fns';
+import { ThumbsUp, ThumbsDown, MessageCircle } from 'lucide-react';
 import { useState } from 'react';
 
 // Mock data for demo purposes
@@ -54,6 +57,85 @@ const mockRepository = {
       tokenAmount: '125.00',
       createdAt: new Date('2025-08-03T09:55:00Z'),
       user: { walletAddress: '0x2468ace02468ace02468ace02468ace02468ace0' }
+    }
+  ],
+  discussions: [
+    {
+      id: 'disc-1',
+      user: {
+        name: 'clippyClip99',
+        walletAddress: '0xABC...123',
+        avatar: '#F59E0B' // Orange color
+      },
+      content: "How does flowstate handle failed tasks in a multi-step pipeline? I've been experimenting with defining multi-step workflows, and I'm curious how the engine handles a failure in one of the middle steps. Does it retry automatically? Can we customize fallback behavior?",
+      createdAt: new Date('2025-08-13T10:42:00Z'),
+      upvotes: 12,
+      downvotes: 2,
+      replies: [
+        {
+          id: 'reply-1',
+          user: {
+            name: 'Marques Read',
+            walletAddress: '0xDEF...456',
+            avatar: '#10B981' // Green color
+          },
+          content: "Great question! By default, the engine will retry failed tasks up to 3 times with exponential backoff. You can override this in the step config using the retry and on_failure keys.",
+          createdAt: new Date('2025-08-13T11:15:00Z'),
+          upvotes: 8,
+          downvotes: 0
+        }
+      ]
+    },
+    {
+      id: 'disc-2',
+      user: {
+        name: 'devMaster2024',
+        walletAddress: '0x789...ABC',
+        avatar: '#8B5CF6' // Purple color
+      },
+      content: "Just integrated Next.js 15 with the new app directory. The performance improvements are incredible! Has anyone tried the new caching strategies?",
+      createdAt: new Date('2025-08-13T09:30:00Z'),
+      upvotes: 25,
+      downvotes: 1,
+      replies: [
+        {
+          id: 'reply-2',
+          user: {
+            name: 'ReactNinja',
+            walletAddress: '0x456...DEF',
+            avatar: '#EF4444' // Red color
+          },
+          content: "Yes! The fetch cache is a game changer. We saw 40% faster page loads on our e-commerce site.",
+          createdAt: new Date('2025-08-13T09:45:00Z'),
+          upvotes: 15,
+          downvotes: 0
+        },
+        {
+          id: 'reply-3',
+          user: {
+            name: 'TypeScriptFan',
+            walletAddress: '0x321...GHI',
+            avatar: '#3B82F6' // Blue color
+          },
+          content: "Don't forget to update your TypeScript config for the new features!",
+          createdAt: new Date('2025-08-13T10:20:00Z'),
+          upvotes: 7,
+          downvotes: 0
+        }
+      ]
+    },
+    {
+      id: 'disc-3',
+      user: {
+        name: 'webDevGuru',
+        walletAddress: '0xGHI...789',
+        avatar: '#F97316' // Orange color
+      },
+      content: "Question about Server Components: When should I use 'use client' vs keeping components server-side? I'm struggling with the decision tree.",
+      createdAt: new Date('2025-08-12T16:20:00Z'),
+      upvotes: 18,
+      downvotes: 0,
+      replies: []
     }
   ]
 };
@@ -141,7 +223,118 @@ export default function DemoRepositoryPage() {
           </TabsContent>
 
           <TabsContent value='discussion' className='mt-0'>
-            <div className='border rounded-md p-4 shadow-xs'>Discussion Content</div>
+            <div className='space-y-4'>
+              {repo.discussions.map((discussion) => (
+                <div key={discussion.id} className='bg-white border border-gray-200 rounded-lg p-6'>
+                  {/* Main Discussion */}
+                  <div className='flex gap-4'>
+                    {/* User Avatar */}
+                    <div 
+                      className='flex items-center justify-center w-12 h-12 rounded-full text-white font-semibold'
+                      style={{ backgroundColor: discussion.user.avatar }}
+                    >
+                      {discussion.user.name.charAt(0).toUpperCase()}
+                    </div>
+                    
+                    {/* Discussion Content */}
+                    <div className='flex-1'>
+                      <div className='flex items-center gap-3 mb-2'>
+                        <h4 className='font-semibold text-gray-900'>{discussion.user.name}</h4>
+                        <span className='text-sm text-gray-500'>{discussion.user.walletAddress}</span>
+                        <span className='text-sm text-gray-500'>
+                          {formatDistanceToNow(discussion.createdAt, { addSuffix: true })}
+                        </span>
+                      </div>
+                      
+                      <p className='text-gray-800 mb-4 leading-relaxed'>
+                        {discussion.content}
+                      </p>
+                      
+                      {/* Voting and Reply Buttons */}
+                      <div className='flex items-center gap-4'>
+                        <Button 
+                          variant='ghost' 
+                          size='sm' 
+                          className='flex items-center gap-2 text-green-600 hover:text-green-700 hover:bg-green-50'
+                        >
+                          <ThumbsUp className='w-4 h-4' />
+                          <span>{discussion.upvotes}</span>
+                        </Button>
+                        <Button 
+                          variant='ghost' 
+                          size='sm' 
+                          className='flex items-center gap-2 text-red-600 hover:text-red-700 hover:bg-red-50'
+                        >
+                          <ThumbsDown className='w-4 h-4' />
+                          <span>{discussion.downvotes}</span>
+                        </Button>
+                        <Button 
+                          variant='ghost' 
+                          size='sm' 
+                          className='flex items-center gap-2 text-gray-600 hover:text-gray-700 hover:bg-gray-50'
+                        >
+                          <MessageCircle className='w-4 h-4' />
+                          <span>Reply</span>
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  {/* Replies */}
+                  {discussion.replies.length > 0 && (
+                    <div className='mt-6 pl-16 space-y-4'>
+                      {discussion.replies.map((reply) => (
+                        <div key={reply.id} className='bg-gray-50 border border-gray-100 rounded-lg p-4'>
+                          <div className='flex gap-3'>
+                            {/* Reply Avatar */}
+                            <div 
+                              className='flex items-center justify-center w-8 h-8 rounded-full text-white font-semibold text-sm'
+                              style={{ backgroundColor: reply.user.avatar }}
+                            >
+                              {reply.user.name.charAt(0).toUpperCase()}
+                            </div>
+                            
+                            {/* Reply Content */}
+                            <div className='flex-1'>
+                              <div className='flex items-center gap-3 mb-2'>
+                                <h5 className='font-medium text-gray-900 text-sm'>{reply.user.name}</h5>
+                                <span className='text-xs text-gray-500'>
+                                  {formatDistanceToNow(reply.createdAt, { addSuffix: true })}
+                                </span>
+                              </div>
+                              
+                              <p className='text-gray-800 mb-3 text-sm leading-relaxed'>
+                                {reply.content}
+                              </p>
+                              
+                              {/* Reply Voting */}
+                              <div className='flex items-center gap-3'>
+                                <Button 
+                                  variant='ghost' 
+                                  size='sm' 
+                                  className='flex items-center gap-1 text-green-600 hover:text-green-700 hover:bg-green-50 p-1 h-auto text-xs'
+                                >
+                                  <ThumbsUp className='w-3 h-3' />
+                                  <span>{reply.upvotes}</span>
+                                </Button>
+                                <Button 
+                                  variant='ghost' 
+                                  size='sm' 
+                                  className='flex items-center gap-1 text-red-600 hover:text-red-700 hover:bg-red-50 p-1 h-auto text-xs'
+                                >
+                                  <ThumbsDown className='w-3 h-3' />
+                                  <span>{reply.downvotes}</span>
+                                </Button>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
           </TabsContent>
 
           <TabsContent value='socials' className='mt-0'>
