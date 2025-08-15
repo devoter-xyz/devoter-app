@@ -15,6 +15,7 @@ import {
   ArrowLeft
 } from 'lucide-react';
 import Image from 'next/image';
+import Link from 'next/link';
 
 export interface RepoSummaryProps {
   id: string;
@@ -73,12 +74,12 @@ const RepoSummary: React.FC<RepoSummaryProps> = ({
 
   return (
     <div className={cn('w-full max-w-5xl mx-auto', className)}>
-      <a
+      <Link
         href='/'
         className='inline-flex items-center text-sm text-muted-foreground hover:text-foreground transition-colors font-bold mb-4 text-2xl'
       >
         <ArrowLeft className='w-4 h-4 mr-2 ' /> Back to Home
-      </a>
+      </Link>
       {/* Main Repository Info */}
       <Card className='p-6 mb-6 bg-card border-border rounded-2xl shadow-sm'>
         <div className='flex w-full'>
