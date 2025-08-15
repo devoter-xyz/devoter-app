@@ -2,8 +2,20 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
-import { Coins, FileText, GitFork, Globe, Heart, Star, Github, TrendingUp, VerifiedIcon } from 'lucide-react';
+import {
+  Coins,
+  FileText,
+  GitFork,
+  Globe,
+  Heart,
+  Star,
+  Github,
+  TrendingUp,
+  VerifiedIcon,
+  ArrowLeft
+} from 'lucide-react';
 import Image from 'next/image';
+import Link from 'next/link';
 
 export interface RepoSummaryProps {
   id: string;
@@ -62,6 +74,12 @@ const RepoSummary: React.FC<RepoSummaryProps> = ({
 
   return (
     <div className={cn('w-full max-w-5xl mx-auto', className)}>
+      <Link
+        href='/'
+        className='inline-flex items-center text-sm text-muted-foreground hover:text-foreground transition-colors font-bold mb-4 text-2xl'
+      >
+        <ArrowLeft className='w-4 h-4 mr-2 ' /> Back to Home
+      </Link>
       {/* Main Repository Info */}
       <Card className='p-6 mb-6 bg-card border-border rounded-2xl shadow-sm'>
         <div className='flex w-full'>
@@ -104,10 +122,7 @@ const RepoSummary: React.FC<RepoSummaryProps> = ({
                     })}
                   />
                 </Button>
-                <Button
-                  onClick={onVote}
-                  className='flex items-center gap-2 px-6 py-2'
-                >
+                <Button onClick={onVote} className='flex items-center gap-2 px-6 py-2'>
                   <Coins className='w-4 h-4' /> Vote {name}
                 </Button>
               </div>
@@ -121,10 +136,7 @@ const RepoSummary: React.FC<RepoSummaryProps> = ({
               {tags.length > 0 && (
                 <div className='flex flex-wrap gap-2 mb-4'>
                   {tags.map((tag) => (
-                    <Badge
-                      key={tag}
-                      variant='transparent'
-                    >
+                    <Badge key={tag} variant='transparent'>
                       {tag}
                     </Badge>
                   ))}
