@@ -16,6 +16,7 @@ const NUM_USERS = 10; // total users to create
 const NUM_REPOS = 30; // repositories that will appear on the leaderboard
 const MAX_VOTES_PER_REPO = 15; // upper bound for votes per repository
 const MAX_DISCUSSIONS_PER_REPO = 8; // upper bound for discussions per repository
+const MAX_REPLIES_PER_DISCUSSION = 5; // upper bound for replies per discussion
 
 function weekString(date: Date): string {
   const tmpDate = new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate()));
@@ -68,6 +69,33 @@ function generateDiscussionContent(): string {
   const detail = faker.helpers.arrayElement(details);
 
   return `${topic}\n\n${detail}`;
+}
+
+function generateReplyContent(): string {
+  const replies = [
+    'I completely agree with this point!',
+    'Thanks for sharing this insight.',
+    'I had a similar experience with this.',
+    "Great question! I've been wondering about this too.",
+    'This helped me solve my issue, thank you!',
+    'I think there might be an alternative approach here.',
+    'Could you provide more details about this?',
+    'This is exactly what I was looking for.',
+    'I found a workaround that might help others.',
+    'The documentation mentions something about this.',
+    "I've opened a PR to address this issue.",
+    'This feature would be really valuable.',
+    'I can confirm this works on my setup.',
+    'Has anyone tried this with the latest version?',
+    "Here's a link that might be relevant.",
+    "I'm experiencing the same problem.",
+    'This solution worked perfectly for me.',
+    'Thanks for the detailed explanation!',
+    "I'll give this a try and report back.",
+    "This is a common issue, here's how I handle it."
+  ];
+
+  return faker.helpers.arrayElement(replies);
 }
 
 async function main() {
@@ -259,7 +287,52 @@ async function main() {
   console.log(`✓ Inserted ${totalDiscussionsCreated} discussions`);
 
   // -------------------------------------------------------------------------
-  // 7. Leaderboards
+  // 7. Replies
+  // -------------------------------------------------------------------------
+  console.log('⎋ Creating replies…');
+  let totalRepliesCreated = 0;
+
+  // Get all discussions to create replies for
+  const discussions = await prisma.discussion.findMany();
+
+  for (const discussion of discussions) {
+    const numReplies = faker.number.int({ min: 0, max: MAX_REPLIES_PER_DISCUSSION });
+
+    for (let i = 0; i < numReplies; i++) {
+      const replyAuthor = faker.helpers.arrayElement(users);
+      if (!replyAuthor) continue;
+
+      // Reply created after the discussion, within last 30 days
+      const minDate = new Date(
+        Math.max(
+          discussion.createdAt.getTime(),
+          Date.now() - 30 * 24 * 60 * 60 * 1000 // 30 days ago
+        )
+      );
+      const replyCreated = faker.date.between({
+        from: minDate,
+        to: new Date()
+      });
+
+      await prisma.reply.create({
+        data: {
+          discussionId: discussion.id,
+          userId: replyAuthor.id,
+          content: generateReplyContent(),
+          upvotes: faker.number.int({ min: 0, max: 15 }),
+          downvotes: faker.number.int({ min: 0, max: 3 }),
+          createdAt: replyCreated
+        }
+      });
+
+      totalRepliesCreated++;
+    }
+  }
+
+  console.log(`✓ Inserted ${totalRepliesCreated} replies`);
+
+  // -------------------------------------------------------------------------
+  // 8. Leaderboards
   // -------------------------------------------------------------------------
   console.log('⎋ Updating weekly leaderboards…');
   for (const week of activeWeeks) {
