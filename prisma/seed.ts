@@ -2,7 +2,7 @@ import { signIn } from '@/actions/auth/signin/logic';
 import { updateWeeklyLeaderboard } from '@/actions/leaderboard/archive/logic';
 import { createRepository } from '@/actions/repository/createRepository/logic';
 import { faker } from '@faker-js/faker';
-import { Prisma, PrismaClient } from '@prisma/client';
+import { Prisma, PrismaClient, SocialLinkType } from '@prisma/client';
 import crypto from 'crypto';
 import { Wallet } from 'ethers';
 import { SiweMessage } from 'siwe';
@@ -32,6 +32,78 @@ function randomTokenDecimal(min: number, max: number, precision = 6) {
   const multipleOf = 1 / 10 ** precision;
   const random = faker.number.float({ min, max, multipleOf });
   return new Prisma.Decimal(random.toString());
+}
+
+function generateSocialLinksForRepo(repoName: string, owner: string) {
+  const socialLinks = [];
+  
+  // Always include GitHub (already handled in githubUrl)
+  // Add website with 70% chance
+  if (faker.datatype.boolean({ probability: 0.7 })) {
+    socialLinks.push({
+      type: SocialLinkType.WEBSITE,
+      url: `https://${repoName.toLowerCase().replace(/\s+/g, '')}.dev`,
+      label: 'Official Website'
+    });
+  }
+  
+  // Add docs with 60% chance
+  if (faker.datatype.boolean({ probability: 0.6 })) {
+    const docsOptions = [
+      { url: `https://docs.${repoName.toLowerCase().replace(/\s+/g, '')}.dev`, label: 'Documentation' },
+      { url: `https://${repoName.toLowerCase().replace(/\s+/g, '')}.gitbook.io`, label: 'GitBook Docs' },
+      { url: `https://${owner}.github.io/${repoName.toLowerCase().replace(/\s+/g, '-')}`, label: 'GitHub Pages' }
+    ];
+    const selectedDocs = faker.helpers.arrayElement(docsOptions);
+    socialLinks.push({
+      type: SocialLinkType.DOCS,
+      ...selectedDocs
+    });
+  }
+  
+  // Add Discord with 40% chance
+  if (faker.datatype.boolean({ probability: 0.4 })) {
+    socialLinks.push({
+      type: SocialLinkType.DISCORD,
+      url: `https://discord.gg/${faker.string.alphanumeric(8)}`,
+      label: 'Discord Community'
+    });
+  }
+  
+  // Add Twitter with 50% chance
+  if (faker.datatype.boolean({ probability: 0.5 })) {
+    socialLinks.push({
+      type: SocialLinkType.TWITTER,
+      url: `https://twitter.com/${repoName.toLowerCase().replace(/\s+/g, '')}_dev`,
+      label: 'Twitter'
+    });
+  }
+  
+  // Add Telegram with 30% chance
+  if (faker.datatype.boolean({ probability: 0.3 })) {
+    socialLinks.push({
+      type: SocialLinkType.TELEGRAM,
+      url: `https://t.me/${repoName.toLowerCase().replace(/\s+/g, '')}_community`,
+      label: 'Telegram Group'
+    });
+  }
+  
+  // Add other links with 20% chance
+  if (faker.datatype.boolean({ probability: 0.2 })) {
+    const otherOptions = [
+      { url: `https://reddit.com/r/${repoName.toLowerCase().replace(/\s+/g, '')}`, label: 'Reddit Community' },
+      { url: `https://medium.com/@${owner}`, label: 'Medium Blog' },
+      { url: `https://dev.to/${owner}`, label: 'Dev.to Blog' },
+      { url: `https://youtube.com/@${repoName.toLowerCase().replace(/\s+/g, '')}`, label: 'YouTube Channel' }
+    ];
+    const selectedOther = faker.helpers.arrayElement(otherOptions);
+    socialLinks.push({
+      type: SocialLinkType.OTHER,
+      ...selectedOther
+    });
+  }
+  
+  return socialLinks;
 }
 
 async function main() {
@@ -125,8 +197,21 @@ async function main() {
         createdAt: repoCreated
       }
     });
+
+    // Generate and create social links for this repository
+    const socialLinks = generateSocialLinksForRepo(repoName, owner);
+    for (const socialLink of socialLinks) {
+      await prisma.socialLink.create({
+        data: {
+          repositoryId: repo.id,
+          type: socialLink.type,
+          url: socialLink.url,
+          label: socialLink.label
+        }
+      });
+    }
   }
-  console.log(`✓ Inserted ${NUM_REPOS} repositories`);
+  console.log(`✓ Inserted ${NUM_REPOS} repositories with social links`);
 
   // -------------------------------------------------------------------------
   // 4. Votes (with Payments)
