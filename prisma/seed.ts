@@ -15,6 +15,7 @@ const prisma = new PrismaClient();
 const NUM_USERS = 10; // total users to create
 const NUM_REPOS = 30; // repositories that will appear on the leaderboard
 const MAX_VOTES_PER_REPO = 15; // upper bound for votes per repository
+const MAX_DISCUSSIONS_PER_REPO = 8; // upper bound for discussions per repository
 
 function weekString(date: Date): string {
   const tmpDate = new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate()));
@@ -32,6 +33,41 @@ function randomTokenDecimal(min: number, max: number, precision = 6) {
   const multipleOf = 1 / 10 ** precision;
   const random = faker.number.float({ min, max, multipleOf });
   return new Prisma.Decimal(random.toString());
+}
+
+function generateDiscussionContent(): string {
+  const topics = [
+    'What are your thoughts on the latest updates?',
+    'How does this compare to similar projects?',
+    "I'm having trouble with the installation process",
+    'Great work on the documentation!',
+    'Any plans for mobile support?',
+    'Performance seems to have improved significantly',
+    'Would love to see more examples in the docs',
+    'Bug report: Found an issue with the authentication',
+    'Feature request: Could we add dark mode?',
+    'How can I contribute to this project?',
+    'Integration with other tools would be awesome',
+    'The API design is really clean and intuitive'
+  ];
+
+  const details = [
+    "I've been using this for a few weeks now and it's been fantastic.",
+    'The learning curve is reasonable and the results are impressive.',
+    'I noticed some edge cases that might need attention.',
+    'The community around this project is very helpful.',
+    'Performance benchmarks look promising compared to alternatives.',
+    'The documentation could use some more advanced examples.',
+    "I'm particularly interested in the roadmap for next quarter.",
+    'Has anyone tried integrating this with TypeScript?',
+    'The recent changes have made my workflow much smoother.',
+    "I'd be happy to help with testing if needed."
+  ];
+
+  const topic = faker.helpers.arrayElement(topics);
+  const detail = faker.helpers.arrayElement(details);
+
+  return `${topic}\n\n${detail}`;
 }
 
 async function main() {
@@ -190,7 +226,40 @@ async function main() {
   console.log(`✓ Updated vote counts for ${reposWithVotes.length} repositories`);
 
   // -------------------------------------------------------------------------
-  // 6. Leaderboards
+  // 6. Discussions
+  // -------------------------------------------------------------------------
+  console.log('⎋ Creating discussions…');
+  let totalDiscussionsCreated = 0;
+
+  for (const repo of repos) {
+    const numDiscussions = faker.number.int({ min: 1, max: MAX_DISCUSSIONS_PER_REPO });
+
+    for (let i = 0; i < numDiscussions; i++) {
+      const discussionAuthor = faker.helpers.arrayElement(users);
+      if (!discussionAuthor) continue;
+
+      // Discussion created within last 60 days
+      const discussionCreated = faker.date.recent({ days: 60 });
+
+      const discussion = await prisma.discussion.create({
+        data: {
+          repositoryId: repo.id,
+          userId: discussionAuthor.id,
+          content: generateDiscussionContent(),
+          upvotes: faker.number.int({ min: 0, max: 25 }),
+          downvotes: faker.number.int({ min: 0, max: 5 }),
+          createdAt: discussionCreated
+        }
+      });
+
+      totalDiscussionsCreated++;
+    }
+  }
+
+  console.log(`✓ Inserted ${totalDiscussionsCreated} discussions`);
+
+  // -------------------------------------------------------------------------
+  // 7. Leaderboards
   // -------------------------------------------------------------------------
   console.log('⎋ Updating weekly leaderboards…');
   for (const week of activeWeeks) {
