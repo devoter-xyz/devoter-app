@@ -15,6 +15,7 @@ const prisma = new PrismaClient();
 const NUM_USERS = 10; // total users to create
 const NUM_REPOS = 30; // repositories that will appear on the leaderboard
 const MAX_VOTES_PER_REPO = 15; // upper bound for votes per repository
+const MAX_FAVORITES_PER_USER = 8; // upper bound for favorites per user
 
 function weekString(date: Date): string {
   const tmpDate = new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate()));
@@ -198,6 +199,37 @@ async function main() {
     console.log(`  - Updated leaderboard for ${week}`);
   }
   console.log(`✓ Updated ${activeWeeks.size} leaderboards`);
+
+  // -------------------------------------------------------------------------
+  // 7. User Favorites
+  // -------------------------------------------------------------------------
+  console.log('⎋ Creating user favorites…');
+  let totalFavoritesCreated = 0;
+
+  for (const user of users) {
+    // Each user favorites a random number of repositories
+    const numFavorites = faker.number.int({ min: 0, max: MAX_FAVORITES_PER_USER });
+    const favoriteRepos = faker.helpers.arrayElements(repos, numFavorites);
+
+    // Remove duplicates (though arrayElements should not create duplicates)
+    const uniqueFavoriteRepos = [...new Set(favoriteRepos)];
+
+    for (const repo of uniqueFavoriteRepos) {
+      try {
+        await prisma.userFavorite.create({
+          data: {
+            userId: user!.id,
+            repositoryId: repo.id
+          }
+        });
+        totalFavoritesCreated++;
+      } catch (error) {
+        // Skip if favorite already exists (unique constraint)
+        console.log(`  - Skipped duplicate favorite for user ${user!.id} and repo ${repo.id}`);
+      }
+    }
+  }
+  console.log(`✓ Inserted ${totalFavoritesCreated} user favorites`);
 }
 
 main()
