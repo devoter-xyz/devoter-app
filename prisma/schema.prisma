@@ -10,18 +10,33 @@ datasource db {
 model User {
   id            String       @id @unique @default(uuid())
   walletAddress String       @unique @db.VarChar(42)
+  name          String?      @db.VarChar(100)
+  avatar        String?      @db.VarChar(7) // For hex color codes like #F59E0B
   createdAt     DateTime     @default(now())
   updatedAt     DateTime     @updatedAt
   repositories  Repository[]
   votes         Vote[]
   payments      Payment[]
+  discussions   Discussion[]
+  replies       Reply[]
+  favorites     UserFavorite[]
 }
 
 model Repository {
   id                 String                  @id @default(uuid())
+  name               String?                 @db.VarChar(255)
+  owner              String?                 @db.VarChar(255)
   title              String                  @db.VarChar(255)
   description        String
   githubUrl          String                  @db.VarChar(255)
+  websiteUrl         String?                 @db.VarChar(255)
+  docsUrl            String?                 @db.VarChar(255)
+  logoUrl            String?                 @db.VarChar(255)
+  tags               String[]                @default([])
+  githubStars        Int                     @default(0)
+  githubForks        Int                     @default(0)
+  weeklyRank         Int?
+  isVerified         Boolean                 @default(false)
   submitterId        String
   submitter          User                    @relation(fields: [submitterId], references: [id])
   totalVotes         Int                     @default(0)
@@ -33,6 +48,9 @@ model Repository {
   updatedAt          DateTime                @updatedAt
   votes              Vote[]
   leaderboardEntries WeeklyRepoLeaderboard[]
+  discussions        Discussion[]
+  socialLinks        SocialLink[]
+  favorites          UserFavorite[]
 }
 
 model Vote {
@@ -82,4 +100,86 @@ model AdminUser {
   id            String   @id @unique @default(uuid())
   walletAddress String   @unique
   createdAt     DateTime @default(now())
+}
+
+model Discussion {
+  id           String    @id @default(uuid())
+  repositoryId String
+  repository   Repository @relation(fields: [repositoryId], references: [id])
+  userId       String
+  user         User      @relation(fields: [userId], references: [id])
+  content      String    @db.Text
+  upvotes      Int       @default(0)
+  downvotes    Int       @default(0)
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  replies      Reply[]
+}
+
+model Reply {
+  id           String     @id @default(uuid())
+  discussionId String
+  discussion   Discussion @relation(fields: [discussionId], references: [id])
+  userId       String
+  user         User       @relation(fields: [userId], references: [id])
+  content      String     @db.Text
+  upvotes      Int        @default(0)
+  downvotes    Int        @default(0)
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+}
+
+model SocialLink {
+  id           String     @id @default(uuid())
+  repositoryId String
+  repository   Repository @relation(fields: [repositoryId], references: [id])
+  type         SocialLinkType
+  url          String     @db.VarChar(255)
+  label        String     @db.VarChar(100)
+  createdAt    DateTime   @default(now())
+}
+
+model UserFavorite {
+  id           String     @id @default(uuid())
+  userId       String
+  user         User       @relation(fields: [userId], references: [id])
+  repositoryId String
+  repository   Repository @relation(fields: [repositoryId], references: [id])
+  createdAt    DateTime   @default(now())
+
+  @@unique([userId, repositoryId])
+}
+
+model ApiUser {
+  id            String   @id @default(uuid())
+  walletAddress String   @unique @db.VarChar(42)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  apiKeys       ApiKey[]
+}
+
+model ApiKey {
+  id        String       @id @default(uuid())
+  apiUserId String
+  apiUser   ApiUser      @relation(fields: [apiUserId], references: [id])
+  key       String       @unique
+  createdAt DateTime     @default(now())
+  totalUsed Int          @default(0)
+  status    ApiKeyStatus @default(PENDING)
+}
+
+enum ApiKeyStatus {
+  ACTIVE
+  DISABLED
+  PENDING
+}
+
+enum SocialLinkType {
+  GITHUB
+  WEBSITE
+  DOCS
+  DISCORD
+  TWITTER
+  TELEGRAM
+  OTHER
 }
