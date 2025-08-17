@@ -1,12 +1,12 @@
 'use client';
 
-import { useParams } from 'next/navigation';
 import RepoSummary from '@/components/common/RepoSummary';
 import RepositoryLeaderboard from '@/components/pages/repository/RepositoryLeaderboard';
-import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { formatDistanceToNow } from 'date-fns';
-import { ThumbsUp, ThumbsDown, MessageCircle } from 'lucide-react';
+import { MessageCircle, ThumbsDown, ThumbsUp } from 'lucide-react';
+import { useParams } from 'next/navigation';
 import { useState } from 'react';
 
 // Mock data for demo purposes
@@ -67,7 +67,8 @@ const mockRepository = {
         walletAddress: '0xABC...123',
         avatar: '#F59E0B' // Orange color
       },
-      content: "How does flowstate handle failed tasks in a multi-step pipeline? I've been experimenting with defining multi-step workflows, and I'm curious how the engine handles a failure in one of the middle steps. Does it retry automatically? Can we customize fallback behavior?",
+      content:
+        "How does flowstate handle failed tasks in a multi-step pipeline? I've been experimenting with defining multi-step workflows, and I'm curious how the engine handles a failure in one of the middle steps. Does it retry automatically? Can we customize fallback behavior?",
       createdAt: new Date('2025-08-13T10:42:00Z'),
       upvotes: 12,
       downvotes: 2,
@@ -79,7 +80,8 @@ const mockRepository = {
             walletAddress: '0xDEF...456',
             avatar: '#10B981' // Green color
           },
-          content: "Great question! By default, the engine will retry failed tasks up to 3 times with exponential backoff. You can override this in the step config using the retry and on_failure keys.",
+          content:
+            'Great question! By default, the engine will retry failed tasks up to 3 times with exponential backoff. You can override this in the step config using the retry and on_failure keys.',
           createdAt: new Date('2025-08-13T11:15:00Z'),
           upvotes: 8,
           downvotes: 0
@@ -93,7 +95,8 @@ const mockRepository = {
         walletAddress: '0x789...ABC',
         avatar: '#8B5CF6' // Purple color
       },
-      content: "Just integrated Next.js 15 with the new app directory. The performance improvements are incredible! Has anyone tried the new caching strategies?",
+      content:
+        'Just integrated Next.js 15 with the new app directory. The performance improvements are incredible! Has anyone tried the new caching strategies?',
       createdAt: new Date('2025-08-13T09:30:00Z'),
       upvotes: 25,
       downvotes: 1,
@@ -105,7 +108,7 @@ const mockRepository = {
             walletAddress: '0x456...DEF',
             avatar: '#EF4444' // Red color
           },
-          content: "Yes! The fetch cache is a game changer. We saw 40% faster page loads on our e-commerce site.",
+          content: 'Yes! The fetch cache is a game changer. We saw 40% faster page loads on our e-commerce site.',
           createdAt: new Date('2025-08-13T09:45:00Z'),
           upvotes: 15,
           downvotes: 0
@@ -131,7 +134,8 @@ const mockRepository = {
         walletAddress: '0xGHI...789',
         avatar: '#F97316' // Orange color
       },
-      content: "Question about Server Components: When should I use 'use client' vs keeping components server-side? I'm struggling with the decision tree.",
+      content:
+        "Question about Server Components: When should I use 'use client' vs keeping components server-side? I'm struggling with the decision tree.",
       createdAt: new Date('2025-08-12T16:20:00Z'),
       upvotes: 18,
       downvotes: 0,
@@ -227,50 +231,51 @@ export default function DemoRepositoryPage() {
               {repo.discussions.map((discussion) => (
                 <div key={discussion.id} className='bg-white border border-gray-200 rounded-lg p-6'>
                   {/* Main Discussion */}
-                  <div className='flex gap-4'>
-                    {/* User Avatar */}
-                    <div 
-                      className='flex items-center justify-center w-12 h-12 rounded-full text-white font-semibold'
-                      style={{ backgroundColor: discussion.user.avatar }}
-                    >
-                      {discussion.user.name.charAt(0).toUpperCase()}
+                  <div className=''>
+                    <div className='flex gap-3 mb-3'>
+                      <div>
+                        <div
+                          className='flex items-center justify-center w-12 h-12 rounded-full text-white font-semibold'
+                          style={{ backgroundColor: discussion.user.avatar }}
+                        >
+                          {discussion.user.name.charAt(0).toUpperCase()}
+                        </div>
+                      </div>
+                      <div className='flex flex-col w-full'>
+                        <h4 className='font-semibold text-gray-900'>{discussion.user.name}</h4>
+                        <div className='flex justify-between'>
+                          <span className='text-sm text-gray-500'>{discussion.user.walletAddress}</span>
+                          <span className='text-sm text-gray-500'>
+                            {formatDistanceToNow(discussion.createdAt, { addSuffix: true })}
+                          </span>
+                        </div>
+                      </div>
                     </div>
-                    
+
                     {/* Discussion Content */}
                     <div className='flex-1'>
-                      <div className='flex items-center gap-3 mb-2'>
-                        <h4 className='font-semibold text-gray-900'>{discussion.user.name}</h4>
-                        <span className='text-sm text-gray-500'>{discussion.user.walletAddress}</span>
-                        <span className='text-sm text-gray-500'>
-                          {formatDistanceToNow(discussion.createdAt, { addSuffix: true })}
-                        </span>
-                      </div>
-                      
-                      <p className='text-gray-800 mb-4 leading-relaxed'>
-                        {discussion.content}
-                      </p>
-                      
+                      <p className='text-gray-800 mb-4 leading-relaxed'>{discussion.content}</p>
                       {/* Voting and Reply Buttons */}
                       <div className='flex items-center gap-4'>
-                        <Button 
-                          variant='ghost' 
-                          size='sm' 
+                        <Button
+                          variant='ghost'
+                          size='sm'
                           className='flex items-center gap-2 text-green-600 hover:text-green-700 hover:bg-green-50'
                         >
                           <ThumbsUp className='w-4 h-4' />
                           <span>{discussion.upvotes}</span>
                         </Button>
-                        <Button 
-                          variant='ghost' 
-                          size='sm' 
+                        <Button
+                          variant='ghost'
+                          size='sm'
                           className='flex items-center gap-2 text-red-600 hover:text-red-700 hover:bg-red-50'
                         >
                           <ThumbsDown className='w-4 h-4' />
                           <span>{discussion.downvotes}</span>
                         </Button>
-                        <Button 
-                          variant='ghost' 
-                          size='sm' 
+                        <Button
+                          variant='ghost'
+                          size='sm'
                           className='flex items-center gap-2 text-gray-600 hover:text-gray-700 hover:bg-gray-50'
                         >
                           <MessageCircle className='w-4 h-4' />
@@ -279,21 +284,21 @@ export default function DemoRepositoryPage() {
                       </div>
                     </div>
                   </div>
-                  
+
                   {/* Replies */}
                   {discussion.replies.length > 0 && (
                     <div className='mt-6 pl-16 space-y-4'>
                       {discussion.replies.map((reply) => (
-                        <div key={reply.id} className='bg-gray-50 border border-gray-100 rounded-lg p-4'>
+                        <div key={reply.id} className='border border-border rounded-lg p-4'>
                           <div className='flex gap-3'>
                             {/* Reply Avatar */}
-                            <div 
+                            <div
                               className='flex items-center justify-center w-8 h-8 rounded-full text-white font-semibold text-sm'
                               style={{ backgroundColor: reply.user.avatar }}
                             >
                               {reply.user.name.charAt(0).toUpperCase()}
                             </div>
-                            
+
                             {/* Reply Content */}
                             <div className='flex-1'>
                               <div className='flex items-center gap-3 mb-2'>
@@ -302,24 +307,22 @@ export default function DemoRepositoryPage() {
                                   {formatDistanceToNow(reply.createdAt, { addSuffix: true })}
                                 </span>
                               </div>
-                              
-                              <p className='text-gray-800 mb-3 text-sm leading-relaxed'>
-                                {reply.content}
-                              </p>
-                              
+
+                              <p className='text-gray-800 mb-3 text-sm leading-relaxed'>{reply.content}</p>
+
                               {/* Reply Voting */}
                               <div className='flex items-center gap-3'>
-                                <Button 
-                                  variant='ghost' 
-                                  size='sm' 
+                                <Button
+                                  variant='ghost'
+                                  size='sm'
                                   className='flex items-center gap-1 text-green-600 hover:text-green-700 hover:bg-green-50 p-1 h-auto text-xs'
                                 >
                                   <ThumbsUp className='w-3 h-3' />
                                   <span>{reply.upvotes}</span>
                                 </Button>
-                                <Button 
-                                  variant='ghost' 
-                                  size='sm' 
+                                <Button
+                                  variant='ghost'
+                                  size='sm'
                                   className='flex items-center gap-1 text-red-600 hover:text-red-700 hover:bg-red-50 p-1 h-auto text-xs'
                                 >
                                   <ThumbsDown className='w-3 h-3' />
