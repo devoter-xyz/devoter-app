@@ -1,38 +1,19 @@
 'use client';
 import RepoCard from '@/components/common/RepoCard';
 import RepoCardSkeleton from '@/components/common/RepoCardSkeleton';
+import { getWeeklyTopRepos } from '@/actions/repository/getTopUniqueVotedRepositories/action';
 import { ChartLine, Star } from 'lucide-react';
-import { Suspense } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 
-const topRepo = [
-  {
-    id: '1',
-    owner: 'openai',
-    name: 'gpt-repo',
-    description: 'A test repo for GPT functionality.',
-    tags: ['AI', 'NLP', 'Machine Learning'],
-    votes: 42,
-    appLogo: '/logo.svg'
-  },
-  {
-    id: '2',
-    owner: 'vercel',
-    name: 'next.js',
-    description: 'The React Framework for the Web.',
-    tags: ['React', 'Framework', 'SSR'],
-    votes: 35,
-    appLogo: '/logo.svg'
-  },
-  {
-    id: '3',
-    owner: 'facebook',
-    name: 'react',
-    description: 'A declarative, efficient, and flexible JavaScript library for building UI.',
-    tags: ['JavaScript', 'Library', 'UI'],
-    votes: 50,
-    appLogo: '/logo.svg'
-  }
-];
+type Repository = {
+  id: string;
+  owner: string;
+  name: string;
+  description: string;
+  tags: string[];
+  votes: number;
+  appLogo: string;
+};
 
 const featuredRepo = [
   {
@@ -65,6 +46,29 @@ const featuredRepo = [
 ];
 
 export default function HomePage() {
+  const [topRepositories, setTopRepositories] = useState<Repository[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchRepositories = async () => {
+      try {
+        const topRepos = await getWeeklyTopRepos();
+        // Ensure each repo has an appLogo property
+        const reposWithLogo = topRepos.map((repo: any) => ({
+          ...repo,
+          appLogo: repo.appLogo || '/logo.svg'
+        }));
+        setTopRepositories(reposWithLogo);
+      } catch (error) {
+        console.error('Failed to fetch repositories:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchRepositories();
+  }, []);
+
   return (
     <section className='py-10 px-6 flex flex-col gap-10'>
       <div>
@@ -82,7 +86,7 @@ export default function HomePage() {
               </>
             }
           >
-            {topRepo.map((repo) => (
+            {featuredRepo.map((repo) => (
               <RepoCard
                 key={repo.id}
                 id={repo.id}
@@ -113,21 +117,29 @@ export default function HomePage() {
               </>
             }
           >
-            {featuredRepo.map((repo, index) => (
-              <RepoCard
-                key={repo.id}
-                id={repo.id}
-                owner={repo.owner}
-                name={repo.name}
-                description={repo.description || ''}
-                tags={repo.tags}
-                votes={repo.votes}
-                cardType='default'
-                variant={index < 3 ? (['first', 'second', 'third'] as const)[index] : 'default'}
-                appLogo={repo.appLogo}
-                isFavorited={index % 2 === 0}
-              />
-            ))}
+            {loading ? (
+              <>
+                <RepoCardSkeleton />
+                <RepoCardSkeleton />
+                <RepoCardSkeleton />
+              </>
+            ) : (
+              topRepositories.map((repo, index) => (
+                <RepoCard
+                  key={repo.id}
+                  id={repo.id}
+                  owner={repo.owner}
+                  name={repo.name}
+                  description={repo.description || ''}
+                  tags={repo.tags}
+                  votes={repo.votes}
+                  cardType='default'
+                  variant={index < 3 ? (['first', 'second', 'third'] as const)[index] : 'default'}
+                  appLogo={repo.appLogo}
+                  isFavorited={index % 2 === 0}
+                />
+              ))
+            )}
           </Suspense>
         </div>
       </div>
