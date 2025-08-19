@@ -54,6 +54,7 @@ export default function HomePage() {
       try {
         const topRepos = await getWeeklyTopRepos();
         // Ensure each repo has an appLogo property
+        // eslint-disable-next-line
         const reposWithLogo = topRepos.map((repo: any) => ({
           ...repo,
           appLogo: repo.appLogo || '/logo.svg'
