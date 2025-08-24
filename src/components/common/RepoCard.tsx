@@ -59,7 +59,7 @@ const RepoCard = ({
         <Card
           className={cn(
             cardVariants({ variant }),
-            `p-6 justify-between cursor-pointer hover:shadow-lg transition-shadow ${
+            `p-6 justify-between cursor-pointer shadow-lg hover:scale-[0.98] duration-300 ${
               cardType == 'featured' ? 'bg-amber-100/30 border-orange-300' : 'bg-background'
             } `,
             className
@@ -103,7 +103,7 @@ const RepoCard = ({
           <CardFooter className='p-0 pt-6'>
             <div className='-ml-1 flex flex-wrap gap-2'>
               {tags.slice(0, 3).map((tag) => (
-                <Badge key={tag}>{tag}</Badge>
+                <Badge key={tag} variant={'transparent'}>{tag}</Badge>
               ))}
               {tags.length > 3 && <Badge>+{tags.length - 3}</Badge>}
             </div>
