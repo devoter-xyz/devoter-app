@@ -150,6 +150,30 @@ model UserFavorite {
   @@unique([userId, repositoryId])
 }
 
+model ApiUser {
+  id            String   @id @default(uuid())
+  walletAddress String   @unique @db.VarChar(42)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  apiKeys       ApiKey[]
+}
+
+model ApiKey {
+  id        String       @id @default(uuid())
+  apiUserId String
+  apiUser   ApiUser      @relation(fields: [apiUserId], references: [id])
+  key       String       @unique
+  createdAt DateTime     @default(now())
+  totalUsed Int          @default(0)
+  status    ApiKeyStatus @default(PENDING)
+}
+
+enum ApiKeyStatus {
+  ACTIVE
+  DISABLED
+  PENDING
+}
+
 enum SocialLinkType {
   GITHUB
   WEBSITE
