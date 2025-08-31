@@ -2,69 +2,42 @@
 import RepoCard from '@/components/common/RepoCard';
 import RepoCardSkeleton from '@/components/common/RepoCardSkeleton';
 import { ChartLine, Star } from 'lucide-react';
-import { Suspense } from 'react';
+import { useEffect, useState } from 'react';
+import { getTopReposThisWeekAction } from '@/actions/repository/getTopReposThisWeek';
 
-const topRepo = [
-  {
-    id: '1',
-    owner: 'openai',
-    name: 'gpt-repo',
-    description: 'A test repo for GPT functionality.',
-    tags: ['AI', 'NLP', 'Machine Learning'],
-    votes: 42,
-    appLogo: '/logo.svg'
-  },
-  {
-    id: '2',
-    owner: 'vercel',
-    name: 'next.js',
-    description: 'The React Framework for the Web.',
-    tags: ['React', 'Framework', 'SSR'],
-    votes: 35,
-    appLogo: '/logo.svg'
-  },
-  {
-    id: '3',
-    owner: 'facebook',
-    name: 'react',
-    description: 'A declarative, efficient, and flexible JavaScript library for building UI.',
-    tags: ['JavaScript', 'Library', 'UI'],
-    votes: 50,
-    appLogo: '/logo.svg'
-  }
-];
-
-const featuredRepo = [
-  {
-    id: '4',
-    owner: 'microsoft',
-    name: 'vscode',
-    description: 'Visual Studio Code – Code editing. Redefined.',
-    tags: ['Editor', 'TypeScript', 'Developer Tools'],
-    votes: 61,
-    appLogo: '/logo.svg'
-  },
-  {
-    id: '5',
-    owner: 'torvalds',
-    name: 'linux',
-    description: 'Linux kernel source tree.',
-    tags: ['Kernel', 'Operating System', 'C'],
-    votes: 78,
-    appLogo: '/logo.svg'
-  },
-  {
-    id: '6',
-    owner: 'tensorflow',
-    name: 'tensorflow',
-    description: 'An open-source machine learning framework for everyone.',
-    tags: ['Machine Learning', 'Deep Learning', 'Python'],
-    votes: 55,
-    appLogo: '/logo.svg'
-  }
-];
+type RepoCardData = {
+  id: string;
+  owner: string | null;
+  name: string | null;
+  title: string;
+  description: string;
+  tags: string[];
+  totalVotes: number;
+  logoUrl: string | null;
+  isVerified?: boolean;
+};
 
 export default function HomePage() {
+  const [repos, setRepos] = useState<RepoCardData[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    (async () => {
+      setLoading(true);
+      try {
+        const result = await getTopReposThisWeekAction({ limit: 6 });
+        setRepos(result?.data?.repositories || []);
+      } catch (e) {
+        setRepos([]);
+      }
+      setLoading(false);
+    })();
+  }, []);
+
+  // Split repos for featured and top (first 3 as featured, next 3 as top)
+  const featuredRepos = repos.slice(0, 3);
+  const topRepos = repos.slice(3, 6);
+
   return (
     <section className='py-10 px-6 flex flex-col gap-10'>
       <div>
@@ -73,29 +46,28 @@ export default function HomePage() {
           Featured Repositories
         </h1>
         <div className='grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3'>
-          <Suspense
-            fallback={
-              <>
-                <RepoCardSkeleton />
-                <RepoCardSkeleton />
-                <RepoCardSkeleton />
-              </>
-            }
-          >
-            {topRepo.map((repo) => (
+          {loading ? (
+            <>
+              <RepoCardSkeleton />
+              <RepoCardSkeleton />
+              <RepoCardSkeleton />
+            </>
+          ) : (
+            featuredRepos.map((repo) => (
               <RepoCard
                 key={repo.id}
                 id={repo.id}
-                owner={repo.owner}
-                name={repo.name}
+                owner={repo.owner || ''}
+                name={repo.name || repo.title}
                 description={repo.description || ''}
                 tags={repo.tags}
-                votes={repo.votes}
+                votes={repo.totalVotes}
                 cardType='featured'
-                appLogo={repo.appLogo}
+                appLogo={repo.logoUrl || '/logo.svg'}
+                isVerified={repo.isVerified}
               />
-            ))}
-          </Suspense>
+            ))
+          )}
         </div>
       </div>
       <div>
@@ -104,31 +76,30 @@ export default function HomePage() {
           Top Repositories
         </h1>
         <div className='grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3'>
-          <Suspense
-            fallback={
-              <>
-                <RepoCardSkeleton />
-                <RepoCardSkeleton />
-                <RepoCardSkeleton />
-              </>
-            }
-          >
-            {featuredRepo.map((repo, index) => (
+          {loading ? (
+            <>
+              <RepoCardSkeleton />
+              <RepoCardSkeleton />
+              <RepoCardSkeleton />
+            </>
+          ) : (
+            topRepos.map((repo, index) => (
               <RepoCard
                 key={repo.id}
                 id={repo.id}
-                owner={repo.owner}
-                name={repo.name}
+                owner={repo.owner || ''}
+                name={repo.name || repo.title}
                 description={repo.description || ''}
                 tags={repo.tags}
-                votes={repo.votes}
+                votes={repo.totalVotes}
                 cardType='default'
                 variant={index < 3 ? (['first', 'second', 'third'] as const)[index] : 'default'}
-                appLogo={repo.appLogo}
+                appLogo={repo.logoUrl || '/logo.svg'}
                 isFavorited={index % 2 === 0}
+                isVerified={repo.isVerified}
               />
-            ))}
-          </Suspense>
+            ))
+          )}
         </div>
       </div>
     </section>
