@@ -1,9 +1,15 @@
-'use client';
-
 import { usePathname } from 'next/navigation';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Search as SearchIcon, Filter } from 'lucide-react';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog"
 
 export function Search() {
   const pathname = usePathname();
@@ -28,10 +34,22 @@ export function Search() {
           className="pl-10 pr-4 py-2 w-full"
         />
       </div>
-      <Button variant="outline">
-        <Filter className="h-4 w-4 mr-2" />
-        Filter
-      </Button>
+      <Dialog>
+        <DialogTrigger asChild>
+          <Button variant="outline">
+            <Filter className="h-4 w-4 mr-2" />
+            Filter
+          </Button>
+        </DialogTrigger>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Filter Results</DialogTitle>
+            <DialogDescription>
+              Use the options below to filter your search results.
+            </DialogDescription>
+          </DialogHeader>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
