@@ -38,11 +38,11 @@ model Repository {
   weeklyRank         Int?
   isVerified         Boolean                 @default(false)
   submitterId        String
-  submitter          User                    @relation(fields: [submitterId], references: [id])
+  submitter          User                    @relation(fields: [submitterId], references: [id], onDelete: Cascade)
   totalVotes         Int                     @default(0)
   totalTokenAmount   Decimal                 @default(0) @db.Decimal(36, 18)
   paymentId          String                  @unique
-  payment            Payment                 @relation("RepoPayment", fields: [paymentId], references: [id])
+  payment            Payment                 @relation("RepoPayment", fields: [paymentId], references: [id], onDelete: Cascade)
   featured           Boolean                 @default(false)
   createdAt          DateTime                @default(now())
   updatedAt          DateTime                @updatedAt
@@ -57,8 +57,8 @@ model Vote {
   id           String     @id @default(uuid())
   userId       String
   repositoryId String
-  user         User       @relation(fields: [userId], references: [id])
-  repository   Repository @relation(fields: [repositoryId], references: [id])
+  user         User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  repository   Repository @relation(fields: [repositoryId], references: [id], onDelete: Cascade)
   tokenAmount  Decimal    @db.Decimal(36, 18)
   lastVerified DateTime   @default(now())
   createdAt    DateTime   @default(now())
@@ -72,13 +72,13 @@ model Vote {
 model Payment {
   id            String      @id @default(uuid())
   userId        String
-  user          User        @relation(fields: [userId], references: [id])
+  user          User        @relation(fields: [userId], references: [id], onDelete: Cascade)
   walletAddress String      @db.VarChar(42)
   tokenAmount   Decimal     @db.Decimal(36, 18)
   txHash        String      @unique
   createdAt     DateTime    @default(now())
   voteId        String?
-  vote          Vote?       @relation(fields: [voteId], references: [id])
+  vote          Vote?       @relation(fields: [voteId], references: [id], onDelete: SetNull)
   repository    Repository? @relation("RepoPayment")
   week          String
 }
@@ -86,7 +86,7 @@ model Payment {
 model WeeklyRepoLeaderboard {
   id         String     @id @default(uuid())
   repoId     String
-  repository Repository @relation(fields: [repoId], references: [id])
+  repository Repository @relation(fields: [repoId], references: [id], onDelete: Cascade)
   rank       Int
   week       String
   createdAt  DateTime   @default(now())
@@ -105,9 +105,9 @@ model AdminUser {
 model Discussion {
   id           String    @id @default(uuid())
   repositoryId String
-  repository   Repository @relation(fields: [repositoryId], references: [id])
+  repository   Repository @relation(fields: [repositoryId], references: [id], onDelete: Cascade)
   userId       String
-  user         User      @relation(fields: [userId], references: [id])
+  user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   content      String    @db.Text
   upvotes      Int       @default(0)
   downvotes    Int       @default(0)
@@ -119,9 +119,9 @@ model Discussion {
 model Reply {
   id           String     @id @default(uuid())
   discussionId String
-  discussion   Discussion @relation(fields: [discussionId], references: [id])
+  discussion   Discussion @relation(fields: [discussionId], references: [id], onDelete: Cascade)
   userId       String
-  user         User       @relation(fields: [userId], references: [id])
+  user         User       @relation(fields: [userId], references: [id], onDelete: Cascade)
   content      String     @db.Text
   upvotes      Int        @default(0)
   downvotes    Int        @default(0)
@@ -132,7 +132,7 @@ model Reply {
 model SocialLink {
   id           String     @id @default(uuid())
   repositoryId String
-  repository   Repository @relation(fields: [repositoryId], references: [id])
+  repository   Repository @relation(fields: [repositoryId], references: [id], onDelete: Cascade)
   type         SocialLinkType
   url          String     @db.VarChar(255)
   label        String     @db.VarChar(100)
@@ -142,9 +142,9 @@ model SocialLink {
 model UserFavorite {
   id           String     @id @default(uuid())
   userId       String
-  user         User       @relation(fields: [userId], references: [id])
+  user         User       @relation(fields: [userId], references: [id], onDelete: Cascade)
   repositoryId String
-  repository   Repository @relation(fields: [repositoryId], references: [id])
+  repository   Repository @relation(fields: [repositoryId], references: [id], onDelete: Cascade)
   createdAt    DateTime   @default(now())
 
   @@unique([userId, repositoryId])
@@ -161,7 +161,7 @@ model ApiUser {
 model ApiKey {
   id        String       @id @default(uuid())
   apiUserId String
-  apiUser   ApiUser      @relation(fields: [apiUserId], references: [id])
+  apiUser   ApiUser      @relation(fields: [apiUserId], references: [id], onDelete: Cascade)
   key       String       @unique
   createdAt DateTime     @default(now())
   totalUsed Int          @default(0)
