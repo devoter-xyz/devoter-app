@@ -7,6 +7,11 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { Badge } from '../ui/badge';
 import { Button } from '../ui/button';
+import { toggleFavoriteAction } from '@/actions/repository/toggleFavorite';
+import { useEffect, useState } from 'react';
+import { toast } from 'sonner';
+import { useSession } from '@/components/providers/SessionProvider';
+import { useRouter } from 'next/navigation';
 
 const cardVariants = cva('h-full w-full rounded-2xl', {
   variants: {
@@ -45,13 +50,21 @@ const RepoCard = ({
   description,
   tags,
   votes,
-  isFavorited,
+  isFavorited = false,
   isVerified,
   appLogo,
   cardType = 'default',
   ...props
 }: RepoCardProps) => {
   const showBadge = variant === 'first' || variant === 'second' || variant === 'third';
+  const [localIsFavorited, setLocalIsFavorited] = useState(isFavorited);
+  const { user } = useSession();
+  const router = useRouter();
+  
+  // Update local state when prop changes
+  useEffect(() => {
+    setLocalIsFavorited(isFavorited);
+  }, [isFavorited]);
 
   return (
     <div className='relative'>
@@ -81,9 +94,38 @@ const RepoCard = ({
                 <Button
                   variant={'ghost'}
                   className='hover:bg-red-100 hover:text-red-500'
-                  onClick={(e) => e.preventDefault()}
+                  onClick={async (e) => {
+                    e.preventDefault();
+                    
+                    // Check if user is authenticated
+                    if (!user) {
+                      toast.error('Please sign in to favorite repositories');
+                      router.push('/signin');
+                      return;
+                    }
+                    
+                    try {
+                      const result = await toggleFavoriteAction({
+                        repositoryId: id
+                      });
+                      // Access the data property of SafeActionResult
+                      if (result.data) {
+                        setLocalIsFavorited(result.data.isFavorited);
+                      }
+                    } catch (error) {
+                      // Check if error message contains authentication error
+                      if (error instanceof Error && 
+                          (error.message.includes('not logged in') || 
+                           error.message.includes('No record was found'))) {
+                        toast.error('Please sign in to favorite repositories');
+                        router.push('/signin');
+                      } else {
+                        toast.error('Failed to toggle favorite status');
+                      }
+                    }
+                  }}
                 >
-                  <Heart className={cn('h-6 w-6', { 'fill-red-500 text-red-500': isFavorited })} />
+                  <Heart className={cn('h-6 w-6', { 'fill-red-500 text-red-500': localIsFavorited })} />
                 </Button>
                 {isVerified && <VerifiedIcon />}
               </div>
