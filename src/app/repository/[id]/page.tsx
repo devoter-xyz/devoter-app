@@ -338,7 +338,35 @@ export default function DemoRepositoryPage() {
           </TabsContent>
 
           <TabsContent value='socials' className='mt-0'>
-            <div className='border rounded-md p-4 shadow-xs'>Socials Content</div>
+            <div className='border rounded-md p-4 shadow-xs'>
+              <h3 className='text-lg font-semibold mb-4'>Connect with us</h3>
+              <div className='space-y-4'>
+                <div className='flex items-center gap-3'>
+                  <div className='bg-blue-100 p-2 rounded-full'>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-blue-600"><path d="M22 4s-.7 2.1-2 3.4c1.6 10-9.4 17.3-18 11.6 2.2.1 4.4-.6 6-2C3 15.5.5 9.6 3 5c2.2 2.6 5.6 4.1 9 4-.9-4.2 4-6.6 7-3.8 1.1 0 3-1.2 3-1.2z"></path></svg>
+                  </div>
+                  <a href="https://twitter.com/projecthandle" className='text-blue-600 hover:underline'>@projecthandle</a>
+                </div>
+                <div className='flex items-center gap-3'>
+                  <div className='bg-purple-100 p-2 rounded-full'>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-purple-600"><path d="M9 19c-4.3 1.4-4.3-2.5-6-3m12 5v-3.5c0-1 .1-1.4-.5-2 2.8-.3 5.5-1.4 5.5-6a4.6 4.6 0 0 0-1.3-3.2 4.2 4.2 0 0 0-.1-3.2s-1.1-.3-3.5 1.3a12.3 12.3 0 0 0-6.2 0C6.5 2.8 5.4 3.1 5.4 3.1a4.2 4.2 0 0 0-.1 3.2A4.6 4.6 0 0 0 4 9.5c0 4.6 2.7 5.7 5.5 6-.6.6-.6 1.2-.5 2V21"></path></svg>
+                  </div>
+                  <a href="https://github.com/organization/repo" className='text-purple-600 hover:underline'>github.com/organization/repo</a>
+                </div>
+                <div className='flex items-center gap-3'>
+                  <div className='bg-blue-100 p-2 rounded-full'>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-blue-600"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path><rect width="4" height="12" x="2" y="9"></rect><circle cx="4" cy="4" r="2"></circle></svg>
+                  </div>
+                  <a href="https://linkedin.com/company/projectname" className='text-blue-600 hover:underline'>linkedin.com/company/projectname</a>
+                </div>
+                <div className='flex items-center gap-3'>
+                  <div className='bg-indigo-100 p-2 rounded-full'>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-indigo-600"><path d="M21.2 8.4c.5 3.97-1.6 7.97-5.08 9.57-3.48 1.6-7.66.25-10.26-3.23-2.6-3.5-2.6-8.4 0-11.9C8.12-.16 12.3-1.5 15.78.1 19.27 1.7 21.4 5.7 20.9 9.67"></path><path d="M12 6v6l4 2"></path></svg>
+                  </div>
+                  <a href="https://discord.gg/projectname" className='text-indigo-600 hover:underline'>discord.gg/projectname</a>
+                </div>
+              </div>
+            </div>
           </TabsContent>
 
           <TabsContent value='about' className='mt-0'>
