@@ -1,13 +1,14 @@
-import { signIn } from '@/actions/auth/signin/logic';
-import { updateWeeklyLeaderboard } from '@/actions/leaderboard/archive/logic';
-import { createRepository } from '@/actions/repository/createRepository/logic';
-import { faker } from '@faker-js/faker';
-import { Prisma, PrismaClient } from '@prisma/client';
-import crypto from 'crypto';
-import { Wallet } from 'ethers';
-import { SiweMessage } from 'siwe';
+// Import with type compatibility for CommonJS
+const { faker } = require('@faker-js/faker');
+const { Prisma, PrismaClient } = require('@prisma/client');
+const nodeCrypto = require('crypto');
+const { Wallet } = require('ethers');
 
-const prisma = new PrismaClient();
+// Type imports for TypeScript
+// Removed PrismaDecimal type alias due to missing runtime types
+
+// Create Prisma client instance
+const prismaClient = new PrismaClient();
 
 // ---------------------------------------------------------------------------
 // Configuration – adjust these numbers to change dataset size
@@ -16,6 +17,11 @@ const NUM_USERS = 10; // total users to create
 const NUM_REPOS = 30; // repositories that will appear on the leaderboard
 const MAX_VOTES_PER_REPO = 15; // upper bound for votes per repository
 
+/**
+ * Calculates the ISO week string from a date
+ * @param {Date} date - The date to calculate the week for
+ * @returns {string} The ISO week string in format YYYY-WXX
+ */
 function weekString(date: Date): string {
   const tmpDate = new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate()));
   const dayNum = tmpDate.getUTCDay() || 7;
@@ -28,19 +34,40 @@ function weekString(date: Date): string {
   return `${year}-W${week}`;
 }
 
-function randomTokenDecimal(min: number, max: number, precision = 6) {
+/**
+ * Generates a random decimal value within a range
+ * @param {number} min - Minimum value
+ * @param {number} max - Maximum value
+ * @param {number} precision - Decimal precision
+ * @returns {Prisma.Decimal} A Prisma Decimal value
+ */
+function randomTokenDecimal(min: number, max: number, precision = 6): any {
   const multipleOf = 1 / 10 ** precision;
   const random = faker.number.float({ min, max, multipleOf });
   return new Prisma.Decimal(random.toString());
 }
 
+// Define types for our entities
+type User = {
+  id: string;
+  walletAddress: string;
+  name?: string;
+  avatar?: string;
+};
+
+type Repository = {
+  id: string;
+  createdAt: Date;
+  [key: string]: any;
+};
+
 async function main() {
-  console.log('🌱  Starting faker seed …');
+  console.log('🌱  Starting simplified seed …');
 
   // -------------------------------------------------------------------------
   // 1. Admin User
   // -------------------------------------------------------------------------
-  await prisma.adminUser.upsert({
+  await prismaClient.adminUser.upsert({
     where: { walletAddress: '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266' },
     update: {},
     create: { walletAddress: '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266' }
@@ -50,46 +77,36 @@ async function main() {
   // -------------------------------------------------------------------------
   // 2. Users
   // -------------------------------------------------------------------------
-  const users = await Promise.all(
-    Array.from({ length: NUM_USERS }).map(async () => {
-      const wallet = Wallet.createRandom();
-      const address = wallet.address;
-      const siweMessage = new SiweMessage({
-        domain: process.env.NEXT_PUBLIC_APP_URL,
-        address,
-        statement: 'Sign in with Ethereum to the app.',
-        uri: `${process.env.NEXT_PUBLIC_APP_URL}/login`,
-        version: '1',
-        chainId: 1,
-        nonce: crypto.randomBytes(16).toString('hex')
-      });
-      const message = siweMessage.prepareMessage();
-      const signature = await wallet.signMessage(message);
-
-      return signIn(
-        {
-          message: JSON.stringify(siweMessage),
-          signature,
-          nonce: siweMessage.nonce
-        },
-        { setCookie: false }
-      );
-    })
-  );
+  const users: User[] = [];
+  for (let i = 0; i < NUM_USERS; i++) {
+    const wallet = Wallet.createRandom();
+    const address = wallet.address;
+    
+    const user = await prismaClient.user.create({
+      data: {
+        walletAddress: address,
+        name: faker.person.fullName(),
+        avatar: faker.internet.color()
+      }
+    });
+    
+    users.push(user as User);
+  }
   console.log(`✓ Inserted ${users.length} users`);
 
   // Keep track of which weeks have had activity
   const activeWeeks = new Set<string>();
 
   // -------------------------------------------------------------------------
-  // 3. Repositories (with submission Payments)
+  // 3. Repositories
   // -------------------------------------------------------------------------
   console.log('⎋ Creating repositories…');
+  const repos: Repository[] = [];
+  
   for (let i = 0; i < NUM_REPOS; i++) {
-    const submitter = faker.helpers.arrayElement(users);
+    const submitter = faker.helpers.arrayElement(users) as User;
 
     if (!submitter) {
-      // Should not happen with the current logic, but good practice
       continue;
     }
 
@@ -99,7 +116,7 @@ async function main() {
     activeWeeks.add(submissionWeek);
 
     // Fee for submitting: = 1 USDC
-    const submissionFee = 1;
+    const submissionFee = new Prisma.Decimal(1);
 
     const title = faker.commerce.productName();
     const description = faker.lorem.paragraph();
@@ -108,58 +125,69 @@ async function main() {
       .toLowerCase()
       .replace(/\s+/g, '-')
       .replace(/[^a-z0-9-._]/g, '');
-
-    const repo = await createRepository(
-      {
+      
+    // Create payment first
+    const payment = await prismaClient.payment.create({
+      data: {
+        userId: submitter.id,
+        walletAddress: submitter.walletAddress,
+        tokenAmount: submissionFee,
+        txHash: `0x${nodeCrypto.randomBytes(32).toString('hex')}`,
+        week: submissionWeek
+      }
+    });
+    
+    // Create repository
+    const repo = await prismaClient.repository.create({
+      data: {
         title,
         description,
         githubUrl: `https://github.com/${owner}/${repoName}`,
-        tokenAmount: submissionFee
-      },
-      submitter.id
-    );
-
-    await prisma.repository.update({
-      where: { id: repo.id },
-      data: {
+        name: repoName,
+        owner,
+        tags: [faker.commerce.department(), faker.commerce.department()],
+        submitterId: submitter.id,
+        paymentId: payment.id,
         createdAt: repoCreated
       }
     });
+    
+    repos.push(repo as Repository);
   }
-  console.log(`✓ Inserted ${NUM_REPOS} repositories`);
+  console.log(`✓ Inserted ${repos.length} repositories`);
 
   // -------------------------------------------------------------------------
-  // 4. Votes (with Payments)
+  // 4. Votes
   // -------------------------------------------------------------------------
   console.log('⎋ Creating votes…');
-  const repos = await prisma.repository.findMany();
   let totalVotesCreated = 0;
+  
   for (const repo of repos) {
     // Each repo gets a random number of votes
     const numVotes = faker.number.int({ min: 1, max: MAX_VOTES_PER_REPO });
     const votersWithDuplicates = faker.helpers.arrayElements(users, numVotes);
-    const voters = [...new Set(votersWithDuplicates)]; // Ensure unique voters per repo
+    const voters = [...new Set(votersWithDuplicates)] as User[]; // Ensure unique voters per repo
 
     for (const voter of voters) {
       const votingWeek = weekString(repo.createdAt);
       activeWeeks.add(votingWeek);
       const tokenAmount = randomTokenDecimal(0.1, 10);
 
-      const vote = await prisma.vote.create({
+      const vote = await prismaClient.vote.create({
         data: {
-          userId: voter!.id,
+          userId: voter.id,
           repositoryId: repo.id,
           tokenAmount,
           week: votingWeek
         }
       });
 
-      await prisma.payment.create({
+      await prismaClient.payment.create({
         data: {
-          userId: voter!.id,
-          walletAddress: voter!.walletAddress,
+          userId: voter.id,
+          walletAddress: voter.walletAddress,
           tokenAmount,
-          txHash: `0x${crypto.randomBytes(32).toString('hex')}`,
+          txHash: `0x${nodeCrypto.randomBytes(32).toString('hex')}`,
           week: votingWeek,
           voteId: vote.id
         }
@@ -173,7 +201,7 @@ async function main() {
   // 5. Update Repository Vote Counts
   // -------------------------------------------------------------------------
   console.log('⎋ Updating repository vote counts…');
-  const reposWithVotes = await prisma.repository.findMany({
+  const reposWithVotes = await prismaClient.repository.findMany({
     include: {
       _count: {
         select: { votes: true }
@@ -182,7 +210,7 @@ async function main() {
   });
 
   for (const repo of reposWithVotes) {
-    await prisma.repository.update({
+    await prismaClient.repository.update({
       where: { id: repo.id },
       data: { totalVotes: repo._count.votes }
     });
@@ -194,7 +222,40 @@ async function main() {
   // -------------------------------------------------------------------------
   console.log('⎋ Updating weekly leaderboards…');
   for (const week of activeWeeks) {
-    await updateWeeklyLeaderboard(week);
+    // Get top repositories for the week
+    const topRepos = await prismaClient.repository.findMany({
+      where: {
+        votes: {
+          some: {
+            week
+          }
+        }
+      },
+      include: {
+        votes: {
+          where: {
+            week
+          }
+        }
+      },
+      orderBy: {
+        totalVotes: 'desc'
+      },
+      take: 10
+    });
+    
+    // Create leaderboard entries
+    for (let i = 0; i < topRepos.length; i++) {
+      const repo = topRepos[i];
+      await prismaClient.weeklyRepoLeaderboard.create({
+        data: {
+          repoId: repo.id,
+          rank: i + 1,
+          week
+        }
+      });
+    }
+    
     console.log(`  - Updated leaderboard for ${week}`);
   }
   console.log(`✓ Updated ${activeWeeks.size} leaderboards`);
@@ -206,5 +267,5 @@ main()
     process.exit(1);
   })
   .finally(async () => {
-    await prisma.$disconnect();
+    await prismaClient.$disconnect();
   });

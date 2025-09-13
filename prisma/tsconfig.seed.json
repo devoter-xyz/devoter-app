@@ -3,7 +3,10 @@
   "compilerOptions": {
     "baseUrl": "..",
     "module": "CommonJS",
-    "outDir": "./.seed-build"
+    "outDir": "./.seed-build",
+    "paths": {
+      "@/*": ["./src/*"]
+    }
   },
   "include": ["./seed.ts"]
-} 
+}
