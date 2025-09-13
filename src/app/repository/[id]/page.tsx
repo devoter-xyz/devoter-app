@@ -370,7 +370,84 @@ export default function DemoRepositoryPage() {
           </TabsContent>
 
           <TabsContent value='about' className='mt-0'>
-            <div className='border rounded-md p-4 shadow-xs'>About Repository Content</div>
+            <div className='border rounded-md p-4 shadow-xs'>
+              <div className='space-y-6'>
+                <div>
+                  <h3 className='text-lg font-semibold mb-2'>Project Overview</h3>
+                  <p className='text-gray-700'>
+                    This repository contains a decentralized voting application built on blockchain technology. 
+                    It allows users to submit their projects for community voting, with the most popular projects 
+                    receiving recognition and potential funding opportunities. The platform aims to democratize 
+                    project discovery and support in the open-source ecosystem.
+                  </p>
+                </div>
+                
+                <div>
+                  <h3 className='text-lg font-semibold mb-2'>Key Features</h3>
+                  <ul className='list-disc pl-5 space-y-1 text-gray-700'>
+                    <li>Secure blockchain-based voting system</li>
+                    <li>Weekly leaderboard of top-voted repositories</li>
+                    <li>User authentication via wallet connection</li>
+                    <li>Detailed repository analytics and insights</li>
+                    <li>Community discussion and feedback mechanisms</li>
+                    <li>Token-based incentives for participation</li>
+                  </ul>
+                </div>
+                
+                <div>
+                  <h3 className='text-lg font-semibold mb-2'>Technology Stack</h3>
+                  <div className='flex flex-wrap gap-2'>
+                    <span className='bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded'>Next.js</span>
+                    <span className='bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded'>TypeScript</span>
+                    <span className='bg-purple-100 text-purple-800 text-xs font-medium px-2.5 py-0.5 rounded'>Prisma</span>
+                    <span className='bg-yellow-100 text-yellow-800 text-xs font-medium px-2.5 py-0.5 rounded'>Ethereum</span>
+                    <span className='bg-red-100 text-red-800 text-xs font-medium px-2.5 py-0.5 rounded'>Tailwind CSS</span>
+                    <span className='bg-indigo-100 text-indigo-800 text-xs font-medium px-2.5 py-0.5 rounded'>PostgreSQL</span>
+                  </div>
+                </div>
+                
+                <div>
+                  <h3 className='text-lg font-semibold mb-2'>Team</h3>
+                  <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+                    <div className='flex items-start gap-3'>
+                      <div className='w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center text-gray-500'>JD</div>
+                      <div>
+                        <p className='font-medium'>Jane Doe</p>
+                        <p className='text-sm text-gray-500'>Lead Developer</p>
+                      </div>
+                    </div>
+                    <div className='flex items-start gap-3'>
+                      <div className='w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center text-gray-500'>JS</div>
+                      <div>
+                        <p className='font-medium'>John Smith</p>
+                        <p className='text-sm text-gray-500'>Blockchain Architect</p>
+                      </div>
+                    </div>
+                    <div className='flex items-start gap-3'>
+                      <div className='w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center text-gray-500'>AK</div>
+                      <div>
+                        <p className='font-medium'>Alice Kim</p>
+                        <p className='text-sm text-gray-500'>UI/UX Designer</p>
+                      </div>
+                    </div>
+                    <div className='flex items-start gap-3'>
+                      <div className='w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center text-gray-500'>RJ</div>
+                      <div>
+                        <p className='font-medium'>Robert Johnson</p>
+                        <p className='text-sm text-gray-500'>Product Manager</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                
+                <div>
+                  <h3 className='text-lg font-semibold mb-2'>License</h3>
+                  <p className='text-gray-700'>
+                    This project is licensed under the MIT License - see the LICENSE file in the repository for details.
+                  </p>
+                </div>
+              </div>
+            </div>
           </TabsContent>
         </Tabs>
       </div>
