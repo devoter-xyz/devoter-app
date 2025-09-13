@@ -5,7 +5,7 @@ const nodeCrypto = require('crypto');
 const { Wallet } = require('ethers');
 
 // Type imports for TypeScript
-type PrismaDecimal = Prisma.Decimal;
+// Removed PrismaDecimal type alias due to missing runtime types
 
 // Create Prisma client instance
 const prismaClient = new PrismaClient();
@@ -41,7 +41,7 @@ function weekString(date: Date): string {
  * @param {number} precision - Decimal precision
  * @returns {Prisma.Decimal} A Prisma Decimal value
  */
-function randomTokenDecimal(min: number, max: number, precision = 6): PrismaDecimal {
+function randomTokenDecimal(min: number, max: number, precision = 6): any {
   const multipleOf = 1 / 10 ** precision;
   const random = faker.number.float({ min, max, multipleOf });
   return new Prisma.Decimal(random.toString());

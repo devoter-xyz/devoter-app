@@ -45,6 +45,7 @@
     "next-themes": "^0.4.6",
     "next-top-loader": "^1.0.4",
     "nextjs-toploader": "^3.8.16",
+    "pino-pretty": "^13.1.1",
     "prisma": "^6.8.2",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
