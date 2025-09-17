@@ -30,7 +30,8 @@ type RepositoryFormValues = z.infer<typeof repositorySchema>;
 
 export const SubmitRepositoryButton = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
-  
+  const [open, setOpen] = useState(false);
+
   const form = useForm<RepositoryFormValues>({
     resolver: zodResolver(repositorySchema),
     defaultValues: {
@@ -47,6 +48,7 @@ export const SubmitRepositoryButton = () => {
       console.log('Repository submitted:', values);
       toast.success('Repository submitted successfully!');
       form.reset();
+      setOpen(false); // Close dialog on success
     } catch (error) {
       console.error('Submission error:', error);
       toast.error('Failed to submit repository. Please try again.');
@@ -56,7 +58,7 @@ export const SubmitRepositoryButton = () => {
   };
 
   return (
-    <Dialog>
+    <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button className='w-full'>
           <Plus className='w-5 h-5' />
@@ -70,7 +72,6 @@ export const SubmitRepositoryButton = () => {
             Submit your GitHub repository for community voting
           </DialogDescription>
         </DialogHeader>
-        
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 py-4">
             <FormField
@@ -113,7 +114,6 @@ export const SubmitRepositoryButton = () => {
                 />
               )}
             />
-            
             <DialogFooter className="pt-4">
               <DialogClose asChild>
                 <Button variant="outline" type="button">Cancel</Button>
