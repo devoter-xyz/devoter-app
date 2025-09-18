@@ -7,7 +7,7 @@ export function Actions() {
   return (
     <div className='flex items-center gap-4'>
       <Popover>
-        <PopoverTrigger>
+        <PopoverTrigger asChild>
           <Button variant='outline' size='icon'>
             <Bell className='h-4 w-4' />
           </Button>

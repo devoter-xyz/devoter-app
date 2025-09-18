@@ -12,9 +12,12 @@ function Popover({
 }
 
 function PopoverTrigger({
+  asChild = false,
   ...props
-}: React.ComponentProps<typeof PopoverPrimitive.Trigger>) {
-  return <PopoverPrimitive.Trigger data-slot="popover-trigger" {...props} />
+}: React.ComponentProps<typeof PopoverPrimitive.Trigger> & { asChild?: boolean }) {
+  return (
+    <PopoverPrimitive.Trigger asChild={asChild} data-slot="popover-trigger" {...props} />
+  )
 }
 
 function PopoverContent({

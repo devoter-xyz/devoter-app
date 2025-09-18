@@ -10,19 +10,19 @@ export interface FilterProps {
 }
 
 export function Filter({ onApply }: FilterProps) {
-  const [selectedTag, setSelectedTag] = useState('');
+  const [selectedTag, setSelectedTag] = useState('all');
   const [org, setOrg] = useState('');
   const [maintainer, setMaintainer] = useState('');
   const [onlyFeatured, setOnlyFeatured] = useState(false);
 
   const handleApply = () => {
     if (onApply) {
-      onApply({ selectedTag, org, maintainer, onlyFeatured });
+      onApply({ selectedTag: selectedTag === 'all' ? '' : selectedTag, org, maintainer, onlyFeatured });
     }
   };
 
   return (
-    <Card className="space-y-4 p-4">
+    <Card className="space-y-4 p-4 border-none shadow-none">
       <div className="space-y-2">
         <Label htmlFor="tag">Tag</Label>
         <Select value={selectedTag} onValueChange={setSelectedTag}>
@@ -30,7 +30,7 @@ export function Filter({ onApply }: FilterProps) {
             <SelectValue placeholder="All" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="">All</SelectItem>
+            <SelectItem value="all">All</SelectItem>
             <SelectItem value="frontend">Frontend</SelectItem>
             <SelectItem value="backend">Backend</SelectItem>
             <SelectItem value="devops">DevOps</SelectItem>
