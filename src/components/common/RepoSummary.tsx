@@ -76,7 +76,7 @@ const RepoSummary: React.FC<RepoSummaryProps> = ({
     <div className={cn('w-full max-w-5xl mx-auto', className)}>
       <Link
         href='/'
-        className='inline-flex items-center text-sm text-muted-foreground hover:text-foreground transition-colors font-bold mb-4 text-2xl'
+        className='inline-flex items-center text-muted-foreground hover:text-foreground transition-colors font-bold mb-4 text-2xl'
       >
         <ArrowLeft className='w-4 h-4 mr-2 ' /> Back to Home
       </Link>
