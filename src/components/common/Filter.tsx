@@ -6,7 +6,7 @@ import { Label } from '@/components/ui/label';
 import { useState } from 'react';
 
 export interface FilterProps {
-  onApply?: (filters: any) => void;
+  onApply?: (filters: { selectedTag: string; org: string; maintainer: string; onlyFeatured: boolean }) => void;
 }
 
 export function Filter({ onApply }: FilterProps) {
