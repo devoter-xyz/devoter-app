@@ -15,6 +15,16 @@ export function Filter({ onApply }: FilterProps) {
   const [maintainer, setMaintainer] = useState('');
   const [onlyFeatured, setOnlyFeatured] = useState(false);
 
+  const tagOptions = [
+    { value: 'all', label: 'All' },
+    { value: 'frontend', label: 'Frontend' },
+    { value: 'backend', label: 'Backend' },
+    { value: 'devops', label: 'DevOps' }, 
+    { value: 'mobile', label: 'Mobile' },
+    { value: 'data-science', label: 'Data Science' },
+    { value: 'machine-learning', label: 'Machine Learning' },
+  ];
+
   const handleApply = () => {
     if (onApply) {
       onApply({ selectedTag: selectedTag === 'all' ? '' : selectedTag, org, maintainer, onlyFeatured });
@@ -22,18 +32,19 @@ export function Filter({ onApply }: FilterProps) {
   };
 
   return (
-    <Card className="space-y-4 p-4 border-none shadow-none">
+    <Card className="space-y-4 p-4 border-none shadow-none bg-transparent">
       <div className="space-y-2">
         <Label htmlFor="tag">Tag</Label>
         <Select value={selectedTag} onValueChange={setSelectedTag}>
           <SelectTrigger className="w-full">
             <SelectValue placeholder="All" />
           </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All</SelectItem>
-            <SelectItem value="frontend">Frontend</SelectItem>
-            <SelectItem value="backend">Backend</SelectItem>
-            <SelectItem value="devops">DevOps</SelectItem>
+          <SelectContent className='bg-black/5 backdrop-blur-sm shadow-inner'>
+            {tagOptions.map(option => (
+              <SelectItem key={option.value} value={option.value}>
+                {option.label}
+              </SelectItem>
+            ))}
           </SelectContent>
         </Select>
       </div>
