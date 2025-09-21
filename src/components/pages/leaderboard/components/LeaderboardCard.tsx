@@ -44,7 +44,9 @@ export const LeaderboardCard: React.FC<LeaderboardCardProps> = ({ repository, ra
           </Badge>
           <Badge variant='secondary' className='flex items-center gap-1'>
             <DevTokenLogo size={16} />
-            {repository.totalVotingPower.toNumber().toFixed(2)} Total Votes
+            {typeof repository.totalVotingPower?.toNumber === 'function'
+              ? repository.totalVotingPower.toNumber().toFixed(2)
+              : Number(repository.totalVotingPower ?? 0).toFixed(2)} Total Votes
           </Badge>
         </div>
       </CardHeader>
