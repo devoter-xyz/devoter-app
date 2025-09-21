@@ -57,15 +57,21 @@ export const VoteButton = ({ repositoryId, hasVoted }: VoteButtonProps) => {
 
   useEffect(() => {
     fetchTokenBalance();
-  }, [fetchTokenBalance]);
+    // Only fetch once on mount
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const tokenBalance = tokenBalanceResult?.data;
-  const hasZeroBalance = tokenBalance !== undefined && parseFloat(tokenBalance) === 0;
-  const voteFee = tokenBalance ? (parseFloat(tokenBalance) * 0.0025).toFixed(4) : '0';
+  const hasZeroBalance = tokenBalance === undefined || parseFloat(tokenBalance) === 0;
+  const voteFee = '0.0025'; // Fixed fee
 
   const handleVote = async () => {
     if (!walletClient) {
       toast.error('Please connect your wallet to vote.');
+      return;
+    }
+    if (hasZeroBalance) {
+      toast.error('You do not have enough DEV tokens to vote.');
       return;
     }
     try {
