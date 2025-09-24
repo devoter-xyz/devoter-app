@@ -14,7 +14,7 @@ export function ProtectedRoute({ children, fallback }: ProtectedRouteProps) {
   const router = useRouter();
 
   useEffect(() => {
-    if (!isLoading) return;
+    if (isLoading) return;
 
     if (!user) {
       router.push('/signin');
