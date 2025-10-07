@@ -1,14 +1,10 @@
-// Import with type compatibility for CommonJS
-const { faker } = require('@faker-js/faker');
-const { Prisma, PrismaClient } = require('@prisma/client');
-const nodeCrypto = require('crypto');
-const { Wallet } = require('ethers');
+import { faker } from '@faker-js/faker';
+import { Prisma, PrismaClient } from '@prisma/client';
+import { randomBytes } from 'crypto';
+import { seedUsers } from './seeders/seedUser';
 
-// Type imports for TypeScript
-// Removed PrismaDecimal type alias due to missing runtime types
-
-// Create Prisma client instance
 const prismaClient = new PrismaClient();
+
 
 // ---------------------------------------------------------------------------
 // Configuration – adjust these numbers to change dataset size
@@ -51,8 +47,8 @@ function randomTokenDecimal(min: number, max: number, precision = 6): any {
 type User = {
   id: string;
   walletAddress: string;
-  name?: string;
-  avatar?: string;
+  name?: string | null;
+  avatar?: string | null;
 };
 
 type Repository = {
@@ -77,22 +73,7 @@ async function main() {
   // -------------------------------------------------------------------------
   // 2. Users
   // -------------------------------------------------------------------------
-  const users: User[] = [];
-  for (let i = 0; i < NUM_USERS; i++) {
-    const wallet = Wallet.createRandom();
-    const address = wallet.address;
-    
-    const user = await prismaClient.user.create({
-      data: {
-        walletAddress: address,
-        name: faker.person.fullName(),
-        avatar: faker.internet.color()
-      }
-    });
-    
-    users.push(user as User);
-  }
-  console.log(`✓ Inserted ${users.length} users`);
+  const users: User[] = await seedUsers(NUM_USERS);
 
   // Keep track of which weeks have had activity
   const activeWeeks = new Set<string>();
@@ -132,7 +113,7 @@ async function main() {
         userId: submitter.id,
         walletAddress: submitter.walletAddress,
         tokenAmount: submissionFee,
-        txHash: `0x${nodeCrypto.randomBytes(32).toString('hex')}`,
+        txHash: `0x${randomBytes(32).toString('hex')}`,
         week: submissionWeek
       }
     });
@@ -187,7 +168,7 @@ async function main() {
           userId: voter.id,
           walletAddress: voter.walletAddress,
           tokenAmount,
-          txHash: `0x${nodeCrypto.randomBytes(32).toString('hex')}`,
+          txHash: `0x${randomBytes(32).toString('hex')}`,
           week: votingWeek,
           voteId: vote.id
         }
