@@ -29,7 +29,7 @@ async function main() {
   await seedUsers(10);
 }
 
-if (require.main === module) {
+if (process.argv[1] === new URL(import.meta.url).pathname) {
   main()
     .catch(e => {
       console.error(e);

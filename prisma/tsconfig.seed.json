@@ -2,7 +2,7 @@
   "extends": "../tsconfig.json",
   "compilerOptions": {
     "baseUrl": "..",
-    "module": "CommonJS",
+    "module": "ESNext",
     "outDir": "./.seed-build",
     "paths": {
       "@/*": ["./src/*"]

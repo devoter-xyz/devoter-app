@@ -43,7 +43,12 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Setup environment
-        run: cp .env.example .env
+        run: |
+          if [ -f .env.example ]; then
+            cp .env.example .env
+          else
+            echo '.env.example not found; skipping copy' && true
+          fi
 
       - name: Generate Prisma client
         run: pnpm prisma:generate
