@@ -51,6 +51,16 @@ pnpm dev
 
 ## 🔧 Environment Variables
 
+To get started, create a `.env` file in the root of the project by copying `.env.example`.
+
+```bash
+cp .env.example .env
+```
+
+This file should contain the following environment variables. For local development, you can use the placeholder values provided in `.env.example` or replace them with your actual credentials.
+
+In CI environments, `.env.example` is copied to `.env` if present. If `.env.example` is not found, the CI process will continue without it, assuming environment variables are provided by other means (e.g., GitHub Secrets).
+
 ```env
 DATABASE_URL=postgresql://username:password@localhost:5432/devoter
 NEXT_PUBLIC_THIRDWEB_CLIENT_ID=your_client_id
