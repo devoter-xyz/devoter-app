@@ -3,6 +3,7 @@ import { getCurrentWeek } from '@/lib/utils/date';
 import crypto from 'crypto';
 import { getRepositorySubmissionCount } from '../getRepositorySubmissionCount/logic';
 import { CreateRepositoryInput } from './schema';
+import { DuplicateRepositoryError, WeeklySubmissionLimitError, InvalidGitHubUrlError } from '@/lib/errors';
 
 export interface CreateRepositoryResult {
   id: string;
@@ -29,7 +30,22 @@ export async function createRepository(
   const { count } = await getRepositorySubmissionCount(userId);
 
   if (count >= 3) {
-    throw new Error('You have reached the submission limit of 3 repositories per week.');
+    throw new WeeklySubmissionLimitError();
+  }
+
+  // Validate GitHub URL
+  const githubUrlRegex = /^(https?://)?(www\.)?github\.com/[a-zA-Z0-9-]+/[a-zA-Z0-9.-]+/?$/;
+  if (!githubUrlRegex.test(input.githubUrl)) {
+    throw new InvalidGitHubUrlError();
+  }
+
+  // Check for duplicate repository
+  const existingRepository = await prisma.repository.findUnique({
+    where: { githubUrl: input.githubUrl },
+  });
+
+  if (existingRepository) {
+    throw new DuplicateRepositoryError();
   }
 
   const submissionPayment = await prisma.payment.create({
