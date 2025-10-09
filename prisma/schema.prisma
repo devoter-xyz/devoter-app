@@ -51,6 +51,8 @@ model Repository {
   discussions        Discussion[]
   socialLinks        SocialLink[]
   favorites          UserFavorite[]
+
+  @@index([weeklyRank])
 }
 
 model Vote {
@@ -67,6 +69,7 @@ model Vote {
   payments     Payment[]
 
   @@unique([userId, repositoryId, week])
+  @@index([week])
 }
 
 model Payment {
@@ -94,6 +97,7 @@ model WeeklyRepoLeaderboard {
 
   @@unique([week, rank])
   @@unique([repoId, week])
+  @@index([week])
 }
 
 model AdminUser {
