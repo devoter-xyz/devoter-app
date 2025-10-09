@@ -7,6 +7,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { Badge } from '../ui/badge';
 import { Button } from '../ui/button';
+import { Skeleton } from '../ui/skeleton';
 import { toggleFavoriteAction } from '@/actions/repository/toggleFavorite';
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
@@ -60,6 +61,7 @@ const RepoCard = ({
   const [localIsFavorited, setLocalIsFavorited] = useState(isFavorited);
   const { user } = useSession();
   const router = useRouter();
+  const [isLoading, setIsLoading] = useState(false);
   
   // Update local state when prop changes
   useEffect(() => {
@@ -96,36 +98,50 @@ const RepoCard = ({
                   className='hover:bg-red-100 hover:text-red-500'
                   onClick={async (e) => {
                     e.preventDefault();
-                    
-                    // Check if user is authenticated
+
                     if (!user) {
                       toast.error('Please sign in to favorite repositories');
                       router.push('/signin');
                       return;
                     }
-                    
+
+                    setIsLoading(true);
                     try {
                       const result = await toggleFavoriteAction({
                         repositoryId: id
                       });
-                      // Access the data property of SafeActionResult
                       if (result.data) {
                         setLocalIsFavorited(result.data.isFavorited);
+                        toast.success(
+                          result.data.isFavorited
+                            ? `Added ${name} to favorites!`
+                            : `Removed ${name} from favorites!`
+                        );
                       }
                     } catch (error) {
-                      // Check if error message contains authentication error
-                      if (error instanceof Error && 
-                          (error.message.includes('not logged in') || 
-                           error.message.includes('No record was found'))) {
+                      if (
+                        error instanceof Error &&
+                        (error.message.includes('not logged in') ||
+                          error.message.includes('No record was found'))
+                      ) {
                         toast.error('Please sign in to favorite repositories');
                         router.push('/signin');
                       } else {
                         toast.error('Failed to toggle favorite status');
                       }
+                    } finally {
+                      setIsLoading(false);
                     }
                   }}
+                  disabled={isLoading}
+                  aria-label={localIsFavorited ? `Remove ${name} from favorites` : `Add ${name} to favorites`}
+                  aria-pressed={localIsFavorited}
                 >
-                  <Heart className={cn('h-6 w-6', { 'fill-red-500 text-red-500': localIsFavorited })} />
+                  {isLoading ? (
+                    <Skeleton className='h-6 w-6 rounded-full' />
+                  ) : (
+                    <Heart className={cn('h-6 w-6', { 'fill-red-500 text-red-500': localIsFavorited })} />
+                  )}
                 </Button>
                 {isVerified && <VerifiedIcon />}
               </div>
