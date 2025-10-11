@@ -1,4 +1,5 @@
 import * as z from "zod";
+import { isValidGithubUrl, getGithubRepoDetails, checkGithubRepoExists } from "@/lib/utils";
 import { PREDEFINED_TAGS } from '@/lib/constants';
 
 export const createRepositorySchema = z.object({
@@ -16,15 +17,16 @@ export const createRepositorySchema = z.object({
     .min(1, { message: "GitHub URL is required" })
     .url({ message: "Please enter a valid URL" })
     .refine(
-      (url) => url.includes("github.com"),
-      { message: "Please enter a valid GitHub repository URL" }
+      (url) => isValidGithubUrl(url),
+      { message: "Please enter a valid GitHub repository URL (e.g., https://github.com/user/repo)" }
     )
     .refine(
-      (url) => {
-        const githubRegex = /^https:\/\/github\.com\/[a-zA-Z0-9-]+\/[a-zA-Z0-9-._]+$/;
-        return githubRegex.test(url);
+      async (url) => {
+        const details = getGithubRepoDetails(url);
+        if (!details) return false;
+        return await checkGithubRepoExists(details.owner, details.repo);
       },
-      { message: "Please enter a valid GitHub repository URL (e.g., https://github.com/user/repo)" }
+      { message: "GitHub repository does not exist or is not accessible" }
     ),
   tags: z
     .array(z.string())
