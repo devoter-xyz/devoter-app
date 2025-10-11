@@ -1,4 +1,5 @@
 import * as z from "zod";
+import { PREDEFINED_TAGS } from '@/lib/constants';
 
 export const createRepositorySchema = z.object({
   title: z
@@ -25,6 +26,12 @@ export const createRepositorySchema = z.object({
       },
       { message: "Please enter a valid GitHub repository URL (e.g., https://github.com/user/repo)" }
     ),
+  tags: z
+    .array(z.string())
+    .refine(tags => tags.every(tag => PREDEFINED_TAGS.includes(tag)), {
+      message: "One or more tags are not predefined.",
+    })
+    .optional(),
 });
 
 export type CreateRepositoryInput = z.infer<typeof createRepositorySchema>; 
