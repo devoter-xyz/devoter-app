@@ -8,7 +8,7 @@ import { Separator } from '@/components/ui/separator';
 const notifications = [
   {
     title: 'Your submission for "Devoter App" is live!',
-    description: 'It's now visible to the community.',
+    description: `It's now visible to the community.`,
   },
   {
     title: 'New upvote on "My Awesome Repo"',

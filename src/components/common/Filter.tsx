@@ -1,3 +1,4 @@
+import { PREDEFINED_TAGS } from '@/lib/constants';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from '@/components/ui/select';
@@ -17,12 +18,7 @@ export function Filter({ onApply }: FilterProps) {
 
   const tagOptions = [
     { value: 'all', label: 'All' },
-    { value: 'frontend', label: 'Frontend' },
-    { value: 'backend', label: 'Backend' },
-    { value: 'devops', label: 'DevOps' }, 
-    { value: 'mobile', label: 'Mobile' },
-    { value: 'data-science', label: 'Data Science' },
-    { value: 'machine-learning', label: 'Machine Learning' },
+    ...PREDEFINED_TAGS.map(tag => ({ value: tag, label: tag.charAt(0).toUpperCase() + tag.slice(1) }))
   ];
 
   const handleApply = () => {

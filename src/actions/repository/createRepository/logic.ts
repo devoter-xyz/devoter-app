@@ -34,13 +34,13 @@ export async function createRepository(
   }
 
   // Validate GitHub URL
-  const githubUrlRegex = /^(https?://)?(www\.)?github\.com/[a-zA-Z0-9-]+/[a-zA-Z0-9.-]+/?$/;
+  const githubUrlRegex = new RegExp("^(https?://)?(www\\.)?github\\.com/[a-zA-Z0-9-]+/[a-zA-Z0-9.-]+/?$");
   if (!githubUrlRegex.test(input.githubUrl)) {
     throw new InvalidGitHubUrlError();
   }
 
   // Check for duplicate repository
-  const existingRepository = await prisma.repository.findUnique({
+  const existingRepository = await prisma.repository.findFirst({
     where: { githubUrl: input.githubUrl },
   });
 
@@ -64,7 +64,8 @@ export async function createRepository(
       description: input.description,
       githubUrl: input.githubUrl,
       submitterId: user.id,
-      paymentId: submissionPayment.id
+      paymentId: submissionPayment.id,
+      tags: input.tags || [],
     },
     select: {
       id: true,
