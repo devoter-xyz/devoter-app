@@ -1,5 +1,6 @@
 import * as z from "zod";
 import { isValidGithubUrl, getGithubRepoDetails, checkGithubRepoExists } from "@/lib/utils";
+import { PREDEFINED_TAGS } from '@/lib/constants';
 
 export const createRepositorySchema = z.object({
   title: z
@@ -27,6 +28,12 @@ export const createRepositorySchema = z.object({
       },
       { message: "GitHub repository does not exist or is not accessible" }
     ),
+  tags: z
+    .array(z.string())
+    .refine(tags => tags.every(tag => PREDEFINED_TAGS.includes(tag)), {
+      message: "One or more tags are not predefined.",
+    })
+    .optional(),
 });
 
 export type CreateRepositoryInput = z.infer<typeof createRepositorySchema>; 
