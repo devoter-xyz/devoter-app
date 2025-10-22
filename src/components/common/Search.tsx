@@ -28,7 +28,9 @@ export function Search() {
     <div className="flex w-full max-w-lg items-center space-x-2">
       <div className="relative w-full">
         <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500" />
+        <label htmlFor="search-input" className="sr-only">{getPlaceholder() || 'Search'}</label>
         <Input
+          id="search-input"
           type="search"
           placeholder={getPlaceholder()}
           className="pl-10 pr-4 py-2 w-full"
