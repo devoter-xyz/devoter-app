@@ -3,7 +3,7 @@
 import { getUserFromSessionAction } from '@/actions/auth/session/action';
 import { GetUserFromSessionResult } from '@/actions/auth/session/logic';
 import { useAction } from 'next-safe-action/hooks';
-import { createContext, ReactNode, useContext, useEffect, useState } from 'react';
+import { createContext, ReactNode, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 
 interface SessionContextType {
   user: GetUserFromSessionResult | null;
@@ -22,30 +22,29 @@ export function SessionProvider({ children }: SessionProviderProps) {
   const [user, setUser] = useState<GetUserFromSessionResult | null>(null);
   const { executeAsync: getUserFromSession, isExecuting } = useAction(getUserFromSessionAction);
 
-  const fetchUser = () => {
+  const fetchUser = useCallback(() => {
     getUserFromSession().then((result) => {
       setUser(result?.data ?? null);
     });
-  };
+  }, [getUserFromSession]);
 
   useEffect(() => {
     fetchUser();
-  }, [getUserFromSession]);
+  }, [getUserFromSession, fetchUser]);
 
-  const refetchSession = () => {
+  const refetchSession = useCallback(() => {
     fetchUser();
-  };
+  }, [fetchUser]);
 
-  const clearSession = () => {
+  const clearSession = useCallback(() => {
     setUser(null);
-  };
-
-  const value: SessionContextType = {
+  }, []);
+  const value: SessionContextType = useMemo(() => ({
     user,
     isLoading: isExecuting,
     refetchSession,
     clearSession,
-  };
+  }), [user, isExecuting, refetchSession, clearSession]);
 
   return (
     <SessionContext.Provider value={value}>

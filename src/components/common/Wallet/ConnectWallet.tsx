@@ -80,7 +80,7 @@ export function ConnectWallet() {
         setIsConnecting(false);
       }
     },
-    [chainId, signMessageAsync, signIn, router, toast]
+    [chainId, signMessageAsync, signIn, router, refetchSession]
   );
 
   const handleSignOut = async () => {
