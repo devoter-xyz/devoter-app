@@ -1,6 +1,8 @@
 import { toggleFavoriteAction } from '@/actions/repository/toggleFavorite';
 import { useSession } from '@/components/providers/SessionProvider';
 import { useRouter } from 'next/navigation';
+"use client";
+
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 import { RepoCardView, RepoCardViewProps } from './RepoCardView';

@@ -1,13 +1,13 @@
-import { CustomBadge } from '@/components/common/Badge';
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
-import { cva, type VariantProps } from 'class-variance-authority';
-import { Heart, VerifiedIcon } from 'lucide-react';
+import { cva } from 'class-variance-authority';
+import { HeartFilledIcon, HeartIcon } from '@radix-ui/react-icons';
 import Image from 'next/image';
 import Link from 'next/link';
-import { Badge } from '../ui/badge';
-import { Button } from '../ui/button';
-import { Skeleton } from '../ui/skeleton';
+import { Button } from '@/components/ui/button';
+import { VerifiedIcon } from './VerifiedIcon';
+import { Badge } from '@/components/ui/badge';
+import { CustomBadge } from '@/components/common/Badge';
 
 const cardVariants = cva('h-full w-full rounded-2xl', {
   variants: {
@@ -24,19 +24,18 @@ const cardVariants = cva('h-full w-full rounded-2xl', {
   }
 });
 
-export interface RepoCardViewProps extends React.HTMLAttributes<HTMLDivElement>, VariantProps<typeof cardVariants> {
+interface RepoCardViewProps {
   id: string;
   name: string;
   owner: string;
   description: string;
+  logoUrl: string;
   tags: string[];
-  votes: number;
   isFavorited: boolean;
-  isVerified?: boolean;
-  cardType?: 'default' | 'featured';
-  appLogo: string;
-  onToggleFavorite: (e: React.MouseEvent<HTMLButtonElement>) => void;
-  isLoading: boolean;
+  onToggleFavorite: () => void;
+  isVerified: boolean;
+  votes: number;
+  rank: number;
 }
 
 export const RepoCardView = ({
@@ -50,10 +49,8 @@ export const RepoCardView = ({
   votes,
   isFavorited,
   isVerified,
-  appLogo,
   cardType = 'default',
   onToggleFavorite,
-  isLoading,
   ...props
 }: RepoCardViewProps) => {
   const showBadge = variant === 'first' || variant === 'second' || variant === 'third';
@@ -72,33 +69,31 @@ export const RepoCardView = ({
           {...props}
         >
           <CardHeader className='flex items-start justify-between p-0'>
-            <div className='flex w-full items-start justify-between gap-4'>
-              <div className='flex items-center gap-4'>
-                <div>
-                  <Image src={appLogo} alt='dev' height={48} width={48} className='h-12 w-12 rounded-lg' />
-                </div>
-                <div>
-                  <h3 className='text-xl font-bold'>{name}</h3>
-                  <p className='text-muted-foreground'>@{owner}</p>
-                </div>
+            <Link href={`/repository/${id}`} className='flex items-center gap-4 min-w-0'>
+              <Image
+                src={logoUrl}
+                alt={`${name} logo`}
+                width={48}
+                height={48}
+                className='h-12 w-12 rounded-full'
+              />
+              <div className='flex flex-col'>
+                <p className='text-lg font-semibold truncate'>{name}</p>
+                <p className='text-sm text-gray-500 truncate'>{owner}</p>
               </div>
-              <div className='flex items-center flex-col gap-2'>
-                <Button
-                  variant={'ghost'}
-                  className='hover:bg-red-100 hover:text-red-500'
-                  onClick={onToggleFavorite}
-                  disabled={isLoading}
-                  aria-label={isFavorited ? `Remove ${name} from favorites` : `Add ${name} to favorites`}
-                  aria-pressed={isFavorited}
-                >
-                  {isLoading ? (
-                    <Skeleton className='h-6 w-6 rounded-full' />
-                  ) : (
-                    <Heart className={cn('h-6 w-6', { 'fill-red-500 text-red-500': isFavorited })} />
-                  )}
-                </Button>
-                {isVerified && <VerifiedIcon />}
-              </div>
+            </Link>
+            <div className='flex items-center flex-col gap-2'>
+              <Button
+                variant='ghost'
+                size='icon'
+                onClick={onToggleFavorite}
+                className='text-red-500 hover:text-red-600'
+                aria-label={isFavorited ? `Remove ${name} from favorites` : `Add ${name} to favorites`}
+                aria-pressed={isFavorited}
+              >
+                {isFavorited ? <HeartFilledIcon className='h-6 w-6' /> : <HeartIcon className='h-6 w-6' />}
+              </Button>
+              {isVerified && <VerifiedIcon role="img" aria-label="Verified repository" className="h-4 w-4 text-emerald-600" />}
             </div>
           </CardHeader>
           <CardContent className='flex flex-col gap-4 p-0 pt-6'>
