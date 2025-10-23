@@ -4,13 +4,6 @@ export const DEV_TOKEN_ADDRESS = '0x047157cffb8841a64db93fd4e29fa3796b78466c';
 export const DEV_TOKEN_UNISWAP_URL = `https://app.uniswap.org/explore/tokens/base/${DEV_TOKEN_ADDRESS}`;
 export const RECIPIENT_WALLET_ADDRESS = '0x9F1E0E0aA99846B3D15A9D1eA5C09F27FBCf8783';
 
-function normalizeTag(tag: string): string {
-  return tag
-    .toLowerCase()
-    .replace(/[\s/.]+/g, '-') // Replace spaces, slashes, dots with hyphens
-    .replace(/^-+|-+$/g, ''); // Remove leading/trailing hyphens
-}
-
 export const PREDEFINED_TAGS = [
   'accessibility',
   'actix',

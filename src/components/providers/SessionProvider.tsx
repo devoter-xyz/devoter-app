@@ -30,7 +30,7 @@ export function SessionProvider({ children }: SessionProviderProps) {
 
   useEffect(() => {
     fetchUser();
-  }, [getUserFromSession]);
+  }, [getUserFromSession, fetchUser]);
 
   const refetchSession = () => {
     fetchUser();
