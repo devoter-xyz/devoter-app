@@ -5,7 +5,7 @@ import { voteRepositoryAction } from '@/actions/vote/voteRepository/action';
 import { Button } from '@/components/ui/button';
 import { DEV_TOKEN_ADDRESS, DEV_TOKEN_UNISWAP_URL } from '@/lib/constants';
 import { InsufficientTokenBalanceError } from '@/lib/errors';
-import { Vote } from 'lucide-react';
+import { Loader2, Vote } from 'lucide-react';
 import { useAction } from 'next-safe-action/hooks';
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
@@ -93,8 +93,8 @@ export const VoteButton = ({ repositoryId, hasVoted }: VoteButtonProps) => {
           className='cursor-pointer'
           disabled={hasVoted || isVoting || hasZeroBalance || isFetchingBalance}
         >
-          <Vote className='h-4 w-4' />
-          {hasVoted ? 'Voted' : 'Vote'}
+          {isVoting ? <Loader2 className='h-4 w-4 animate-spin' /> : <Vote className='h-4 w-4' />}
+          {hasVoted ? 'Voted' : (isVoting ? 'Voting...' : 'Vote')}
         </Button>
       }
       title='Are you sure you want to vote?'
