@@ -130,7 +130,7 @@ const RepoSummary: React.FC<RepoSummaryProps> = ({
 
             {/* Repository Details */}
             <div className='flex-1'>
-              <p className='text-foreground mb-4 max-w-3xl leading-relaxed'>{description}</p>
+              <p className='text-foreground mb-4 max-w-3xl leading-relaxed overflow-hidden text-ellipsis line-clamp-3'>{description}</p>
 
               {/* Tags */}
               {tags.length > 0 && (
