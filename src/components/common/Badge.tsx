@@ -1,27 +1,19 @@
-import { cva, type VariantProps } from 'class-variance-authority';
-
 import { cn } from '@/lib/utils';
-import { Badge } from '../ui/badge';
+import { type VariantProps } from 'class-variance-authority';
 
-const badgeVariants = cva(
-  'px-3',
-  {
-    variants: {
-      variant: {
-        first: 'bg-yellow-500 text-black',
-        second: 'bg-gray-300 text-black',
-        third: 'bg-orange-200 text-black',
-      },
-    },
-  },
-);
+import { Badge, badgeVariants } from '../ui/badge';
 
-export interface BadgeProps
-  extends React.HTMLAttributes<HTMLDivElement>,
-    VariantProps<typeof badgeVariants> {}
+export interface BadgeProps extends React.HTMLAttributes<HTMLDivElement> {
+  variant: 'first' | 'second' | 'third';
+}
 
 function CustomBadge({ className, variant, ...props }: BadgeProps) {
-  const content = variant === 'first' ? '#1' : variant === 'second' ? '#2' : '#3';
+  const contentMap: Record<BadgeProps['variant'], string> = {
+    first: '#1',
+    second: '#2',
+    third: '#3',
+  };
+  const content = contentMap[variant];
   return (
     <Badge className={cn(badgeVariants({ variant }), className)} {...props}>
       {content}
@@ -29,4 +21,4 @@ function CustomBadge({ className, variant, ...props }: BadgeProps) {
   );
 }
 
-export { CustomBadge, badgeVariants };
+export { CustomBadge };

@@ -5,7 +5,7 @@ import { cva, type VariantProps } from "class-variance-authority"
 import { cn } from "@/lib/utils"
 
 const badgeVariants = cva(
-  "inline-flex items-center justify-center rounded-md border px-2 py-0.5 text-xs font-medium w-fit whitespace-nowrap shrink-0 [&>svg]:size-3 gap-1 [&>svg]:pointer-events-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive transition-[color,box-shadow] overflow-hidden",
+  "inline-flex items-center justify-center rounded-md border px-[var(--badge-padding-x)] py-[var(--badge-padding-y)] text-[var(--badge-font-size)] font-medium w-fit whitespace-nowrap shrink-0 [&>svg]:size-3 gap-1 [&>svg]:pointer-events-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive transition-[color,box-shadow] overflow-hidden",
   {
     variants: {
       variant: {
@@ -19,6 +19,12 @@ const badgeVariants = cva(
           "text-foreground [a&]:hover:bg-accent [a&]:hover:text-accent-foreground",
         transparent:
           "bg-accent text-primary [a&]:hover:bg-accent/50 [a&]:hover:text-foreground/80 border border-primary",
+        first:
+          "border-transparent bg-[var(--badge-first-background)] text-[var(--badge-first-foreground)]",
+        second:
+          "border-transparent bg-[var(--badge-second-background)] text-[var(--badge-second-foreground)]",
+        third:
+          "border-transparent bg-[var(--badge-third-background)] text-[var(--badge-third-foreground)]",
       },
     },
     defaultVariants: {

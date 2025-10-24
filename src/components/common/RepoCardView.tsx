@@ -5,9 +5,9 @@ import { HeartFilledIcon, HeartIcon } from '@radix-ui/react-icons';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
-import { VerifiedIcon } from './VerifiedIcon';
+import VerifiedIcon from './VerifiedIcon';
 import { Badge } from '@/components/ui/badge';
-import { CustomBadge } from '@/components/common/Badge';
+import { CustomBadge, BadgeProps } from '@/components/common/Badge';
 
 const cardVariants = cva('h-full w-full rounded-2xl', {
   variants: {
@@ -24,7 +24,7 @@ const cardVariants = cva('h-full w-full rounded-2xl', {
   }
 });
 
-interface RepoCardViewProps {
+export interface RepoCardViewProps extends React.HTMLAttributes<HTMLDivElement> {
   id: string;
   name: string;
   owner: string;
@@ -32,10 +32,12 @@ interface RepoCardViewProps {
   logoUrl: string;
   tags: string[];
   isFavorited: boolean;
-  onToggleFavorite: () => void;
+  onToggleFavorite: () => Promise<void> | void;
   isVerified: boolean;
   votes: number;
   rank: number;
+  variant: BadgeProps['variant'] | 'default' | 'featured';
+  cardType?: 'default' | 'featured';
 }
 
 export const RepoCardView = ({
@@ -51,6 +53,7 @@ export const RepoCardView = ({
   isVerified,
   cardType = 'default',
   onToggleFavorite,
+  logoUrl,
   ...props
 }: RepoCardViewProps) => {
   const showBadge = variant === 'first' || variant === 'second' || variant === 'third';
