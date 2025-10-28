@@ -35,7 +35,7 @@ export interface RepoCardViewProps extends React.HTMLAttributes<HTMLDivElement> 
   onToggleFavorite: () => Promise<void> | void;
   isVerified: boolean;
   votes: number;
-  rank: number;
+  rank?: number; // Make rank optional
   variant: BadgeProps['variant'] | 'default' | 'featured';
   cardType?: 'default' | 'featured';
 }
@@ -54,9 +54,11 @@ export const RepoCardView = ({
   cardType = 'default',
   onToggleFavorite,
   logoUrl,
+  rank,
   ...props
 }: RepoCardViewProps) => {
-  const showBadge = variant === 'first' || variant === 'second' || variant === 'third';
+  // Show badge if variant is one of the top 3 or if a positive rank is provided
+  const showBadge = (variant === 'first' || variant === 'second' || variant === 'third') || (typeof rank === 'number' && rank > 0);
 
   return (
     <div className='relative'>
@@ -96,7 +98,7 @@ export const RepoCardView = ({
               >
                 {isFavorited ? <HeartFilledIcon className='h-6 w-6' /> : <HeartIcon className='h-6 w-6' />}
               </Button>
-              {isVerified && <VerifiedIcon role="img" aria-label="Verified repository" className="h-4 w-4 text-emerald-600" />}
+              {isVerified && <VerifiedIcon className="h-5 w-5" />}
             </div>
           </CardHeader>
           <CardContent className='flex flex-col gap-4 p-0 pt-6'>
@@ -122,7 +124,11 @@ export const RepoCardView = ({
       </Link>
       {showBadge && (
         <div className='absolute right-10 -top-3'>
-          <CustomBadge className='absolute top-1 right-1' variant={variant} />
+          <CustomBadge
+            className='absolute top-1 right-1'
+            variant={variant === 'default' || variant === 'featured' ? 'default' : variant}
+            rank={rank}
+          />
         </div>
       )}
     </div>

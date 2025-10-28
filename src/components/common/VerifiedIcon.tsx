@@ -1,5 +1,6 @@
 import { cn } from '@/lib/utils';
 
+// VerifiedIcon: size-only; color handled by surrounding context or theme
 const VerifiedIcon = ({ className }: { className?: string }) => {
   return (
     <svg

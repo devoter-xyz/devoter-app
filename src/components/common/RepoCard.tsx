@@ -22,8 +22,7 @@ const RepoCard = ({ isFavorited = false, ...props }: RepoCardProps) => {
     setLocalIsFavorited(isFavorited);
   }, [isFavorited]);
 
-  const handleToggleFavorite = async (e: React.MouseEvent<HTMLButtonElement>) => {
-    e.preventDefault();
+  const handleToggleFavorite = async () => {
 
     if (!user) {
       toast.error('Please sign in to favorite repositories');
@@ -64,7 +63,6 @@ const RepoCard = ({ isFavorited = false, ...props }: RepoCardProps) => {
       {...props}
       isFavorited={localIsFavorited}
       onToggleFavorite={handleToggleFavorite}
-      isLoading={isLoading}
     />
   );
 };
