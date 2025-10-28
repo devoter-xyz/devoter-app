@@ -96,7 +96,7 @@ export const RepoCardView = ({
               >
                 {isFavorited ? <HeartFilledIcon className='h-6 w-6' /> : <HeartIcon className='h-6 w-6' />}
               </Button>
-              {isVerified && <VerifiedIcon role="img" aria-label="Verified repository" className="h-4 w-4 text-emerald-600" />}
+              {isVerified && <VerifiedIcon className="h-5 w-5" />}
             </div>
           </CardHeader>
           <CardContent className='flex flex-col gap-4 p-0 pt-6'>

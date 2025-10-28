@@ -54,8 +54,10 @@ export default function FavoritesPage() {
               tags={repo.tags}
               votes={repo.votes}
               cardType='featured'
-              appLogo={repo.appLogo}
+              logoUrl={repo.appLogo}
               isVerified={repo.isVerified}
+              variant='default'
+              rank={0}
             />
           ))}
         </div>

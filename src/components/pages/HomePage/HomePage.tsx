@@ -63,8 +63,10 @@ export default function HomePage() {
                 tags={repo.tags}
                 votes={repo.totalVotes}
                 cardType='featured'
-                appLogo={repo.logoUrl || '/logo.svg'}
-                isVerified={repo.isVerified}
+                logoUrl={repo.logoUrl || '/logo.svg'}
+                isVerified={repo.isVerified || false}
+                variant='default'
+                rank={0}
               />
             ))
           )}
@@ -94,9 +96,10 @@ export default function HomePage() {
                 votes={repo.totalVotes}
                 cardType='default'
                 variant={index < 3 ? (['first', 'second', 'third'] as const)[index] : 'default'}
-                appLogo={repo.logoUrl || '/logo.svg'}
+                logoUrl={repo.logoUrl || '/logo.svg'}
                 isFavorited={index % 2 === 0}
-                isVerified={repo.isVerified}
+                isVerified={repo.isVerified || false}
+                rank={0}
               />
             ))
           )}
