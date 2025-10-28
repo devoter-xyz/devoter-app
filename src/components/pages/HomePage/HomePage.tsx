@@ -53,7 +53,7 @@ export default function HomePage() {
               <RepoCardSkeleton />
             </>
           ) : (
-            featuredRepos.map((repo) => (
+            featuredRepos.map((repo, index) => (
               <RepoCard
                 key={repo.id}
                 id={repo.id}
@@ -66,7 +66,7 @@ export default function HomePage() {
                 logoUrl={repo.logoUrl || '/logo.svg'}
                 isVerified={repo.isVerified || false}
                 variant='default'
-                rank={0}
+                rank={index + 1} // Assign rank based on index for featured repos
               />
             ))
           )}
@@ -97,9 +97,10 @@ export default function HomePage() {
                 cardType='default'
                 variant={index < 3 ? (['first', 'second', 'third'] as const)[index] : 'default'}
                 logoUrl={repo.logoUrl || '/logo.svg'}
-                isFavorited={index % 2 === 0}
+                // TODO: Replace with real favorite status (e.g., repo.isFavorited or userFavoritesSet.has(repo.id))
+                isFavorited={false} // Placeholder, as real favorite status is not yet available in RepoCardData
                 isVerified={repo.isVerified || false}
-                rank={0}
+                rank={index + 4} // Assign rank with an offset for top repos
               />
             ))
           )}

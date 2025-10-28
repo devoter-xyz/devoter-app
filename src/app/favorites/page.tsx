@@ -57,7 +57,6 @@ export default function FavoritesPage() {
               logoUrl={repo.appLogo}
               isVerified={repo.isVerified}
               variant='default'
-              rank={0}
             />
           ))}
         </div>
