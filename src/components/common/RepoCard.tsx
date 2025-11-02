@@ -7,7 +7,7 @@ import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 import { RepoCardView, RepoCardViewProps } from './RepoCardView';
 
-export interface RepoCardProps extends Omit<RepoCardViewProps, 'onToggleFavorite' | 'isLoading' | 'isFavorited'> {
+export interface RepoCardProps extends Omit<RepoCardViewProps, 'onToggleFavorite' | 'isFavorited'> {
   isFavorited?: boolean;
 }
 
@@ -63,6 +63,7 @@ const RepoCard = ({ isFavorited = false, ...props }: RepoCardProps) => {
       {...props}
       isFavorited={localIsFavorited}
       onToggleFavorite={handleToggleFavorite}
+      isLoading={isLoading}
     />
   );
 };

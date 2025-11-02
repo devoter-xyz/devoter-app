@@ -3,9 +3,7 @@
 import Link from 'next/link';
 import { LogoText } from './LogoText';
 
-interface LogoProps {}
-
-export function Logo(props: LogoProps) {
+export function Logo() {
   return (
     <Link href="/" className="flex items-center">
       <LogoText />
