@@ -25,36 +25,79 @@ function PaginationContent({
   ...props
 }: React.ComponentProps<"ul">) {
   const contentRef = React.useRef<HTMLUListElement>(null);
+  const [focusedIndex, setFocusedIndex] = React.useState<number>(0);
 
-  const handleKeyDown = React.useCallback((event: React.KeyboardEvent<HTMLUListElement>) => {
-    const focusableLinks = Array.from(
-      contentRef.current?.querySelectorAll('[data-slot="pagination-link"]') || []
-    ) as HTMLAnchorElement[];
-    const activeElement = document.activeElement as HTMLAnchorElement;
-    const currentIndex = focusableLinks.indexOf(activeElement);
-
-    if (event.key === "ArrowRight") {
-      event.preventDefault();
-      if (currentIndex < focusableLinks.length - 1) {
-        focusableLinks[currentIndex + 1].focus();
-      } else {
-        focusableLinks[0].focus(); // Loop to the first item
+  React.useLayoutEffect(() => {
+    if (contentRef.current) {
+      const focusableLinks = Array.from(
+        contentRef.current.querySelectorAll('[data-slot="pagination-link"]')
+      ) as HTMLAnchorElement[];
+      const activeLinkIndex = focusableLinks.findIndex(link => link.dataset.active === 'true');
+      if (activeLinkIndex !== -1) {
+        setFocusedIndex(activeLinkIndex);
+      } else if (focusableLinks.length > 0) {
+        setFocusedIndex(0);
       }
-    } else if (event.key === "ArrowLeft") {
-      event.preventDefault();
-      if (currentIndex > 0) {
-        focusableLinks[currentIndex - 1].focus();
-      } else {
-        focusableLinks[focusableLinks.length - 1].focus(); // Loop to the last item
-      }
-    } else if (event.key === "Home") {
-      event.preventDefault();
-      focusableLinks[0].focus();
-    } else if (event.key === "End") {
-      event.preventDefault();
-      focusableLinks[focusableLinks.length - 1].focus();
     }
   }, []);
+
+    const handleKeyDown = React.useCallback((event: React.KeyboardEvent<HTMLUListElement>) => {
+
+      const focusableLinks = Array.from(
+
+        contentRef.current?.querySelectorAll('[data-slot="pagination-link"]') || []
+
+      ) as HTMLAnchorElement[];
+
+  
+
+      // Guard: do nothing if no focusable links exist
+
+      if (focusableLinks.length === 0) return;
+
+  
+
+      let newFocusedIndex = focusedIndex;
+
+  
+
+      if (event.key === "ArrowRight") {
+
+        event.preventDefault();
+
+        newFocusedIndex = (focusedIndex + 1) % focusableLinks.length;
+
+      } else if (event.key === "ArrowLeft") {
+
+        event.preventDefault();
+
+        newFocusedIndex = (focusedIndex - 1 + focusableLinks.length) % focusableLinks.length;
+
+      } else if (event.key === "Home") {
+
+        event.preventDefault();
+
+        newFocusedIndex = 0;
+
+      } else if (event.key === "End") {
+
+        event.preventDefault();
+
+        newFocusedIndex = focusableLinks.length - 1;
+
+      } else {
+
+        return; // Do not update focusedIndex or focus if not a navigation key
+
+      }
+
+  
+
+      setFocusedIndex(newFocusedIndex);
+
+      focusableLinks[newFocusedIndex].focus();
+
+    }, [focusedIndex]);
 
   return (
     <ul
@@ -63,7 +106,16 @@ function PaginationContent({
       data-slot="pagination-content"
       className={cn("flex flex-row items-center gap-1", className)}
       {...props}
-    />
+    >
+      {React.Children.map(props.children, (child, index) => {
+        if (React.isValidElement(child) && child.type === PaginationLink) {
+          return React.cloneElement(child, {
+            tabIndex: index === focusedIndex ? 0 : -1,
+          });
+        }
+        return child;
+      })}
+    </ul>
   )
 }
 
@@ -85,7 +137,6 @@ function PaginationLink({
   return (
     <a
       aria-current={isActive ? "page" : undefined}
-      tabIndex={isActive ? -1 : 0}
       data-slot="pagination-link"
       data-active={isActive}
       className={cn(
