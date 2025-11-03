@@ -13,7 +13,8 @@
     "prisma:generate": "npx dotenv -e .env.local -- npx prisma generate --no-engine",
     "prisma:studio": "npx dotenv -e .env.local -- npx prisma studio",
     "prisma:seed": "npx dotenv -e .env.local -- ts-node -r tsconfig-paths/register --project prisma/tsconfig.seed.json prisma/seed.ts",
-    "db:empty": "node scripts/empty-db.js"
+    "db:empty": "node scripts/empty-db.js",
+    "test": "NODE_ENV=test jest --passWithNoTests"
   },
   "dependencies": {
     "@faker-js/faker": "^8.4.0",
@@ -67,9 +68,16 @@
   "devDependencies": {
     "@eslint/eslintrc": "^3",
     "@tailwindcss/postcss": "^4",
+    "@types/jest": "^30.0.0",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "@types/testing-library__react": "^10.2.0",
+    "@testing-library/jest-dom": "^6.0.0",
+    "@testing-library/react": "^16.0.0",
+    "jest": "^30.0.0",
+    "jest-environment-jsdom": "^30.0.0",
+    "ts-jest": "^29.0.0",
     "@typescript-eslint/eslint-plugin": "^7.0.0",
     "@typescript-eslint/parser": "^7.0.0",
     "dotenv-cli": "^8.0.0",

@@ -20,16 +20,125 @@ function Pagination({ className, ...props }: React.ComponentProps<"nav">) {
   )
 }
 
+interface PaginationContextType {
+  focusedIndex: number;
+  setFocusedIndex: (index: number) => void;
+  registerLink: (linkElement: HTMLAnchorElement) => number;
+  unregisterLink: (index: number) => void;
+  focusLink: (index: number) => void;
+}
+
+const PaginationContext = React.createContext<PaginationContextType | null>(null);
+
 function PaginationContent({
   className,
   ...props
 }: React.ComponentProps<"ul">) {
+  const contentRef = React.useRef<HTMLUListElement>(null);
+  const [focusedIndex, setFocusedIndex] = React.useState<number>(0);
+  const linksRef = React.useRef<HTMLAnchorElement[]>([]);
+
+  const registerLink = React.useCallback((linkElement: HTMLAnchorElement) => {
+    linksRef.current.push(linkElement);
+    return linksRef.current.length - 1;
+  }, []);
+
+  const unregisterLink = React.useCallback((index: number) => {
+    linksRef.current.splice(index, 1);
+  }, []);
+
+  const focusLink = React.useCallback((index: number) => {
+    if (linksRef.current[index]) {
+      linksRef.current[index].focus();
+    }
+  }, []);
+
+  React.useLayoutEffect(() => {
+    if (contentRef.current) {
+      const focusableLinks = Array.from(
+        contentRef.current.querySelectorAll('[data-slot="pagination-link"]')
+      ) as HTMLAnchorElement[];
+
+      linksRef.current = focusableLinks;
+
+      const activeLinkIndex = focusableLinks.findIndex(link => link.dataset.active === 'true');
+      if (activeLinkIndex !== -1) {
+        setFocusedIndex(activeLinkIndex);
+      } else if (focusableLinks.length > 0) {
+        setFocusedIndex(0);
+      }
+    }
+  }, [props.children]);
+
+    const handleKeyDown = React.useCallback((event: React.KeyboardEvent<HTMLUListElement>) => {
+
+      const focusableLinks = Array.from(
+
+        contentRef.current?.querySelectorAll('[data-slot="pagination-link"]') || []
+
+      ) as HTMLAnchorElement[];
+
+  
+
+      // Guard: do nothing if no focusable links exist
+
+      if (focusableLinks.length === 0) return;
+
+  
+
+      let newFocusedIndex = focusedIndex;
+
+  
+
+      if (event.key === "ArrowRight") {
+
+        event.preventDefault();
+
+        newFocusedIndex = (focusedIndex + 1) % focusableLinks.length;
+
+      } else if (event.key === "ArrowLeft") {
+
+        event.preventDefault();
+
+        newFocusedIndex = (focusedIndex - 1 + focusableLinks.length) % focusableLinks.length;
+
+      } else if (event.key === "Home") {
+
+        event.preventDefault();
+
+        newFocusedIndex = 0;
+
+      } else if (event.key === "End") {
+
+        event.preventDefault();
+
+        newFocusedIndex = focusableLinks.length - 1;
+
+      } else {
+
+        return; // Do not update focusedIndex or focus if not a navigation key
+
+      }
+
+  
+
+      setFocusedIndex(newFocusedIndex);
+      focusLink(newFocusedIndex);
+
+    }, [focusedIndex, focusLink]);
+
   return (
-    <ul
-      data-slot="pagination-content"
-      className={cn("flex flex-row items-center gap-1", className)}
-      {...props}
-    />
+    <PaginationContext.Provider value={{ focusedIndex, setFocusedIndex, registerLink, unregisterLink, focusLink }}>
+      <ul
+        ref={contentRef}
+        onKeyDown={handleKeyDown}
+        data-slot="pagination-content"
+        className={cn("flex flex-row items-center gap-1", className)}
+        {...props}
+      >
+        {props.children}
+      </ul>
+    </PaginationContext.Provider>
   )
 }
 
@@ -48,11 +157,30 @@ function PaginationLink({
   size = "icon",
   ...props
 }: PaginationLinkProps) {
+  const context = React.useContext(PaginationContext);
+  const linkRef = React.useRef<HTMLAnchorElement>(null);
+  const [linkIndex, setLinkIndex] = React.useState<number>(-1);
+
+  React.useEffect(() => {
+    if (context && linkRef.current) {
+      const index = context.registerLink(linkRef.current);
+      setLinkIndex(index);
+      return () => {
+        context.unregisterLink(index);
+      };
+    }
+    return undefined;
+  }, [context]);
+
+  const tabIndex = context && linkIndex === context.focusedIndex ? 0 : -1;
+
   return (
     <a
+      ref={linkRef}
       aria-current={isActive ? "page" : undefined}
       data-slot="pagination-link"
       data-active={isActive}
+      tabIndex={tabIndex}
       className={cn(
         buttonVariants({
           variant: isActive ? "outline" : "ghost",
