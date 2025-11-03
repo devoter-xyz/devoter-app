@@ -1,7 +1,7 @@
 import { Button } from '@/components/ui/button';
 import { Bell } from 'lucide-react';
 import { ConnectWallet } from './Wallet/ConnectWallet';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
 
@@ -31,13 +31,13 @@ const notifications = [
 export function Actions() {
   return (
     <div className='flex items-center gap-4'>
-      <Popover>
-        <PopoverTrigger asChild>
-          <Button variant='outline' size='icon'>
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button variant='outline' size='icon' aria-label='Notifications'>
             <Bell className='h-4 w-4' />
           </Button>
-        </PopoverTrigger>
-        <PopoverContent className='w-80 p-0'>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent className='w-80 p-0'>
           <div className='flex flex-col space-y-2 p-4'>
             <h4 className='font-medium leading-none'>Notifications</h4>
             <p className='text-sm text-muted-foreground'>
@@ -52,21 +52,21 @@ export function Actions() {
               ) : (
                 <div className='space-y-4'>
                   {notifications.map((notification, index) => (
-                    <div key={index} className='grid gap-1'>
+                    <DropdownMenuItem key={index} className='grid gap-1'>
                       <p className='text-sm font-medium leading-none'>
                         {notification.title}
                       </p>
                       <p className='text-sm text-muted-foreground'>
                         {notification.description}
                       </p>
-                    </div>
+                    </DropdownMenuItem>
                   ))}
                 </div>
               )}
             </div>
           </ScrollArea>
-        </PopoverContent>
-      </Popover>
+        </DropdownMenuContent>
+      </DropdownMenu>
       <ConnectWallet />
     </div>
   );
