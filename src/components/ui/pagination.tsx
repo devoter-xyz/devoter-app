@@ -24,8 +24,42 @@ function PaginationContent({
   className,
   ...props
 }: React.ComponentProps<"ul">) {
+  const contentRef = React.useRef<HTMLUListElement>(null);
+
+  const handleKeyDown = React.useCallback((event: React.KeyboardEvent<HTMLUListElement>) => {
+    const focusableLinks = Array.from(
+      contentRef.current?.querySelectorAll('[data-slot="pagination-link"]') || []
+    ) as HTMLAnchorElement[];
+    const activeElement = document.activeElement as HTMLAnchorElement;
+    const currentIndex = focusableLinks.indexOf(activeElement);
+
+    if (event.key === "ArrowRight") {
+      event.preventDefault();
+      if (currentIndex < focusableLinks.length - 1) {
+        focusableLinks[currentIndex + 1].focus();
+      } else {
+        focusableLinks[0].focus(); // Loop to the first item
+      }
+    } else if (event.key === "ArrowLeft") {
+      event.preventDefault();
+      if (currentIndex > 0) {
+        focusableLinks[currentIndex - 1].focus();
+      } else {
+        focusableLinks[focusableLinks.length - 1].focus(); // Loop to the last item
+      }
+    } else if (event.key === "Home") {
+      event.preventDefault();
+      focusableLinks[0].focus();
+    } else if (event.key === "End") {
+      event.preventDefault();
+      focusableLinks[focusableLinks.length - 1].focus();
+    }
+  }, []);
+
   return (
     <ul
+      ref={contentRef}
+      onKeyDown={handleKeyDown}
       data-slot="pagination-content"
       className={cn("flex flex-row items-center gap-1", className)}
       {...props}
@@ -51,6 +85,7 @@ function PaginationLink({
   return (
     <a
       aria-current={isActive ? "page" : undefined}
+      tabIndex={isActive ? -1 : 0}
       data-slot="pagination-link"
       data-active={isActive}
       className={cn(
