@@ -68,6 +68,10 @@ const config: Config = {
           'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
           border: 'hsl(var(--sidebar-border))',
           ring: 'hsl(var(--sidebar-ring))'
+        },
+        skeleton: {
+          background: 'oklch(var(--skeleton-background))',
+          foreground: 'oklch(var(--skeleton-foreground))',
         }
       },
       borderRadius: {
