@@ -30,15 +30,16 @@ describe('Actions component - Dropdown Menu', () => {
     render(
       <div>
         <Actions />
-        <button>Outside Button</button>
+        <button data-testid="outside" style={{ pointerEvents: 'auto' }}>Outside Button</button>
       </div>
     );
+
     const bellButton = screen.getByRole('button', { name: /notifications/i });
     await userEvent.click(bellButton); // Open
     expect(screen.getByRole('menu')).toBeInTheDocument();
 
-    // Simulate clicking outside by pressing Escape, as direct outside clicks are problematic with pointer-events: none
-    await userEvent.keyboard('{escape}');
+    // Click the real outside button to simulate outside click
+    await userEvent.click(screen.getByTestId('outside'));
     expect(screen.queryByRole('menu')).not.toBeInTheDocument();
   });
 
