@@ -1,3 +1,4 @@
+import { useCallback } from "react";
 import { createThirdwebClient, toWei } from "thirdweb";
 import { base } from "thirdweb/chains";
 import { ConnectButton, useActiveAccount, useSendTransaction } from "thirdweb/react";
@@ -22,9 +23,11 @@ export function Payment({ onPaymentSuccess, isLoading }: PaymentProps) {
   const account = useActiveAccount();
   const { mutate: sendTransaction, isPending } = useSendTransaction();
 
-  const handlePayment = () => {
+  const handlePayment = useCallback(() => {
+    console.time('Payment_handlePayment');
     if (!account) {
       console.error("No account connected");
+      console.timeEnd('Payment_handlePayment');
       return;
     }
 
@@ -38,11 +41,13 @@ export function Payment({ onPaymentSuccess, isLoading }: PaymentProps) {
     sendTransaction(transaction, {
       onSuccess: (result) => {
         onPaymentSuccess(result.transactionHash);
+        console.timeEnd('Payment_handlePayment');
       }, onError: (error) => {
         console.error("Payment error:", error);
+        console.timeEnd('Payment_handlePayment');
       }
     });
-  };
+  }, [account, onPaymentSuccess, sendTransaction]);
 
   if (!account) {
     return <ConnectButton client={client} />;
