@@ -13,7 +13,7 @@ import { Form, FormField } from '@/components/ui/form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { GitBranch, Github } from 'lucide-react';
 import { useAction } from 'next-safe-action/hooks';
-import { useEffect } from 'react';
+import React, { useCallback, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 
@@ -42,7 +42,7 @@ export function SubmitRepoForm() {
     }
   });
 
-  async function onPaymentSuccess(txHash: string) {
+  const onPaymentSuccess = useCallback(async (txHash: string) => {
     const values = form.getValues();
     try {
       const payment = await createPayment({
@@ -60,7 +60,7 @@ export function SubmitRepoForm() {
       console.error('Submission error:', error);
       toast.error(error instanceof Error ? error.message : 'An unexpected error occurred. Please try again.');
     }
-  }
+  }, [createPayment, createRepository, form, getSubmissionCount]);
 
   return (
     <div className='space-y-8'>
