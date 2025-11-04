@@ -1,4 +1,4 @@
-import { useCallback } from "react";
+import React, { memo, useCallback } from "react";
 import { createThirdwebClient, toWei } from "thirdweb";
 import { base } from "thirdweb/chains";
 import { ConnectButton, useActiveAccount, useSendTransaction } from "thirdweb/react";
@@ -19,15 +19,21 @@ interface PaymentProps {
   isLoading: boolean;
 }
 
-export function Payment({ onPaymentSuccess, isLoading }: PaymentProps) {
+function PaymentImpl({ onPaymentSuccess, isLoading }: PaymentProps) {
   const account = useActiveAccount();
   const { mutate: sendTransaction, isPending } = useSendTransaction();
 
   const handlePayment = useCallback(() => {
-    console.time('Payment_handlePayment');
+    const timerLabel = `Payment_handlePayment_${Date.now()}_${Math.random().toString(36).slice(2,8)}`;
+    if (process.env.NODE_ENV === 'development') {
+      console.time(timerLabel);
+    }
+
     if (!account) {
-      console.error("No account connected");
-      console.timeEnd('Payment_handlePayment');
+      console.error('No account connected');
+      if (process.env.NODE_ENV === 'development') {
+        console.timeEnd(timerLabel);
+      }
       return;
     }
 
@@ -41,10 +47,14 @@ export function Payment({ onPaymentSuccess, isLoading }: PaymentProps) {
     sendTransaction(transaction, {
       onSuccess: (result) => {
         onPaymentSuccess(result.transactionHash);
-        console.timeEnd('Payment_handlePayment');
+        if (process.env.NODE_ENV === 'development') {
+          console.timeEnd(timerLabel);
+        }
       }, onError: (error) => {
-        console.error("Payment error:", error);
-        console.timeEnd('Payment_handlePayment');
+        console.error('Payment error:', error);
+        if (process.env.NODE_ENV === 'development') {
+          console.timeEnd(timerLabel);
+        }
       }
     });
   }, [account, onPaymentSuccess, sendTransaction]);
@@ -58,4 +68,6 @@ export function Payment({ onPaymentSuccess, isLoading }: PaymentProps) {
       {isPending || isLoading ? "Processing..." : "Pay 0.01 USDC & Submit"}
     </button>
   );
-} 
+}
+
+export const Payment = memo(PaymentImpl); 
