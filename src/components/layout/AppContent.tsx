@@ -18,9 +18,11 @@ export function AppContent({ children }: { children: React.ReactNode }) {
         <Sidebar />
       </div>
       {isSidebarOpen && (
-        <div
+        <button
+          type='button'
           className='fixed inset-0 z-30 bg-black bg-opacity-50 md:hidden'
           onClick={closeSidebar}
+          aria-label='Close sidebar'
         />
       )}
       <div className='flex-1 md:ml-64'>
