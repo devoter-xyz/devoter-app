@@ -8,15 +8,16 @@ interface SidebarItemProps {
   href: string;
   icon: LucideIcon;
   text: string;
+  onClick?: () => void;
 }
 
-export const SidebarItem = ({ href, icon: Icon, text }: SidebarItemProps) => {
+export const SidebarItem = ({ href, icon: Icon, text, onClick }: SidebarItemProps) => {
   const pathname = usePathname();
   const isActive = pathname === href;
 
   return (
     <li>
-      <Link href={href}>
+      <Link href={href} onClick={onClick}>
         <div
           className={`flex items-center p-3 rounded-lg border transition-colors
             ${isActive
