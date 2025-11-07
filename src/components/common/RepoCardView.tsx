@@ -80,7 +80,7 @@ export const RepoCardView = ({
                   src={logoUrl}
                   alt={`${name} logo`}
                   fill
-                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                  sizes="48px"
                   className='rounded-full object-cover'
                 />
               </div>
@@ -110,8 +110,8 @@ export const RepoCardView = ({
                   src={'/dev-token-logo.png'}
                   alt='Dev Token logo'
                   fill
-                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                  className='object-cover'
+                  sizes="20px"
+                  className='object-cover rounded-full'
                 />
               </div>
               <p className='font-bold text-brand-purple'>
