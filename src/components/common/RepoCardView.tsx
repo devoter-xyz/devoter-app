@@ -75,13 +75,15 @@ export const RepoCardView = ({
         >
           <CardHeader className='flex items-start justify-between p-0'>
             <Link href={`/repository/${id}`} className='flex items-center gap-4 min-w-0'>
-              <Image
-                src={logoUrl}
-                alt={`${name} logo`}
-                width={48}
-                height={48}
-                className='h-12 w-12 rounded-full'
-              />
+              <div className='relative h-12 w-12'>
+                <Image
+                  src={logoUrl}
+                  alt={`${name} logo`}
+                  fill
+                  sizes="48px"
+                  className='rounded-full object-cover'
+                />
+              </div>
               <div className='flex flex-col'>
                 <p className='text-lg font-semibold truncate'>{name}</p>
                 <p className='text-sm text-gray-500 truncate'>{owner}</p>
@@ -103,8 +105,14 @@ export const RepoCardView = ({
           </CardHeader>
           <CardContent className='flex flex-col gap-4 p-0 pt-6'>
             <div className='flex items-center gap-2'>
-              <div>
-                <Image src={'/dev-token-logo.png'} alt='dev' height={10} width={10} className='h-5 w-5' />
+              <div className='relative h-5 w-5'>
+                <Image
+                  src={'/dev-token-logo.png'}
+                  alt='Dev Token logo'
+                  fill
+                  sizes="20px"
+                  className='object-cover rounded-full'
+                />
               </div>
               <p className='font-bold text-brand-purple'>
                 {votes} Votes <span className='text-muted-foreground font-normal'>This Week</span>
