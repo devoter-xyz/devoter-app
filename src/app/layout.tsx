@@ -1,4 +1,3 @@
-import { Sidebar } from '@/components/common/Sidebar';
 import { SessionProvider } from '@/components/providers/SessionProvider';
 import { Providers as ThirdwebProviders } from '@/components/providers/ThirdwebProvider';
 import { WalletProvider } from '@/components/providers/WalletProvider';
@@ -6,10 +5,9 @@ import { Toaster as SonnerToaster } from '@/components/ui/sonner';
 import { cn } from '@/lib/utils';
 import { Analytics } from '@vercel/analytics/react';
 import type { Metadata } from 'next';
-import { TopLoader } from 'next-top-loader';
 import { Geist, Geist_Mono } from 'next/font/google';
 import './globals.css';
-import { Header } from '@/components/common/Header';
+import { LayoutProvider } from '@/components/providers/LayoutProvider';
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -34,6 +32,8 @@ export const metadata: Metadata = {
   }
 };
 
+import { AppContent } from '@/components/layout/AppContent';
+
 export default function RootLayout({
   children
 }: Readonly<{
@@ -45,14 +45,9 @@ export default function RootLayout({
         <ThirdwebProviders>
           <SessionProvider>
             <WalletProvider>
-              <div className='flex'>
-                <Sidebar />
-                <div className='flex-1 ml-64'>
-                  <TopLoader />
-                  <Header/>
-                  <main>{children}</main>
-                </div>
-              </div>
+              <LayoutProvider>
+                <AppContent>{children}</AppContent>
+              </LayoutProvider>
               <SonnerToaster />
             </WalletProvider>
           </SessionProvider>
