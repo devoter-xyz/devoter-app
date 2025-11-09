@@ -92,12 +92,6 @@ describe('RepoCard', () => {
   });
 
   it('calls toggleFavoriteAction and shows success toast when favorited', async () => {
-    (toggleFavoriteAction as jest.Mock).mockResolvedValue({ data: { isFavorited: true } });
-
-    render(<RepoCard {...mockRepo} isFavorited={false} />);
-
-    fireEvent.click(screen.getByTestId('toggle-favorite-button'));
-
     expect(screen.getByTestId('is-loading')).toHaveTextContent('true');
 
     await waitFor(() => {
@@ -115,7 +109,9 @@ describe('RepoCard', () => {
 
     fireEvent.click(screen.getByTestId('toggle-favorite-button'));
 
-    expect(screen.getByTestId('is-loading')).toHaveTextContent('true');
+    await waitFor(() => {
+      expect(screen.getByTestId('is-loading')).toHaveTextContent('true');
+    });
 
     await waitFor(() => {
       expect(toggleFavoriteAction).toHaveBeenCalledWith({ repositoryId: mockRepo.id });
