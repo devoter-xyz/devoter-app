@@ -1,12 +1,13 @@
 
+import { getDefaultConfig } from '@rainbow-me/rainbowkit';
+import { mainnet, sepolia } from 'wagmi/chains';
+
 export const createWagmiConfig = (projectId: string) => {
-  const connectors = createWalletConnectors(projectId);
-  const config = createConfig({
-    connectors,
-    chains: wagmiChains,
-    transports,
+  const config = getDefaultConfig({
+    appName: 'Devoter',
+    projectId,
+    chains: [mainnet, sepolia],
     ssr: true,
-    storage: createStorage({ storage: cookieStorage })
   });
   return config;
-}
+};
