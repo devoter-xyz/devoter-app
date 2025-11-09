@@ -10,7 +10,7 @@ import {
 import { ReactNode, useState } from 'react';
 import { WagmiProvider } from 'wagmi';
 
-import { getConfig } from '@/lib/wagmi';
+import { createWagmiConfig } from '@/lib/wallet-utils';
 import '@rainbow-me/rainbowkit/styles.css';
 
 interface WalletProviderProps {
@@ -19,7 +19,7 @@ interface WalletProviderProps {
 
 export function WalletProvider({ children }: WalletProviderProps) {
   const [queryClient] = useState(() => new QueryClient());
-  const [config] = useState(() => getConfig({ projectId: process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID || '' }));
+  const [config] = useState(() => createWagmiConfig(process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID || ''));
 
   return (
     <WagmiProvider config={config}>
