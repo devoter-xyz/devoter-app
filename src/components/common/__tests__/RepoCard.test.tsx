@@ -1,4 +1,5 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import type { Repo } from '@/types/repository';
 import RepoCard from '../RepoCard';
 import RepoCardSkeleton from '../RepoCardSkeleton';
 import { useSession } from '@/components/providers/SessionProvider';
@@ -96,7 +97,11 @@ describe('RepoCard', () => {
   });
 
   it('calls toggleFavoriteAction and shows success toast when favorited', async () => {
-    expect(screen.getByTestId('is-loading')).toHaveTextContent('true');
+    (toggleFavoriteAction as jest.Mock).mockResolvedValue({ data: { isFavorited: true } });
+
+    render(<RepoCard {...mockRepo} isFavorited={false} />);
+
+    fireEvent.click(screen.getByTestId('toggle-favorite-button'));
 
     await waitFor(() => {
       expect(toggleFavoriteAction).toHaveBeenCalledWith({ repositoryId: mockRepo.id });
