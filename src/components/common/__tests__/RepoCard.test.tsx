@@ -41,7 +41,7 @@ jest.mock('sonner', () => ({
   },
 }));
 
-const mockRepo = {
+const mockRepo: Repo = {
   id: 'repo123',
   name: 'Test Repo',
   description: 'A test repository',
@@ -58,6 +58,10 @@ const mockRepo = {
   lastSubmission: new Date().toISOString(),
   totalVotes: 50,
   rank: 1,
+  votes: 50,
+  logoUrl: 'https://example.com/logo.png',
+  isVerified: false,
+  variant: 'default' as const,
 };
 
 describe('RepoCard', () => {

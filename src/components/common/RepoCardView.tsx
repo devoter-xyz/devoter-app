@@ -71,7 +71,6 @@ export const RepoCardView = ({
             } `,
             className
           )}
-          {...props}
         >
           <CardHeader className='flex items-start justify-between p-0'>
             <Link href={`/repository/${id}`} className='flex items-center gap-4 min-w-0'>
