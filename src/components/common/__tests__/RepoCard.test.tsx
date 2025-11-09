@@ -83,7 +83,7 @@ describe('RepoCard', () => {
     expect(repoCardView).toBeInTheDocument();
     expect(screen.getByTestId('repo-name')).toHaveTextContent(mockRepo.name);
     expect(screen.getByTestId('repo-id')).toHaveTextContent(mockRepo.id);
-    expect(screen.getByTestId('repo-href')).toHaveTextContent(mockRepo.href);
+    expect(screen.getByTestId('repo-href')).toHaveTextContent(mockRepo.href!);
     expect(screen.getByTestId('is-favorited')).toHaveTextContent('true');
     expect(screen.getByTestId('is-loading')).toHaveTextContent('false');
   });
