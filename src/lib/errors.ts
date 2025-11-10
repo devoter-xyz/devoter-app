@@ -32,3 +32,17 @@ export class InvalidGitHubUrlError extends Error {
     this.name = 'InvalidGitHubUrlError';
   }
 }
+
+export class UnauthorizedError extends Error {
+  constructor(message = 'Unauthorized.') {
+    super(message);
+    this.name = 'UnauthorizedError';
+  }
+}
+
+export class BadRequestError extends Error {
+  constructor(message = 'Bad Request.') {
+    super(message);
+    this.name = 'BadRequestError';
+  }
+}
