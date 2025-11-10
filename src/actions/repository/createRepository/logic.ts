@@ -3,7 +3,7 @@ import { getCurrentWeek } from '@/lib/utils/date';
 import crypto from 'crypto';
 import { getRepositorySubmissionCount } from '../getRepositorySubmissionCount/logic';
 import { CreateRepositoryInput } from './schema';
-import { DuplicateRepositoryError, WeeklySubmissionLimitError, InvalidGitHubUrlError } from '@/lib/errors';
+import { DuplicateRepositoryError, WeeklySubmissionLimitError, InvalidGitHubUrlError, UnauthorizedError, BadRequestError } from '@/lib/errors';
 
 export interface CreateRepositoryResult {
   id: string;
@@ -18,10 +18,10 @@ export async function createRepository(
   userId: string
 ): Promise<CreateRepositoryResult> {
   if (!userId) {
-    throw new Error('Unauthorized: User ID is missing.');
+    throw new UnauthorizedError('User ID is missing.');
   }
   if (!input) {
-    throw new Error('Bad Request: Input data is missing.');
+    throw new BadRequestError('Input data is missing.');
   }
 
   const currentWeek = getCurrentWeek();
