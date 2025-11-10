@@ -17,6 +17,13 @@ export async function createRepository(
   input: CreateRepositoryInput & { tokenAmount?: number },
   userId: string
 ): Promise<CreateRepositoryResult> {
+  if (!userId) {
+    throw new Error('Unauthorized: User ID is missing.');
+  }
+  if (!input) {
+    throw new Error('Bad Request: Input data is missing.');
+  }
+
   const currentWeek = getCurrentWeek();
 
   const user = await prisma.user.findUniqueOrThrow({
