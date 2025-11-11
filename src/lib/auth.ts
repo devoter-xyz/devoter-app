@@ -21,7 +21,7 @@ export async function verifySiweSignature(message: string, signature: string, no
     }
 
     return null;
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('SIWE verification error:', error);
     return null;
   }
