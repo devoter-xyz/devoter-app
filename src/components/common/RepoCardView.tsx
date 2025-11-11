@@ -38,6 +38,7 @@ export interface RepoCardViewProps extends React.HTMLAttributes<HTMLDivElement> 
   rank?: number; // Make rank optional
   variant: BadgeProps['variant'] | 'default' | 'featured';
   cardType?: 'default' | 'featured';
+  isLoading?: boolean;
 }
 
 export const RepoCardView = ({
