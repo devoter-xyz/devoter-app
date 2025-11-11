@@ -25,7 +25,7 @@ export function Search() {
   };
 
   return (
-    <div className="flex w-full max-w-lg items-center space-x-2">
+    <div className="flex w-full max-w-lg items-center space-x-2" role="search">
       <div className="relative w-full">
         <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500" />
         <label htmlFor="search-input" className="sr-only">{getPlaceholder() || 'Search'}</label>
@@ -34,16 +34,17 @@ export function Search() {
           type="search"
           placeholder={getPlaceholder()}
           className="pl-10 pr-4 py-2 w-full"
+          aria-label={getPlaceholder()}
         />
       </div>
       <Dialog>
         <DialogTrigger asChild>
-          <Button variant="outline">
+          <Button variant="outline" aria-controls="filter-dialog">
             <FilterIcon className="h-4 w-4 mr-2" />
             Filter
           </Button>
         </DialogTrigger>
-        <DialogContent>
+        <DialogContent id="filter-dialog">
           <DialogHeader>
             <DialogTitle>Filter Results</DialogTitle>
           </DialogHeader>
