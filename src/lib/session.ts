@@ -55,7 +55,7 @@ export async function getSession(): Promise<SessionData | null> {
 
     const decryptedSession = session ? decryptSession(session.value) : null;
     return decryptedSession;
-  } catch (error) {
+  } catch (error: unknown) {
     console.warn('Failed to decrypt session:', error);
     return null;
   }
