@@ -1,10 +1,17 @@
-import { ThirdwebSDK } from '@thirdweb-dev/sdk';
-import { DEV_TOKEN_ADDRESS } from './constants';
+import { createThirdwebClient, getContract } from "thirdweb";
+import { base } from "thirdweb/chains";
+import { DEV_TOKEN_ADDRESS } from "./constants";
 
-const CHAIN = 'base';
+if (!process.env.THIRDWEB_SECRET_KEY) {
+  throw new Error("Missing THIRDWEB_SECRET_KEY environment variable");
+}
 
-export const sdk = new ThirdwebSDK(CHAIN, {
-  secretKey: process.env.THIRDWEB_SECRET_KEY
+export const client = createThirdwebClient({
+  secretKey: process.env.THIRDWEB_SECRET_KEY,
 });
 
-export const devTokenContract = sdk.getContract(DEV_TOKEN_ADDRESS);
+export const devTokenContract = getContract({
+  client,
+  chain: base,
+  address: DEV_TOKEN_ADDRESS,
+});
