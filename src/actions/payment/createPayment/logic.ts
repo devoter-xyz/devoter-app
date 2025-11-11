@@ -1,12 +1,12 @@
 import { prisma } from '@/lib/prisma';
 import { SessionData } from '@/lib/session';
-import { ThirdwebSDK } from '@thirdweb-dev/sdk';
+import { getRpcClient } from 'thirdweb';
+import { client } from '@/lib/thirdweb'; // Server-side client
 import { getISOWeek, getYear } from 'date-fns';
 import { ethers } from 'ethers';
 import { CreatePaymentPayload } from './schema';
 
-// Initialize the SDK on the appropriate chain
-const sdk = new ThirdwebSDK('ethereum'); // Or your specific chain
+const rpcClient = getRpcClient(client);
 
 const recipientWalletAddress = process.env.RECIPIENT_WALLET_ADDRESS;
 
@@ -17,7 +17,7 @@ if (!recipientWalletAddress) {
 export const createPayment = async (payload: CreatePaymentPayload, session: SessionData) => {
   // 1. Validate the transaction on-chain
   const txHash = payload.transactionHash;
-  const transaction = await sdk.getProvider().getTransaction(txHash);
+  const transaction = await rpcClient.getTransaction({hash: txHash});
 
   if (!transaction) {
     throw new Error('Transaction not found on-chain.');
@@ -28,7 +28,7 @@ export const createPayment = async (payload: CreatePaymentPayload, session: Sess
   }
 
   const expectedAmountInWei = ethers.utils.parseEther(payload.amount.toString());
-  if (!transaction.value.eq(expectedAmountInWei)) {
+  if (!ethers.BigNumber.from(transaction.value).eq(expectedAmountInWei)) {
     throw new Error('Transaction amount does not match the expected amount.');
   }
 
