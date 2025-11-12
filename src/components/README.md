@@ -8,28 +8,48 @@ This document provides a quick overview and usage examples for key components wi
 
 Displays a repository card, handling favorite toggling and navigation to the sign-in page if the user is not authenticated.
 
+### Props Interface
+
+```typescript
+interface RepoCardProps {
+  id: string;
+  name: string;
+  description: string;
+  owner: string;
+  logoUrl: string;
+  tags: string[];
+  isVerified: boolean;
+  votes: number;
+  variant: string;
+  isFavorited?: boolean; // Optional
+  rank?: number; // Optional
+  cardType?: string; // Optional
+  isLoading?: boolean; // Optional
+}
+```
+
 ### Usage Example
 
 ```typescript jsx
 import RepoCard from '@/components/common/RepoCard';
 
-// Assuming `repo` is an object conforming to RepoCardViewProps
-<RepoCard
-  id={repo.id}
-  name={repo.name}
-  description={repo.description}
-  // ... other RepoCardViewProps
-  isFavorited={repo.isFavorited}
-/>
+const exampleRepo = {
+  id: 'repo123',
+  name: 'Devoter App',
+  description: 'A platform for discovering and voting on developer projects.',
+  owner: 'devoter-xyz',
+  logoUrl: '/dev-token-logo.png',
+  tags: ['react', 'nextjs', 'web3'],
+  isVerified: true,
+  votes: 1200,
+  variant: 'default',
+  isFavorited: true,
+  rank: 1,
+  cardType: 'featured',
+};
+
+<RepoCard {...exampleRepo} isLoading={false} />
 ```
-
-### Props Summary
-
--   `id`: `string` - Unique identifier for the repository.
--   `name`: `string` - Name of the repository.
--   `description`: `string` - Description of the repository.
--   `isFavorited?`: `boolean` - (Optional) Indicates if the repository is currently favorited by the user. Defaults to `false`.
--   ... (other props inherited from `RepoCardViewProps`)
 
 ## Header
 
@@ -41,9 +61,22 @@ The main application header, featuring the logo, a search bar, and user action b
 
 ```typescript jsx
 import { Header } from '@/components/common/Header';
+import { LayoutProvider } from '@/components/providers/LayoutProvider';
 
-<Header />
+// Header must be wrapped in LayoutProvider to access layout context.
+// Otherwise, it will throw the error: "useLayout must be used within a LayoutProvider".
+<LayoutProvider>
+  <Header />
+</LayoutProvider>
 ```
+
+### Context Properties
+
+The `Header` component relies on the following context properties from `LayoutProvider`:
+
+-   `isSidebarOpen`: `boolean` - Indicates if the sidebar is currently open.
+-   `toggleSidebar`: `() => void` - Function to toggle the sidebar's open/closed state.
+-   `closeSidebar`: `() => void` - Function to explicitly close the sidebar.
 
 ### Props Summary
 
@@ -65,7 +98,7 @@ import { Search } from '@/components/common/Search';
 
 ### Props Summary
 
-This component does not accept any direct props. It derives its behavior and placeholder text from the current URL path.
+This component does not accept any direct props. It derives its behavior and placeholder text from the current URL path. The integrated filter dialog is currently UI-only and does not apply filtering logic.
 
 ## WalletProvider
 
