@@ -8,12 +8,12 @@ datasource db {
 }
 
 model User {
-  id            String       @id @unique @default(uuid())
-  walletAddress String       @unique @db.VarChar(42)
-  name          String?      @db.VarChar(100)
-  avatar        String?      @db.VarChar(7) // For hex color codes like #F59E0B
-  createdAt     DateTime     @default(now())
-  updatedAt     DateTime     @updatedAt
+  id            String         @id @unique @default(uuid())
+  walletAddress String         @unique @db.VarChar(42)
+  name          String?        @db.VarChar(100)
+  avatar        String?        @db.VarChar(7) // For hex color codes like #F59E0B
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
   repositories  Repository[]
   votes         Vote[]
   payments      Payment[]
@@ -53,6 +53,7 @@ model Repository {
   favorites          UserFavorite[]
 
   @@index([weeklyRank])
+  @@index([featured])
 }
 
 model Vote {
@@ -70,6 +71,7 @@ model Vote {
 
   @@unique([userId, repositoryId, week])
   @@index([week])
+  @@index([repositoryId, week])
 }
 
 model Payment {
@@ -84,6 +86,8 @@ model Payment {
   vote          Vote?       @relation(fields: [voteId], references: [id], onDelete: SetNull)
   repository    Repository? @relation("RepoPayment")
   week          String
+
+  @@index([userId, week])
 }
 
 model WeeklyRepoLeaderboard {
@@ -107,16 +111,16 @@ model AdminUser {
 }
 
 model Discussion {
-  id           String    @id @default(uuid())
+  id           String     @id @default(uuid())
   repositoryId String
   repository   Repository @relation(fields: [repositoryId], references: [id], onDelete: Cascade)
   userId       String
-  user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  content      String    @db.Text
-  upvotes      Int       @default(0)
-  downvotes    Int       @default(0)
-  createdAt    DateTime  @default(now())
-  updatedAt    DateTime  @updatedAt
+  user         User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  content      String     @db.Text
+  upvotes      Int        @default(0)
+  downvotes    Int        @default(0)
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
   replies      Reply[]
 }
 
@@ -134,13 +138,13 @@ model Reply {
 }
 
 model SocialLink {
-  id           String     @id @default(uuid())
+  id           String         @id @default(uuid())
   repositoryId String
-  repository   Repository @relation(fields: [repositoryId], references: [id], onDelete: Cascade)
+  repository   Repository     @relation(fields: [repositoryId], references: [id], onDelete: Cascade)
   type         SocialLinkType
-  url          String     @db.VarChar(255)
-  label        String     @db.VarChar(100)
-  createdAt    DateTime   @default(now())
+  url          String         @db.VarChar(255)
+  label        String         @db.VarChar(100)
+  createdAt    DateTime       @default(now())
 }
 
 model UserFavorite {
