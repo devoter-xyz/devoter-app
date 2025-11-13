@@ -53,6 +53,7 @@ model Repository {
   favorites          UserFavorite[]
 
   @@index([weeklyRank])
+  @@index([featured])
 }
 
 model Vote {
@@ -70,6 +71,7 @@ model Vote {
 
   @@unique([userId, repositoryId, week])
   @@index([week])
+  @@index([repositoryId, week])
 }
 
 model Payment {
@@ -84,6 +86,7 @@ model Payment {
   vote          Vote?       @relation(fields: [voteId], references: [id], onDelete: SetNull)
   repository    Repository? @relation("RepoPayment")
   week          String
+  @@index([userId, week])
 }
 
 model WeeklyRepoLeaderboard {
@@ -98,6 +101,7 @@ model WeeklyRepoLeaderboard {
   @@unique([week, rank])
   @@unique([repoId, week])
   @@index([week])
+  @@index([week, rank])
 }
 
 model AdminUser {
