@@ -68,7 +68,7 @@ export async function createRepository(
       githubUrl: input.githubUrl,
       submitterId: user.id,
       paymentId: submissionPayment.id,
-      tags: input.tags?.map(tag => tag.toLowerCase()) || [],
+      tags: Array.from(new Set(input.tags?.map(tag => tag.toLowerCase()))) || [],
     },
     select: {
       id: true,
