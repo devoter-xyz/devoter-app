@@ -5,7 +5,7 @@ export async function searchRepositoriesLogic(
   page: number = 1,
   pageSize: number = 20,
 ) {
-  const lowercasedTokens = query.split(/\s+/).map((token) => token.toLowerCase());
+  const lowercasedTokens = query.split(/\s+/).filter(Boolean).map((token) => token.toLowerCase());
 
   const whereClause = {
     OR: [
