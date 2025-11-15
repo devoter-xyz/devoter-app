@@ -9,7 +9,7 @@ import { VoteRepositoryInput } from './schema';
 import { publicClient } from '@/lib/viem';
 import { InvalidTransactionError } from '@/lib/errors';
 
-export const voteRepository = async (input: VoteRepositoryInput, userId: string) => {
+export const voteRepository = async (input: VoteRepositoryInput, userId: string): Promise<{ tokenAmount: Decimal }> => {
   const currentWeek = getWeek(new Date());
 
   const transaction = await publicClient.getTransaction({
@@ -33,7 +33,7 @@ export const voteRepository = async (input: VoteRepositoryInput, userId: string)
     throw new InvalidTransactionError('Transaction is too old.');
   }
 
-  await prisma.$transaction(async tx => {
+  const result = await prisma.$transaction(async tx => {
     const balance = await getTokenBalance(user.walletAddress);
     const userBalance = new Decimal(balance || '0');
     const tokenAmount = userBalance.mul(0.0025);
@@ -43,7 +43,7 @@ export const voteRepository = async (input: VoteRepositoryInput, userId: string)
         userId,
         repositoryId: input.repositoryId,
         week: currentWeek,
-        tokenAmount: userBalance.toNumber()
+        tokenAmount: tokenAmount
       }
     });
 
@@ -71,6 +71,8 @@ export const voteRepository = async (input: VoteRepositoryInput, userId: string)
         }
       }
     });
+    return { tokenAmount: tokenAmount };
   });
   await updateWeeklyLeaderboard(currentWeek);
+  return result;
 };

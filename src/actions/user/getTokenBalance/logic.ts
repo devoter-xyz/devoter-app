@@ -1,7 +1,13 @@
 import { devTokenContract } from '@/lib/thirdweb';
+import { readContract } from 'thirdweb';
+import { formatUnits } from 'ethers/lib/utils';
 
 export const getTokenBalance = async (walletAddress: string) => {
-  const contract = await devTokenContract;
-  const balance = await contract.erc20.balanceOf(walletAddress);
-  return balance.displayValue;
-}; 
+  const balance = await readContract({
+    contract: devTokenContract,
+    method: "function balanceOf(address account) view returns (uint256)",
+    params: [walletAddress],
+  });
+
+  return formatUnits(balance, 18);
+};

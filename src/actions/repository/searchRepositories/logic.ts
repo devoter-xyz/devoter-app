@@ -1,4 +1,5 @@
 import { prisma } from '@/lib/prisma';
+import { Prisma } from '@prisma/client';
 
 export async function searchRepositoriesLogic(
   query: string,
@@ -9,9 +10,9 @@ export async function searchRepositoriesLogic(
 
   const whereClause = {
     OR: [
-      { title: { contains: query, mode: 'insensitive' } },
-      { description: { contains: query, mode: 'insensitive' } },
-      { owner: { contains: query, mode: 'insensitive' } },
+      { title: { contains: query, mode: Prisma.QueryMode.insensitive } },
+      { description: { contains: query, mode: Prisma.QueryMode.insensitive } },
+      { owner: { contains: query, mode: Prisma.QueryMode.insensitive } },
       { tags: { hasSome: lowercasedTokens } },
     ],
   };

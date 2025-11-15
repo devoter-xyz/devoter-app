@@ -45,6 +45,21 @@ export async function checkGithubRepoExists(owner: string, repo: string): Promis
     return response.ok; // 200 OK indicates the repository exists
   } catch (error) {
     console.error("Error checking GitHub repository existence:", error);
-    return false;
-  }
-}
+          return false;
+        }
+      }
+      
+      /**
+       * Returns the base URL of the application.
+       * @returns The base URL string.
+       */
+      export function getBaseUrl(): string {
+        if (process.env.NEXT_PUBLIC_APP_URL) {
+          return process.env.NEXT_PUBLIC_APP_URL;
+        }
+        if (process.env.VERCEL_URL) {
+          return `https://${process.env.VERCEL_URL}`;
+        }
+        return 'http://localhost:3000';
+      }
+      
