@@ -30,6 +30,8 @@ export async function sendNewRepoInFavoriteTagEmails() {
     select: { id: true, title: true, description: true, tags: true },
   });
 
+  const emailPromises: Promise<void>[] = [];
+
   for (const user of usersToNotify) {
     if (user.email) {
       const userFavoriteTags = new Set<string>();
@@ -47,7 +49,7 @@ export async function sendNewRepoInFavoriteTagEmails() {
         const matchingTag = repo.tags.find(tag => userFavoriteTags.has(tag));
 
         if (matchingTag) {
-          await sendEmail({
+          emailPromises.push(sendEmail({
             to: user.email,
             subject: `New Repository in Your Favorite Tag: ${matchingTag}`,
             html: newRepoInFavoriteTagEmailTemplate({
@@ -57,10 +59,13 @@ export async function sendNewRepoInFavoriteTagEmails() {
               repositoryUrl,
               repositoryDescription: repo.description,
             }),
-          });
+          }));
         }
       }
     }
   }
+
+  await Promise.allSettled(emailPromises);
+
   return { success: true, message: `Sent new repository updates to ${usersToNotify.length} users.` };
 }

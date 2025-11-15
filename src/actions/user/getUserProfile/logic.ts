@@ -5,7 +5,7 @@ const userProfileInclude = Prisma.validator<Prisma.UserDefaultArgs>()({
   include: {
     repositories: {
       include: {
-        user: true,
+        submitter: true,
         _count: {
           select: {
             votes: true,
@@ -17,17 +17,7 @@ const userProfileInclude = Prisma.validator<Prisma.UserDefaultArgs>()({
       include: {
         repository: {
           include: {
-            user: true,
-          },
-        },
-      },
-    },
-    favoriteRepositories: {
-      include: {
-        user: true,
-        _count: {
-          select: {
-            votes: true,
+            submitter: true,
           },
         },
       },

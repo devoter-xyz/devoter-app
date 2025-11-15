@@ -13,7 +13,7 @@ const updateNotificationPreferencesSchema = z.object({
 export async function updateNotificationPreferences(formData: FormData) {
   const session = await getSession();
 
-  if (!session?.user?.id) {
+  if (!session?.userId) {
     throw new Error('Unauthorized');
   }
 
@@ -27,10 +27,10 @@ export async function updateNotificationPreferences(formData: FormData) {
 
   try {
     await prisma.notificationPreference.upsert({
-      where: { userId: session.user.id },
+      where: { userId: session.userId },
       update: parsed,
       create: {
-        userId: session.user.id,
+        userId: session.userId,
         ...parsed,
       },
     });

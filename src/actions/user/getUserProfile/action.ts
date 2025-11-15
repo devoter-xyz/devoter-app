@@ -1,5 +1,3 @@
-import { getUserProfileLogic } from "./logic";
-
 import { User } from "@prisma/client";
 import { getUserProfileLogic } from "./logic";
 
