@@ -1,5 +1,6 @@
 import { devTokenContract } from '@/lib/thirdweb';
-import { readContract } from 'thirdweb/utilities';
+import { readContract } from 'thirdweb';
+import { formatUnits } from 'ethers/lib/utils';
 
 export const getTokenBalance = async (walletAddress: string) => {
   const contract = devTokenContract;
@@ -9,5 +10,5 @@ export const getTokenBalance = async (walletAddress: string) => {
     params: [walletAddress],
   });
 
-  return balance.toString();
+  return formatUnits(balance, 18);
 };
