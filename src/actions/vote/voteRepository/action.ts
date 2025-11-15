@@ -11,7 +11,7 @@ import { getBaseUrl } from '@/lib/utils';
 export const voteRepositoryAction = authActionClient
   .inputSchema(voteRepositorySchema)
   .action(async ({ parsedInput, ctx }) => {
-    await voteRepository(parsedInput, ctx.session.userId);
+    const { tokenAmount } = await voteRepository(parsedInput, ctx.session.userId);
 
     // Fetch repository and owner details for email notification
     const repository = await prisma.repository.findUnique({
@@ -39,7 +39,7 @@ export const voteRepositoryAction = authActionClient
             userName: repository.submitter.name || 'there',
             repositoryTitle: repository.title,
             voterName: voter.name || 'Someone',
-            voteAmount: parsedInput.tokenAmount.toString(),
+            voteAmount: tokenAmount.toString(),
             repositoryUrl,
           }),
         });
