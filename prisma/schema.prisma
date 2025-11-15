@@ -20,6 +20,20 @@ model User {
   discussions   Discussion[]
   replies       Reply[]
   favorites     UserFavorite[]
+  email         String?        @unique
+  notificationPreferences NotificationPreference?
+}
+
+model NotificationPreference {
+  id                      String    @id @default(uuid())
+  userId                  String    @unique
+  user                    User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  newVoteNotification     Boolean   @default(true)
+  leaderboardNotification Boolean   @default(true)
+  newRepoNotification     Boolean   @default(true)
+  favoriteTagNotification Boolean   @default(true)
+  createdAt               DateTime  @default(now())
+  updatedAt               DateTime  @updatedAt
 }
 
 model Repository {
