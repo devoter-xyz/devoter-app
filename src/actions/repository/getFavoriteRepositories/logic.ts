@@ -27,8 +27,9 @@ export type GetFavoriteRepositoriesResult = {
 
 export async function getFavoriteRepositories(
   userId: string,
-  { limit = 10, offset = 0 }: GetFavoriteRepositoriesInput
+  { pageSize = 10, page = 1 }: GetFavoriteRepositoriesInput
 ): Promise<GetFavoriteRepositoriesResult> {
+  const skip = (page - 1) * pageSize;
   // Get the total count of favorites
   const totalCount = await prisma.userFavorite.count({
     where: {
@@ -70,8 +71,8 @@ export async function getFavoriteRepositories(
     orderBy: {
       createdAt: 'desc'
     },
-    take: limit,
-    skip: offset
+    take: pageSize,
+    skip: skip
   });
 
   // Map the results to the expected format
