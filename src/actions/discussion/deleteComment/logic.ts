@@ -1,33 +1,24 @@
 import { prisma } from '@/lib/prisma';
-import { getAuthSession } from '@/lib/auth';
+import { getSession } from '@/lib/session';
 import { DeleteCommentSchema } from './schema';
 
 export const deleteComment = async ({ commentId }: DeleteCommentSchema) => {
-  const session = await getAuthSession();
+  const session = await getSession();
 
-  if (!session?.user) {
+  if (!session?.userId) {
     throw new Error('You must be logged in to delete a comment.');
   }
 
-  const existingComment = await prisma.discussion.findUnique({
+  const result = await prisma.discussion.deleteMany({
     where: {
       id: commentId,
+      userId: session.userId,
     },
   });
 
-  if (!existingComment) {
-    throw new Error('Comment not found.');
+  if (result.count === 0) {
+    throw new Error('Comment not found or you are not authorized to delete this comment.');
   }
-
-  if (existingComment.userId !== session.user.id) {
-    throw new Error('You are not authorized to delete this comment.');
-  }
-
-  await prisma.discussion.delete({
-    where: {
-      id: commentId,
-    },
-  });
 
   return { success: true };
 };

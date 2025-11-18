@@ -1,5 +1,5 @@
 import { getComments } from './logic';
 import { getCommentsSchema } from './schema';
-import { action } from '@/lib/actions';
+import { actionClient } from '@/lib/actions';
 
-export const getCommentsAction = action(getCommentsSchema, getComments);
+export const getCommentsAction = actionClient.action(getCommentsSchema, getComments);

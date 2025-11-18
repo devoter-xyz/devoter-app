@@ -1,5 +1,5 @@
 import { deleteComment } from './logic';
 import { deleteCommentSchema } from './schema';
-import { action } from '@/lib/actions';
+import { authActionClient } from '@/lib/actions';
 
-export const deleteCommentAction = action(deleteCommentSchema, deleteComment);
+export const deleteCommentAction = authActionClient.action(deleteCommentSchema, deleteComment);

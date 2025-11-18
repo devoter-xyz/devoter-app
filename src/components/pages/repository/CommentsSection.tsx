@@ -19,48 +19,49 @@ export const CommentsSection = ({ repositoryId }: CommentsSectionProps) => {
   const [offset, setOffset] = useState(0);
   const limit = 10;
 
-  const fetchComments = useCallback(async () => {
+  const fetchComments = useCallback(async (currentOffset: number) => {
     setLoading(true);
     try {
-      const response = await getCommentsAction({ repositoryId, limit, offset });
+      const response = await getCommentsAction({ repositoryId, limit, offset: currentOffset });
       setComments((prevComments) => {
-        const newComments = response.comments.filter(
-          (newComment) => !prevComments.some((prevComment) => prevComment.id === newComment.id)
-        );
-        return [...prevComments, ...newComments];
+        if (currentOffset === 0) {
+          // If fetching from the beginning, clear existing comments
+          return response.comments;
+        } else {
+          // Otherwise, append new comments, filtering out duplicates
+          const newComments = response.comments.filter(
+            (newComment) => !prevComments.some((prevComment) => prevComment.id === newComment.id)
+          );
+          return [...prevComments, ...newComments];
+        }
       });
       setTotalComments(response.totalComments);
+      setOffset(currentOffset);
     } catch (error) {
       console.error('Failed to fetch comments:', error);
     } finally {
       setLoading(false);
     }
-  }, [repositoryId, limit, offset]);
+  }, [repositoryId, limit]);
 
   useEffect(() => {
-    fetchComments();
+    fetchComments(0);
   }, [fetchComments]);
 
   const handleCommentAdded = () => {
-    setComments([]); // Clear existing comments to refetch all from start
-    setOffset(0);
-    fetchComments();
+    fetchComments(0);
   };
 
   const handleCommentUpdated = () => {
-    setComments([]); // Clear existing comments to refetch all from start
-    setOffset(0);
-    fetchComments();
+    fetchComments(0);
   };
 
   const handleCommentDeleted = () => {
-    setComments([]); // Clear existing comments to refetch all from start
-    setOffset(0);
-    fetchComments();
+    fetchComments(0);
   };
 
   const handleLoadMore = () => {
-    setOffset((prevOffset) => prevOffset + limit);
+    fetchComments(offset + limit);
   };
 
   return (

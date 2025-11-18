@@ -1,18 +1,18 @@
 import { prisma } from '@/lib/prisma';
-import { getAuthSession } from '@/lib/auth';
+import { getSession } from '@/lib/session';
 import { CreateCommentSchema } from './schema';
 
 export const createComment = async ({ repositoryId, content }: CreateCommentSchema) => {
-  const session = await getAuthSession();
+  const session = await getSession();
 
-  if (!session?.user) {
+  if (!session?.userId) {
     throw new Error('You must be logged in to comment.');
   }
 
   const comment = await prisma.discussion.create({
     data: {
       repositoryId,
-      userId: session.user.id,
+      userId: session.userId,
       content,
     },
   });
