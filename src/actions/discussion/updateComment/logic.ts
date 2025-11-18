@@ -9,19 +9,21 @@ export const updateComment = async ({ commentId, content }: UpdateCommentSchema)
     throw new Error('You must be logged in to update a comment.');
   }
 
-  const updatedComment = await prisma.discussion.updateMany({
-    where: {
-      id: commentId,
-      userId: session.userId,
-    },
-    data: {
-      content,
-    },
-  });
-
-  if (updatedComment.count === 0) {
-    throw new Error('Comment not found or you are not authorized to update this comment.');
+  try {
+    const updatedComment = await prisma.discussion.update({
+      where: {
+        id: commentId,
+        userId: session.userId,
+      },
+      data: {
+        content,
+      },
+    });
+    return updatedComment;
+  } catch (error: any) {
+    if (error.code === 'P2025') {
+      throw new Error('Comment not found or you are not authorized to update this comment.');
+    }
+    throw error;
   }
-
-  return updatedComment;
 };
