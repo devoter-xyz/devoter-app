@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { formatDistanceToNow } from 'date-fns';
 import { ThumbsUp, ThumbsDown, MessageCircle } from 'lucide-react';
 import { useState } from 'react';
+import { CommentsSection } from '@/components/pages/repository/CommentsSection';
 
 // Mock data for demo purposes
 const mockRepository = {
@@ -223,118 +224,7 @@ export default function DemoRepositoryPage() {
           </TabsContent>
 
           <TabsContent value='discussion' className='mt-0'>
-            <div className='space-y-4'>
-              {repo.discussions.map((discussion) => (
-                <div key={discussion.id} className='bg-white border border-gray-200 rounded-lg p-6'>
-                  {/* Main Discussion */}
-                  <div className='flex gap-4'>
-                    {/* User Avatar */}
-                    <div 
-                      className='flex items-center justify-center w-12 h-12 rounded-full text-white font-semibold'
-                      style={{ backgroundColor: discussion.user.avatar }}
-                    >
-                      {discussion.user.name.charAt(0).toUpperCase()}
-                    </div>
-                    
-                    {/* Discussion Content */}
-                    <div className='flex-1'>
-                      <div className='flex items-center gap-3 mb-2'>
-                        <h4 className='font-semibold text-gray-900'>{discussion.user.name}</h4>
-                        <span className='text-sm text-gray-500'>{discussion.user.walletAddress}</span>
-                        <span className='text-sm text-gray-500'>
-                          {formatDistanceToNow(discussion.createdAt, { addSuffix: true })}
-                        </span>
-                      </div>
-                      
-                      <p className='text-gray-800 mb-4 leading-relaxed'>
-                        {discussion.content}
-                      </p>
-                      
-                      {/* Voting and Reply Buttons */}
-                      <div className='flex items-center gap-4'>
-                        <Button 
-                          variant='ghost' 
-                          size='sm' 
-                          className='flex items-center gap-2 text-green-600 hover:text-green-700 hover:bg-green-50'
-                        >
-                          <ThumbsUp className='w-4 h-4' />
-                          <span>{discussion.upvotes}</span>
-                        </Button>
-                        <Button 
-                          variant='ghost' 
-                          size='sm' 
-                          className='flex items-center gap-2 text-red-600 hover:text-red-700 hover:bg-red-50'
-                        >
-                          <ThumbsDown className='w-4 h-4' />
-                          <span>{discussion.downvotes}</span>
-                        </Button>
-                        <Button 
-                          variant='ghost' 
-                          size='sm' 
-                          className='flex items-center gap-2 text-gray-600 hover:text-gray-700 hover:bg-gray-50'
-                        >
-                          <MessageCircle className='w-4 h-4' />
-                          <span>Reply</span>
-                        </Button>
-                      </div>
-                    </div>
-                  </div>
-                  
-                  {/* Replies */}
-                  {discussion.replies.length > 0 && (
-                    <div className='mt-6 pl-16 space-y-4'>
-                      {discussion.replies.map((reply) => (
-                        <div key={reply.id} className='bg-gray-50 border border-gray-100 rounded-lg p-4'>
-                          <div className='flex gap-3'>
-                            {/* Reply Avatar */}
-                            <div 
-                              className='flex items-center justify-center w-8 h-8 rounded-full text-white font-semibold text-sm'
-                              style={{ backgroundColor: reply.user.avatar }}
-                            >
-                              {reply.user.name.charAt(0).toUpperCase()}
-                            </div>
-                            
-                            {/* Reply Content */}
-                            <div className='flex-1'>
-                              <div className='flex items-center gap-3 mb-2'>
-                                <h5 className='font-medium text-gray-900 text-sm'>{reply.user.name}</h5>
-                                <span className='text-xs text-gray-500'>
-                                  {formatDistanceToNow(reply.createdAt, { addSuffix: true })}
-                                </span>
-                              </div>
-                              
-                              <p className='text-gray-800 mb-3 text-sm leading-relaxed'>
-                                {reply.content}
-                              </p>
-                              
-                              {/* Reply Voting */}
-                              <div className='flex items-center gap-3'>
-                                <Button 
-                                  variant='ghost' 
-                                  size='sm' 
-                                  className='flex items-center gap-1 text-green-600 hover:text-green-700 hover:bg-green-50 p-1 h-auto text-xs'
-                                >
-                                  <ThumbsUp className='w-3 h-3' />
-                                  <span>{reply.upvotes}</span>
-                                </Button>
-                                <Button 
-                                  variant='ghost' 
-                                  size='sm' 
-                                  className='flex items-center gap-1 text-red-600 hover:text-red-700 hover:bg-red-50 p-1 h-auto text-xs'
-                                >
-                                  <ThumbsDown className='w-3 h-3' />
-                                  <span>{reply.downvotes}</span>
-                                </Button>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              ))}
-            </div>
+            <CommentsSection repositoryId={id} />
           </TabsContent>
 
           <TabsContent value='socials' className='mt-0'>
