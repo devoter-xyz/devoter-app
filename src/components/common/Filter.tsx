@@ -43,6 +43,10 @@ export function Filter({ onApply, initialFilters }: FilterProps) {
   const [endDate, setEndDate] = useState(initialFilters?.endDate || '');
   const [minVotes, setMinVotes] = useState(initialFilters?.minVotes?.toString() ?? '');
   const [maxVotes, setMaxVotes] = useState(initialFilters?.maxVotes?.toString() ?? '');
+  const [startDateError, setStartDateError] = useState('');
+  const [endDateError, setEndDateError] = useState('');
+  const [minVotesError, setMinVotesError] = useState('');
+  const [maxVotesError, setMaxVotesError] = useState('');
 
   useEffect(() => {
     setSelectedTags(initialFilters?.selectedTags ?? []);
@@ -53,6 +57,10 @@ export function Filter({ onApply, initialFilters }: FilterProps) {
     setEndDate(initialFilters?.endDate ?? '');
     setMinVotes(initialFilters?.minVotes?.toString() ?? '');
     setMaxVotes(initialFilters?.maxVotes?.toString() ?? '');
+    setStartDateError('');
+    setEndDateError('');
+    setMinVotesError('');
+    setMaxVotesError('');
   }, [initialFilters]);
 
   const tagOptions = [
@@ -61,7 +69,29 @@ export function Filter({ onApply, initialFilters }: FilterProps) {
   ];
 
   const handleApply = () => {
-    if (onApply) {
+    setStartDateError('');
+    setEndDateError('');
+    setMinVotesError('');
+    setMaxVotesError('');
+
+    let isValid = true;
+
+    // Date validation
+    if (startDate && endDate && new Date(startDate) > new Date(endDate)) {
+      setStartDateError('Start date must be before or equal to end date');
+      isValid = false;
+    }
+
+    // Vote validation
+    const minVotesNum = parseFloat(minVotes);
+    const maxVotesNum = parseFloat(maxVotes);
+
+    if (!isNaN(minVotesNum) && !isNaN(maxVotesNum) && minVotesNum > maxVotesNum) {
+      setMinVotesError('Minimum votes must be less than or equal to maximum votes');
+      isValid = false;
+    }
+
+    if (isValid && onApply) {
       const minVotesInt = parseInt(minVotes, 10);
       const parsedMinVotes = Number.isFinite(minVotesInt) ? Math.max(0, minVotesInt) : undefined;
 
@@ -80,6 +110,8 @@ export function Filter({ onApply, initialFilters }: FilterProps) {
       });
     }
   };
+
+  const hasErrors = !!startDateError || !!endDateError || !!minVotesError || !!maxVotesError;
 
   return (
     <Card className="space-y-4 p-4 border-none shadow-none bg-transparent">
@@ -106,16 +138,16 @@ export function Filter({ onApply, initialFilters }: FilterProps) {
                 {PREDEFINED_TAGS.map((tag) => (
                   <CommandItem
                     key={tag}
-                    onSelect={() => {
-                      setSelectedTags(
-                        selectedTags.includes(tag)
-                          ? selectedTags.filter((t) => t !== tag)
-                          : [...selectedTags, tag]
-                      );
-                    }}
                   >
                     <Checkbox
                       checked={selectedTags.includes(tag)}
+                      onCheckedChange={(checked) => {
+                        setSelectedTags(
+                          checked
+                            ? [...selectedTags, tag]
+                            : selectedTags.filter((t) => t !== tag)
+                        );
+                      }}
                       className="mr-2"
                     />
                     {tag.charAt(0).toUpperCase() + tag.slice(1)}
@@ -137,18 +169,22 @@ export function Filter({ onApply, initialFilters }: FilterProps) {
       <div className="space-y-2">
         <Label htmlFor="startDate">Start Date</Label>
         <Input id="startDate" type="date" value={startDate} onChange={e => setStartDate(e.target.value)} />
+        {startDateError && <p className="text-red-500 text-sm mt-1">{startDateError}</p>}
       </div>
       <div className="space-y-2">
         <Label htmlFor="endDate">End Date</Label>
         <Input id="endDate" type="date" value={endDate} onChange={e => setEndDate(e.target.value)} />
+        {endDateError && <p className="text-red-500 text-sm mt-1">{endDateError}</p>}
       </div>
       <div className="space-y-2">
         <Label htmlFor="minVotes">Minimum Votes</Label>
-        <Input id="minVotes" type="number" value={minVotes} onChange={e => setMinVotes(e.target.value)} placeholder="e.g. 10" />
+        <Input id="minVotes" type="number" min="0" value={minVotes} onChange={e => setMinVotes(e.target.value)} placeholder="e.g. 10" />
+        {minVotesError && <p className="text-red-500 text-sm mt-1">{minVotesError}</p>}
       </div>
       <div className="space-y-2">
         <Label htmlFor="maxVotes">Maximum Votes</Label>
-        <Input id="maxVotes" type="number" value={maxVotes} onChange={e => setMaxVotes(e.target.value)} placeholder="e.g. 100" />
+        <Input id="maxVotes" type="number" min="0" value={maxVotes} onChange={e => setMaxVotes(e.target.value)} placeholder="e.g. 100" />
+        {maxVotesError && <p className="text-red-500 text-sm mt-1">{maxVotesError}</p>}
       </div>
       <div className="flex items-center space-x-2">
         <input
@@ -160,7 +196,7 @@ export function Filter({ onApply, initialFilters }: FilterProps) {
         />
         <Label htmlFor="featured">Only show featured</Label>
       </div>
-      <Button className="w-full mt-2" onClick={handleApply}>
+      <Button className="w-full mt-2" onClick={handleApply} disabled={hasErrors}>
         Apply Filters
       </Button>
     </Card>
