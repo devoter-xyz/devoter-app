@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import { getCurrentWeek } from "@/lib/utils/date";
 
 export type VoteTrendData = {
   date: string;
@@ -33,8 +34,8 @@ export async function getRepositoryAnalyticsLogic(repositoryId: string): Promise
   const voteTrends = await prisma.$queryRaw<VoteTrendData[]>`
     SELECT
       "createdAt"::date as date,
-      COUNT(*) as votes
-    FROM Vote
+      COUNT(*)::int as votes
+    FROM "Vote"
     WHERE repositoryId = ${repositoryId}
     GROUP BY "createdAt"::date
     ORDER BY date ASC;
@@ -44,8 +45,8 @@ export async function getRepositoryAnalyticsLogic(repositoryId: string): Promise
   const uniqueVoters = await prisma.$queryRaw<UniqueVoterData[]>`
     SELECT
       "createdAt"::date as date,
-      COUNT(DISTINCT userId) as uniqueVoters
-    FROM Vote
+      COUNT(DISTINCT userId)::int as uniqueVoters
+    FROM "Vote"
     WHERE repositoryId = ${repositoryId}
     GROUP BY "createdAt"::date
     ORDER BY date ASC;
@@ -56,17 +57,16 @@ export async function getRepositoryAnalyticsLogic(repositoryId: string): Promise
     SELECT
       u.id as voterId,
       u.name as voterName,
-      COUNT(v.id) as votes
-    FROM Vote v
-    JOIN User u ON v.userId = u.id
+      COUNT(v.id)::int as votes
+    FROM "Vote" v
+    JOIN "User" u ON v.userId = u.id
     WHERE v.repositoryId = ${repositoryId}
     GROUP BY u.id, u.name
     ORDER BY votes DESC;
   `;
 
   // Fetch weekly performance
-  const now = new Date();
-  const currentWeekStart = new Date(now.setDate(now.getDate() - now.getDay())); // Sunday
+  const { start: currentWeekStart } = getCurrentWeek();
   const previousWeekStart = new Date(currentWeekStart);
   previousWeekStart.setDate(currentWeekStart.getDate() - 7);
 
