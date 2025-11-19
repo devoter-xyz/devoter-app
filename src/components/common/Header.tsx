@@ -7,6 +7,7 @@ import { LogoText } from './LogoText';
 import { Button } from '@/components/ui/button';
 import { MenuIcon } from 'lucide-react';
 import { useLayout } from '@/components/providers/LayoutProvider';
+import { ThemeToggle } from './ThemeToggle';
 
 export function Header() {
   const { toggleSidebar } = useLayout();
@@ -28,6 +29,7 @@ export function Header() {
           <Search />
         </div>
         <div className='flex items-center justify-end'>
+          <ThemeToggle />
           <Actions />
         </div>
       </div>

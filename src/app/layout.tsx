@@ -8,6 +8,7 @@ import type { Metadata } from 'next';
 import { Geist, Geist_Mono } from 'next/font/google';
 import './globals.css';
 import { LayoutProvider } from '@/components/providers/LayoutProvider';
+import { ThemeProvider } from 'next-themes';
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -42,16 +43,23 @@ export default function RootLayout({
   return (
     <html lang='en' suppressHydrationWarning>
       <body className={cn('min-h-screen bg-background font-sans antialiased', geistSans.variable, geistMono.variable)}>
-        <ThirdwebProviders>
-          <SessionProvider>
-            <WalletProvider>
-              <LayoutProvider>
-                <AppContent>{children}</AppContent>
-              </LayoutProvider>
-              <SonnerToaster />
-            </WalletProvider>
-          </SessionProvider>
-        </ThirdwebProviders>
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
+          <ThirdwebProviders>
+            <SessionProvider>
+              <WalletProvider>
+                <LayoutProvider>
+                  <AppContent>{children}</AppContent>
+                </LayoutProvider>
+                <SonnerToaster />
+              </WalletProvider>
+            </SessionProvider>
+          </ThirdwebProviders>
+        </ThemeProvider>
         <Analytics />
       </body>
     </html>
