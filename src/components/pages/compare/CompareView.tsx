@@ -47,7 +47,13 @@ export function CompareView({ repositories }: CompareViewProps) {
                     : "N/A"}
                 </p>
                 {/* Add more comparison metrics here, e.g., voting trends */}
-                <Badge variant="secondary">{repo.tag}</Badge>
+                <div className="flex flex-wrap gap-2">
+                  {repo.tags && repo.tags.map((tag) => (
+                    <Badge key={tag} variant="secondary">
+                      {tag}
+                    </Badge>
+                  ))}
+                </div>
               </div>
             </CardContent>
           </Card>
