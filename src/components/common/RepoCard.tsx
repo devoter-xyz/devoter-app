@@ -1,7 +1,8 @@
+"use client";
+
 import { toggleFavoriteAction } from '@/actions/repository/toggleFavorite';
 import { useSession } from '@/components/providers/SessionProvider';
-import { useRouter } from 'next/navigation';
-"use client";
+import { useRouter, useSearchParams } from 'next/navigation';
 
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
@@ -58,11 +59,27 @@ const RepoCard = ({ isFavorited = false, ...props }: RepoCardProps) => {
     }
   };
 
+  const handleAddToCompare = () => {
+    const currentRepoIds = searchParams.getAll('repoIds');
+    const newRepoIds = currentRepoIds.includes(props.id)
+      ? currentRepoIds
+      : [...currentRepoIds, props.id];
+
+    const params = new URLSearchParams(searchParams.toString());
+    params.delete('repoIds'); // Clear existing to avoid duplicates
+
+    newRepoIds.forEach((id) => params.append('repoIds', id));
+
+    router.push(`/compare?${params.toString()}`);
+    toast.info(`Added ${props.name} to comparison!`);
+  };
+
   return (
     <RepoCardView
       {...props}
       isFavorited={localIsFavorited}
       onToggleFavorite={handleToggleFavorite}
+      onAddToCompare={handleAddToCompare}
       isLoading={isLoading}
     />
   );

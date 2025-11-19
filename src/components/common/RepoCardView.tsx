@@ -33,6 +33,7 @@ export interface RepoCardViewProps extends React.HTMLAttributes<HTMLDivElement> 
   tags: string[];
   isFavorited: boolean;
   onToggleFavorite: () => Promise<void> | void;
+  onAddToCompare?: () => void;
   isVerified: boolean;
   votes: number;
   rank?: number; // Make rank optional
