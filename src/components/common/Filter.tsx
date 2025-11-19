@@ -19,8 +19,8 @@ export interface FilterProps {
     onlyFeatured: boolean;
     startDate: string;
     endDate: string;
-    minVotes: number;
-    maxVotes: number;
+    minVotes: number | undefined;
+    maxVotes: number | undefined;
   }) => void;
   initialFilters?: {
     selectedTags?: string[];
@@ -62,8 +62,11 @@ export function Filter({ onApply, initialFilters }: FilterProps) {
 
   const handleApply = () => {
     if (onApply) {
-      const parsedMinVotes = minVotes === '' ? undefined : (Number.isFinite(parseInt(minVotes, 10)) ? Math.max(0, parseInt(minVotes, 10)) : undefined);
-      const parsedMaxVotes = maxVotes === '' ? undefined : (Number.isFinite(parseInt(maxVotes, 10)) ? Math.max(0, parseInt(maxVotes, 10)) : undefined);
+      const minVotesInt = parseInt(minVotes, 10);
+      const parsedMinVotes = Number.isFinite(minVotesInt) ? Math.max(0, minVotesInt) : undefined;
+
+      const maxVotesInt = parseInt(maxVotes, 10);
+      const parsedMaxVotes = Number.isFinite(maxVotesInt) ? Math.max(0, maxVotesInt) : undefined;
 
       onApply({
         selectedTags,
