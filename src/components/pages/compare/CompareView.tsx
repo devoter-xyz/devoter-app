@@ -39,7 +39,12 @@ export function CompareView({ repositories }: CompareViewProps) {
                 </p>
                 <p>
                   <strong>Submission Date:</strong>{" "}
-                  {format(new Date(repo.createdAt), "PPP")}
+                  {repo.createdAt
+                    ? (() => {
+                        const d = new Date(repo.createdAt);
+                        return isNaN(d.getTime()) ? "N/A" : format(d, "PPP");
+                      })()
+                    : "N/A"}
                 </p>
                 {/* Add more comparison metrics here, e.g., voting trends */}
                 <Badge variant="secondary">{repo.tag}</Badge>
