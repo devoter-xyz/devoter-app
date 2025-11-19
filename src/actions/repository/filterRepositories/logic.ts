@@ -7,7 +7,10 @@ export async function filterRepositoriesLogic(filters: FilterRepositoriesSchema)
     startDate,
     endDate,
     minVotes,
-    maxVotes
+    maxVotes,
+    org,
+    maintainer,
+    onlyFeatured,
   } = filters;
 
   const where: any = {};
@@ -28,14 +31,29 @@ export async function filterRepositoriesLogic(filters: FilterRepositoriesSchema)
     }
   }
 
-  if (minVotes || maxVotes) {
-    where.totalVotes = {};
-    if (minVotes) {
-      where.totalVotes.gte = minVotes;
-    }
-    if (maxVotes) {
-      where.totalVotes.lte = maxVotes;
-    }
+  if (minVotes) {
+    where.totalVotes = {
+      gte: minVotes,
+    };
+  }
+
+  if (maxVotes) {
+    where.totalVotes = {
+      ...(where.totalVotes || {}),
+      lte: maxVotes,
+    };
+  }
+
+  if (org) {
+    where.owner = org;
+  }
+
+  if (maintainer) {
+    where.maintainer = maintainer;
+  }
+
+  if (onlyFeatured) {
+    where.isFeatured = true;
   }
 
   const repositories = await prisma.repository.findMany({

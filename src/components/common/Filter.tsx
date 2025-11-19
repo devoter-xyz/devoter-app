@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from '@/components/ui/select';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from '@/components/ui/command';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -41,8 +41,19 @@ export function Filter({ onApply, initialFilters }: FilterProps) {
   const [onlyFeatured, setOnlyFeatured] = useState(initialFilters?.onlyFeatured || false);
   const [startDate, setStartDate] = useState(initialFilters?.startDate || '');
   const [endDate, setEndDate] = useState(initialFilters?.endDate || '');
-  const [minVotes, setMinVotes] = useState(initialFilters?.minVotes || 0);
-  const [maxVotes, setMaxVotes] = useState(initialFilters?.maxVotes || 0);
+  const [minVotes, setMinVotes] = useState(initialFilters?.minVotes?.toString() ?? '');
+  const [maxVotes, setMaxVotes] = useState(initialFilters?.maxVotes?.toString() ?? '');
+
+  useEffect(() => {
+    setSelectedTags(initialFilters?.selectedTags ?? []);
+    setOrg(initialFilters?.org ?? '');
+    setMaintainer(initialFilters?.maintainer ?? '');
+    setOnlyFeatured(initialFilters?.onlyFeatured ?? false);
+    setStartDate(initialFilters?.startDate ?? '');
+    setEndDate(initialFilters?.endDate ?? '');
+    setMinVotes(initialFilters?.minVotes?.toString() ?? '');
+    setMaxVotes(initialFilters?.maxVotes?.toString() ?? '');
+  }, [initialFilters]);
 
   const tagOptions = [
     { value: 'all', label: 'All' },
@@ -51,6 +62,9 @@ export function Filter({ onApply, initialFilters }: FilterProps) {
 
   const handleApply = () => {
     if (onApply) {
+      const parsedMinVotes = minVotes === '' ? undefined : Math.max(0, parseInt(minVotes));
+      const parsedMaxVotes = maxVotes === '' ? undefined : Math.max(0, parseInt(maxVotes));
+
       onApply({
         selectedTags,
         org,
@@ -58,8 +72,8 @@ export function Filter({ onApply, initialFilters }: FilterProps) {
         onlyFeatured,
         startDate,
         endDate,
-        minVotes,
-        maxVotes,
+        minVotes: parsedMinVotes,
+        maxVotes: parsedMaxVotes,
       });
     }
   };
@@ -127,11 +141,11 @@ export function Filter({ onApply, initialFilters }: FilterProps) {
       </div>
       <div className="space-y-2">
         <Label htmlFor="minVotes">Minimum Votes</Label>
-        <Input id="minVotes" type="number" value={minVotes} onChange={e => setMinVotes(Number(e.target.value))} placeholder="e.g. 10" />
+        <Input id="minVotes" type="number" value={minVotes} onChange={e => setMinVotes(e.target.value)} placeholder="e.g. 10" />
       </div>
       <div className="space-y-2">
         <Label htmlFor="maxVotes">Maximum Votes</Label>
-        <Input id="maxVotes" type="number" value={maxVotes} onChange={e => setMaxVotes(Number(e.target.value))} placeholder="e.g. 100" />
+        <Input id="maxVotes" type="number" value={maxVotes} onChange={e => setMaxVotes(e.target.value)} placeholder="e.g. 100" />
       </div>
       <div className="flex items-center space-x-2">
         <input

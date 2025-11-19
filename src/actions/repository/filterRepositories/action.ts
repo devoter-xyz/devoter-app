@@ -1,3 +1,5 @@
+'use server';
+
 import { filterRepositoriesSchema } from "./schema";
 import { filterRepositoriesLogic } from "./logic";
 
