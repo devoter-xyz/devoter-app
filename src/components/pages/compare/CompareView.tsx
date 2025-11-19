@@ -27,7 +27,7 @@ export function CompareView({ repositories }: CompareViewProps) {
           <Card key={repo.id}>
             <CardHeader>
               <CardTitle>{repo.name}</CardTitle>
-              <p className="text-sm text-gray-500">{repo.description}</p>
+              <p className="text-sm text-gray-500">{repo.description || 'No description available'}</p>
             </CardHeader>
             <CardContent>
               <div className="space-y-2">
@@ -48,8 +48,8 @@ export function CompareView({ repositories }: CompareViewProps) {
                 </p>
                 {/* Add more comparison metrics here, e.g., voting trends */}
                 <div className="flex flex-wrap gap-2">
-                  {repo.tags && repo.tags.map((tag) => (
-                    <Badge key={tag} variant="secondary">
+                  {repo.tags && repo.tags.map((tag, index) => (
+                    <Badge key={`${repo.id}-${tag}-${index}`} variant="secondary">
                       {tag}
                     </Badge>
                   ))}
