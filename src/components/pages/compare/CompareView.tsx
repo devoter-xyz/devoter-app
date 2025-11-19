@@ -35,7 +35,7 @@ export function CompareView({ repositories }: CompareViewProps) {
                   <strong>Votes:</strong> {repo.votesCount}
                 </p>
                 <p>
-                  <strong>GitHub Stars:</strong> {repo.githubStars || "N/A"}
+                  <strong>GitHub Stars:</strong> {repo.githubStars ?? "N/A"}
                 </p>
                 <p>
                   <strong>Submission Date:</strong>{" "}
