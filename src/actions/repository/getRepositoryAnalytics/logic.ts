@@ -32,22 +32,22 @@ export async function getRepositoryAnalyticsLogic(repositoryId: string): Promise
   // Fetch vote trends over time (daily votes)
   const voteTrends = await prisma.$queryRaw<VoteTrendData[]>`
     SELECT
-      DATE(createdAt) as date,
+      "createdAt"::date as date,
       COUNT(*) as votes
     FROM Vote
     WHERE repositoryId = ${repositoryId}
-    GROUP BY DATE(createdAt)
+    GROUP BY "createdAt"::date
     ORDER BY date ASC;
   `;
 
   // Fetch unique voters over time (daily unique voters)
   const uniqueVoters = await prisma.$queryRaw<UniqueVoterData[]>`
     SELECT
-      DATE(createdAt) as date,
+      "createdAt"::date as date,
       COUNT(DISTINCT userId) as uniqueVoters
     FROM Vote
     WHERE repositoryId = ${repositoryId}
-    GROUP BY DATE(createdAt)
+    GROUP BY "createdAt"::date
     ORDER BY date ASC;
   `;
 
