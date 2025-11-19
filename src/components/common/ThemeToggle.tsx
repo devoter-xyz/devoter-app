@@ -13,7 +13,14 @@ export function ThemeToggle() {
     <Button
       variant="ghost"
       size="icon"
-      onClick={() => setTheme(theme === "light" ? "dark" : "light")}
+      onClick={() => {
+        if (theme === 'system') {
+          const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+          setTheme(prefersDark ? 'light' : 'dark');
+        } else {
+          setTheme(theme === 'light' ? 'dark' : 'light');
+        }
+      }}
     >
       <Sun className="h-[1.5rem] w-[1.3rem] dark:hidden" />
       <Moon className="hidden h-[1.5rem] w-[1.3rem] dark:block" />
