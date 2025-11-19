@@ -62,8 +62,8 @@ export function Filter({ onApply, initialFilters }: FilterProps) {
 
   const handleApply = () => {
     if (onApply) {
-      const parsedMinVotes = minVotes === '' ? undefined : Math.max(0, parseInt(minVotes));
-      const parsedMaxVotes = maxVotes === '' ? undefined : Math.max(0, parseInt(maxVotes));
+      const parsedMinVotes = minVotes === '' ? undefined : (Number.isFinite(parseInt(minVotes, 10)) ? Math.max(0, parseInt(minVotes, 10)) : undefined);
+      const parsedMaxVotes = maxVotes === '' ? undefined : (Number.isFinite(parseInt(maxVotes, 10)) ? Math.max(0, parseInt(maxVotes, 10)) : undefined);
 
       onApply({
         selectedTags,
