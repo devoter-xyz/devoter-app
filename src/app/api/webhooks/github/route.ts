@@ -35,9 +35,9 @@ export async function POST(req: Request) {
   }
 
   // Validate payload shape
-  if (!parsedPayload || typeof parsedPayload !== 'object' || !parsedPayload.action || !parsedPayload.repository || !parsedPayload.sender) {
-    console.error("Invalid webhook payload shape:", parsedPayload);
-    return new NextResponse("Invalid payload shape: missing required fields", { status: 400 });
+  if (!parsedPayload || typeof parsedPayload !== 'object' || !parsedPayload.repository) {
+    console.error("Invalid webhook payload shape: missing required 'repository' field.");
+    return new NextResponse("Invalid payload shape: missing required 'repository' field", { status: 400 });
   }
 
   try {
