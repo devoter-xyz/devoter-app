@@ -26,12 +26,26 @@ export async function POST(req: Request) {
     return new NextResponse("Invalid signature", { status: 401 });
   }
 
+  let parsedPayload: any;
   try {
-    const parsedPayload = JSON.parse(payload);
+    parsedPayload = JSON.parse(payload);
+  } catch (error) {
+    console.error("Error parsing webhook payload:", error);
+    return new NextResponse("Invalid JSON payload", { status: 400 });
+  }
+
+  // Validate payload shape
+  if (!parsedPayload || typeof parsedPayload !== 'object' || !parsedPayload.action || !parsedPayload.repository || !parsedPayload.sender) {
+    console.error("Invalid webhook payload shape:", parsedPayload);
+    return new NextResponse("Invalid payload shape: missing required fields", { status: 400 });
+  }
+
+  try {
     await handleGitHubWebhook(event, parsedPayload);
     return new NextResponse("Webhook received", { status: 200 });
-  } catch (error) {
-    console.error("Error processing webhook:", error);
+  } catch (error: any) {
+    console.error(`Error processing webhook: ${error.name} - ${error.message}`);
+    // For internal monitoring, full error can be logged securely elsewhere.
     return new NextResponse("Error processing webhook", { status: 500 });
   }
 }
