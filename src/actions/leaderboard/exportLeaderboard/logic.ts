@@ -1,18 +1,18 @@
-import { getLeaderboard } from '@/src/actions/leaderboard/getLeaderboard';
+import { getLeaderboard } from '@/actions/leaderboard/getLeaderboard/logic';
 import { MAX_EXPORT_FILE_SIZE_BYTES } from '@/lib/constants';
 
 export async function exportLeaderboardLogic(format: 'csv' | 'json', week: string): Promise<string> {
-  const leaderboard = await getLeaderboard({ week });
+  const { leaderboard } = await getLeaderboard({ week });
 
-  if (!leaderboard) {
+  if (!leaderboard || leaderboard.length === 0) {
     throw new Error('Leaderboard data not found.');
   }
 
   let fileContent: string;
   if (format === 'csv') {
-    fileContent = convertToCsv(leaderboard.leaderboardEntries);
+    fileContent = convertToCsv(leaderboard);
   } else if (format === 'json') {
-    fileContent = JSON.stringify(leaderboard.leaderboardEntries, null, 2);
+    fileContent = JSON.stringify(leaderboard, null, 2);
   } else {
     throw new Error('Unsupported format.');
   }
