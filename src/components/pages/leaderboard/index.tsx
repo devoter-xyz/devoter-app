@@ -1,8 +1,17 @@
 import { LeaderboardEntry } from '@/actions/leaderboard/getLeaderboard/logic';
+import { exportLeaderboard } from '@/src/actions/leaderboard/exportLeaderboard/action';
 import { LeaderboardCard } from '@/components/pages/leaderboard/components/LeaderboardCard';
 import { WeekSelector } from '@/components/pages/leaderboard/components/WeekSelector';
+import { Button } from '@/components/ui/button';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from '@/components/ui/pagination';
 import { type IsoWeek } from '@/lib/utils/date';
+import { useState } from 'react';
 
 type LeaderboardPageContentProps = {
   leaderboard: LeaderboardEntry[];
@@ -27,6 +36,30 @@ export function LeaderboardPageContent({
 }: LeaderboardPageContentProps) {
   const isPastWeek = selectedWeek !== currentWeek;
   const totalPages = Math.ceil(total / count);
+  const [isExporting, setIsExporting] = useState(false);
+
+  const handleExport = async (format: 'csv' | 'json') => {
+    setIsExporting(true);
+    try {
+      const fileContentBase64 = await exportLeaderboard({ format, week: selectedWeek });
+      const fileName = `leaderboard-${selectedWeek}.${format}`;
+      const decodedFileContent = Buffer.from(fileContentBase64, 'base64').toString('utf8');
+      const blob = new Blob([decodedFileContent], { type: format === 'csv' ? 'text/csv' : 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = fileName;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error('Failed to export leaderboard:', error);
+      alert('Failed to export leaderboard. Please try again later.');
+    } finally {
+      setIsExporting(false);
+    }
+  };
 
   return (
     <div className="container mx-auto p-4">
@@ -39,7 +72,20 @@ export function LeaderboardPageContent({
 
         <div className="mt-6">
           <div className="flex flex-col items-start gap-4 mt-4">
-            <WeekSelector weeks={weeks} currentWeek={currentWeek} selectedWeek={selectedWeek} />
+            <div className="flex items-center gap-4">
+              <WeekSelector weeks={weeks} currentWeek={currentWeek} selectedWeek={selectedWeek} />
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="outline" disabled={isExporting}>
+                    {isExporting ? 'Exporting...' : 'Export'}
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent>
+                  <DropdownMenuItem onClick={() => handleExport('csv')}>Export as CSV</DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => handleExport('json')}>Export as JSON</DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
             <>
               {leaderboard.length > 0 ? (
                 <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 mt-6">
