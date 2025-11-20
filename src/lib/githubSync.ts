@@ -43,9 +43,15 @@ async function handleRepositoryEvent(payload: any) {
     const newName = repository.name;
     console.log(`Repository renamed from ${oldName} to ${newName}`);
 
+    const oldFullName = changes.repository.full_name.from;
+    if (!oldFullName || typeof oldFullName !== 'string' || oldFullName.trim() === '') {
+      console.error("Error: changes.repository.full_name.from is invalid or empty. Skipping repository update.");
+      return;
+    }
+
     await prisma.repository.updateMany({
       where: {
-        githubUrl: changes.repository.full_name.from ? `https://github.com/${changes.repository.full_name.from}` : undefined,
+        githubUrl: `https://github.com/${oldFullName}`,
       },
       data: {
         name: newName,

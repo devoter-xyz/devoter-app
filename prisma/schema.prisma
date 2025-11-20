@@ -42,7 +42,7 @@ model Repository {
   owner              String?                 @db.VarChar(255)
   title              String                  @db.VarChar(255)
   description        String
-  githubUrl          String                  @db.VarChar(255)
+  githubUrl          String                  @unique @db.VarChar(255)
   websiteUrl         String?                 @db.VarChar(255)
   docsUrl            String?                 @db.VarChar(255)
   logoUrl            String?                 @db.VarChar(255)

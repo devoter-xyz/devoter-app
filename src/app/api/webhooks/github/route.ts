@@ -6,8 +6,9 @@ import { env } from "@/lib/env";
 import { handleGitHubWebhook } from "@/lib/githubSync";
 
 export async function POST(req: Request) {
-  const signature = headers().get("x-hub-signature-256");
-  const event = headers().get("x-github-event");
+  const headersList = await headers();
+  const signature = headersList.get("x-hub-signature-256");
+  const event = headersList.get("x-github-event");
   const payload = await req.text();
 
   if (!signature || !event) {
@@ -18,7 +19,10 @@ export async function POST(req: Request) {
   hmac.update(payload);
   const digest = "sha256=" + hmac.digest("hex");
 
-  if (signature !== digest) {
+  const signatureBuffer = Buffer.from(signature);
+  const digestBuffer = Buffer.from(digest);
+
+  if (signatureBuffer.length !== digestBuffer.length || !crypto.timingSafeEqual(signatureBuffer, digestBuffer)) {
     return new NextResponse("Invalid signature", { status: 401 });
   }
 
