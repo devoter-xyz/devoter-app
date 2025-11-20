@@ -10,6 +10,7 @@ export const envSchema = z.object({
   NODE_ENV: z.enum(['development', 'production', 'test'], { message: 'NODE_ENV must be either "development", "production", or "test".' }),
   NEXT_PUBLIC_THIRDWEB_CLIENT_ID: z.string().min(1, { message: 'NEXT_PUBLIC_THIRDWEB_CLIENT_ID is required.' }),
   NEXT_PUBLIC_THIRDWEB_SECRET_KEY: z.string().min(1, { message: 'NEXT_PUBLIC_THIRDWEB_SECRET_KEY is required.' }),
+  GITHUB_WEBHOOK_SECRET: z.string().min(1, { message: 'GITHUB_WEBHOOK_SECRET is required.' }),
 });
 
 // Allow bypass if NODE_ENV or MODE is 'test'
@@ -26,5 +27,6 @@ export const env =
         NODE_ENV: (process.env.NODE_ENV as 'development' | 'production' | 'test') ?? 'test',
         NEXT_PUBLIC_THIRDWEB_CLIENT_ID: process.env.NEXT_PUBLIC_THIRDWEB_CLIENT_ID ?? '',
         NEXT_PUBLIC_THIRDWEB_SECRET_KEY: process.env.NEXT_PUBLIC_THIRDWEB_SECRET_KEY ?? '',
+        GITHUB_WEBHOOK_SECRET: process.env.GITHUB_WEBHOOK_SECRET ?? '',
       }
     : envSchema.parse(process.env);
