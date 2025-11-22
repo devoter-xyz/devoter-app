@@ -1,4 +1,6 @@
 'use client';
+import ErrorBoundary from '@/components/ErrorBoundary';
+import ErrorFallback from '@/components/common/ErrorFallback';
 import RepoCard from '@/components/common/RepoCard';
 import RepoCardSkeleton from '@/components/common/RepoCardSkeleton';
 import { ChartLine, Star } from 'lucide-react';
@@ -116,25 +118,58 @@ export default function HomePage() {
   const topRepos = repos.slice(3, 6);
 
   return (
-    <section className='py-10 px-6 flex flex-col gap-10 lg:flex-row'>
-      <div className="lg:w-1/4">
-        <Filter onApply={handleApplyFilters} initialFilters={initialFilters} />
-      </div>
-      <div className="lg:w-3/4">
-        <div>
-          <h1 className='mb-8 flex items-center gap-3 text-3xl font-bold'>
-            <Star className='h-7 w-7 text-orange-400' fill='orange' />
-            Featured Repositories
-          </h1>
-          <div className='grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3'>
-            {loading ? (
-              <>
-                <RepoCardSkeleton />
-                <RepoCardSkeleton />
-                <RepoCardSkeleton />
-              </>
-            ) : (
-              featuredRepos.map((repo, index) => (
+    <ErrorBoundary fallback={<ErrorFallback error={new Error("Failed to load repositories.")} />}>
+      <section className='py-10 px-6 flex flex-col gap-10 lg:flex-row'>
+        <div className="lg:w-1/4">
+          <Filter onApply={handleApplyFilters} initialFilters={initialFilters} />
+        </div>
+        <div className="lg:w-3/4">
+          <div>
+            <h1 className='mb-8 flex items-center gap-3 text-3xl font-bold'>
+              <Star className='h-7 w-7 text-orange-400' fill='orange' />
+              Featured Repositories
+            </h1>
+            <div className='grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3'>
+              {loading ? (
+                <>
+                  <RepoCardSkeleton />
+                  <RepoCardSkeleton />
+                  <RepoCardSkeleton />
+                </>
+              ) : (
+                featuredRepos.map((repo, index) => (
+                  <RepoCard
+                    key={repo.id}
+                    id={repo.id}
+                    owner={repo.owner || ''}
+                    name={repo.name || repo.title}
+                    description={repo.description || ''}
+                    tags={repo.tags}
+                    votes={repo.totalVotes}
+                    cardType='featured'
+                    logoUrl={repo.logoUrl || '/logo.svg'}
+                    isVerified={repo.isVerified || false}
+                    variant='default'
+                    rank={index + 1} // Assign rank based on index for featured repos
+                  />
+                ))
+              )}
+            </div>
+          </div>
+          <div className="mt-10">
+            <h1 className='mb-8 flex items-center gap-3 text-3xl font-bold'>
+              <ChartLine className='h-7 w-7 text-green-600' />
+              All Repositories
+            </h1>
+            <div className='grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3'>
+              {loading ? (
+                <>
+                  <RepoCardSkeleton />
+                  <RepoCardSkeleton />
+                  <RepoCardSkeleton />
+                </>
+              ) : (
+              topRepos.map((repo, index) => (
                 <RepoCard
                   key={repo.id}
                   id={repo.id}
@@ -143,51 +178,20 @@ export default function HomePage() {
                   description={repo.description || ''}
                   tags={repo.tags}
                   votes={repo.totalVotes}
-                  cardType='featured'
+                  cardType='default'
+                  variant={index < 3 ? (['first', 'second', 'third'] as const)[index] : 'default'}
                   logoUrl={repo.logoUrl || '/logo.svg'}
+                  // TODO: Replace with real favorite status (e.g., repo.isFavorited or userFavoritesSet.has(repo.id))
+                  isFavorited={false} // Placeholder, as real favorite status is not yet available in RepoCardData
                   isVerified={repo.isVerified || false}
-                  variant='default'
-                  rank={index + 1} // Assign rank based on index for featured repos
+                  rank={index + 1} // Assign rank based on index for all repositories
                 />
               ))
             )}
+            </div>
           </div>
         </div>
-        <div className="mt-10">
-          <h1 className='mb-8 flex items-center gap-3 text-3xl font-bold'>
-            <ChartLine className='h-7 w-7 text-green-600' />
-            All Repositories
-          </h1>
-          <div className='grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3'>
-            {loading ? (
-              <>
-                <RepoCardSkeleton />
-                <RepoCardSkeleton />
-                <RepoCardSkeleton />
-              </>
-            ) : (
-            topRepos.map((repo, index) => (
-              <RepoCard
-                key={repo.id}
-                id={repo.id}
-                owner={repo.owner || ''}
-                name={repo.name || repo.title}
-                description={repo.description || ''}
-                tags={repo.tags}
-                votes={repo.totalVotes}
-                cardType='default'
-                variant={index < 3 ? (['first', 'second', 'third'] as const)[index] : 'default'}
-                logoUrl={repo.logoUrl || '/logo.svg'}
-                // TODO: Replace with real favorite status (e.g., repo.isFavorited or userFavoritesSet.has(repo.id))
-                isFavorited={false} // Placeholder, as real favorite status is not yet available in RepoCardData
-                isVerified={repo.isVerified || false}
-                rank={index + 1} // Assign rank based on index for all repositories
-              />
-            ))
-          )}
-          </div>
-        </div>
-      </div>
-    </section>
+      </section>
+    </ErrorBoundary>
   );
 }

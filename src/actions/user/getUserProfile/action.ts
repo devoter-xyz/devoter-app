@@ -1,3 +1,4 @@
+import { NetworkError, ValidationError, BadRequestError } from '@/lib/errors';
 import { User } from "@prisma/client";
 import { getUserProfileLogic } from "./logic";
 
@@ -12,6 +13,9 @@ export async function getUserProfile(
       `Error in getUserProfile for wallet address ${walletAddress}:`,
       error,
     );
-    throw error;
+    if (error instanceof ValidationError || error instanceof NetworkError) {
+      throw error;
+    }
+    throw new BadRequestError("An unexpected error occurred while fetching user profile.");
   }
 }

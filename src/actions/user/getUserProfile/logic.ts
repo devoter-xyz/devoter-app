@@ -1,3 +1,4 @@
+import { NetworkError, ValidationError } from '@/lib/errors';
 import { prisma } from "@/lib/prisma";
 import { Prisma } from "@prisma/client";
 
@@ -31,7 +32,7 @@ export async function getUserProfileLogic(
   walletAddress: string,
 ): Promise<UserProfileResult | null> {
   if (!walletAddress || typeof walletAddress !== "string") {
-    throw new Error("Invalid wallet address provided.");
+    throw new ValidationError("Invalid wallet address provided.");
   }
 
   try {
@@ -43,6 +44,6 @@ export async function getUserProfileLogic(
     return user;
   } catch (error) {
     console.error("Failed to fetch user profile:", error);
-    throw new Error("Failed to fetch user profile.");
+    throw new NetworkError("Failed to fetch user profile.");
   }
 }

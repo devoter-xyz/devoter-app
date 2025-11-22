@@ -15,6 +15,6 @@ export const createRepositoryAction = authActionClient
       if (error instanceof DuplicateRepositoryError || error instanceof WeeklySubmissionLimitError || error instanceof InvalidGitHubUrlError) {
         throw error;
       }
-      throw new Error('Something went wrong', { cause: error });
+      throw new BadRequestError('Something went wrong');
     }
   });
