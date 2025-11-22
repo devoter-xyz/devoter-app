@@ -1,3 +1,4 @@
+import { NetworkError, BadRequestError } from '@/lib/errors';
 import { prisma } from '@/lib/db';
 import { Decimal } from '@prisma/client/runtime/library';
 import type { GetLeaderboardInput } from './schema';
@@ -23,76 +24,84 @@ export type GetLeaderboardOutput = {
 };
 
 export async function getLeaderboard(input: GetLeaderboardInput): Promise<GetLeaderboardOutput> {
-  const { week, page = 1, pageSize = 10 } = input;
-  const skip = (page - 1) * pageSize;
+  try {
+    const { week, page = 1, pageSize = 10 } = input;
+    const skip = (page - 1) * pageSize;
 
-  const leaderboardWithVotes = await prisma.weeklyRepoLeaderboard.findMany({
-    where: { week },
-    orderBy: { rank: 'asc' },
-    skip,
-    take: pageSize,
-    select: {
-      rank: true,
-      repository: {
-        select: {
-          id: true,
-          title: true,
-          description: true,
-          githubUrl: true,
-          submitter: {
-            select: {
-              walletAddress: true
-            }
-          },
-          votes: {
-            where: {
-              week: week
+    const leaderboardWithVotes = await prisma.weeklyRepoLeaderboard.findMany({
+      where: { week },
+      orderBy: { rank: 'asc' },
+      skip,
+      take: pageSize,
+      select: {
+        rank: true,
+        repository: {
+          select: {
+            id: true,
+            title: true,
+            description: true,
+            githubUrl: true,
+            submitter: {
+              select: {
+                walletAddress: true
+              }
             },
-            select: {
-              userId: true,
-              tokenAmount: true
+            votes: {
+              where: {
+                week: week
+              },
+              select: {
+                userId: true,
+                tokenAmount: true
+              }
             }
           }
         }
       }
+    });
+
+    const total = await prisma.weeklyRepoLeaderboard.count({
+      where: { week }
+    });
+
+    if (leaderboardWithVotes.length === 0) {
+      return {
+        leaderboard: [],
+        total
+      };
     }
-  });
 
-  const total = await prisma.weeklyRepoLeaderboard.count({
-    where: { week }
-  });
+    const leaderboardWithStats: LeaderboardEntry[] = leaderboardWithVotes.map((entry) => {
+      const stats = entry.repository.votes.reduce(
+        (acc, vote) => {
+          acc.uniqueVoters.add(vote.userId);
+          acc.totalVotingPower = acc.totalVotingPower.add(vote.tokenAmount);
+          return acc;
+        },
+        { uniqueVoters: new Set<string>(), totalVotingPower: new Decimal(0) }
+      );
 
-  if (leaderboardWithVotes.length === 0) {
+      const { votes: _votes, ...repositoryData } = entry.repository;
+
+      return {
+        rank: entry.rank,
+        repository: {
+          ...repositoryData,
+          uniqueVoteCount: stats.uniqueVoters.size,
+          totalVotingPower: stats.totalVotingPower
+        }
+      };
+    });
+
     return {
-      leaderboard: [],
+      leaderboard: leaderboardWithStats,
       total
     };
+  } catch (error) {
+    console.error("Error fetching leaderboard:", error);
+    if (error instanceof NetworkError || error instanceof BadRequestError) {
+      throw error;
+    }
+    throw new NetworkError("Failed to fetch leaderboard due to an unexpected error.", error as Error);
   }
-
-  const leaderboardWithStats: LeaderboardEntry[] = leaderboardWithVotes.map((entry) => {
-    const stats = entry.repository.votes.reduce(
-      (acc, vote) => {
-        acc.uniqueVoters.add(vote.userId);
-        acc.totalVotingPower = acc.totalVotingPower.add(vote.tokenAmount);
-        return acc;
-      },
-      { uniqueVoters: new Set<string>(), totalVotingPower: new Decimal(0) }
-    );
-
-    const { votes: _votes, ...repositoryData } = entry.repository;
-
-    return {
-      rank: entry.rank,
-      repository: {
-        ...repositoryData,
-        uniqueVoteCount: stats.uniqueVoters.size,
-        totalVotingPower: stats.totalVotingPower
-      }
-    };
-  });
-
-  return {
-    leaderboard: leaderboardWithStats,
-    total
-  };
 }

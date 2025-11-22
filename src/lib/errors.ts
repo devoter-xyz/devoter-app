@@ -46,3 +46,19 @@ export class BadRequestError extends Error {
     this.name = 'BadRequestError';
   }
 }
+
+export class NetworkError extends Error {
+  cause?: Error;
+  constructor(message = 'A network error occurred. Please check your internet connection and try again.', cause?: Error) {
+    super(message);
+    this.name = 'NetworkError';
+    this.cause = cause;
+  }
+}
+
+export class ValidationError extends Error {
+  constructor(message = 'Validation failed. Please check your input.') {
+    super(message);
+    this.name = 'ValidationError';
+  }
+}
