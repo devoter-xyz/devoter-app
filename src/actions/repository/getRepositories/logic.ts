@@ -50,9 +50,9 @@ export const getRepositories = async ({ week }: GetRepositoriesInput): Promise<G
     };
   } catch (error) {
     console.error("Error fetching repositories:", error);
-    if (error instanceof Error) {
-      throw new NetworkError("Failed to fetch repositories due to a database error.");
+    if (error instanceof NetworkError || error instanceof BadRequestError) {
+      throw error;
     }
-    throw new BadRequestError("An unexpected error occurred while fetching repositories.");
+    throw new NetworkError("Failed to fetch repositories due to an unexpected error.", error as Error);
   }
 };

@@ -99,9 +99,9 @@ export async function getLeaderboard(input: GetLeaderboardInput): Promise<GetLea
     };
   } catch (error) {
     console.error("Error fetching leaderboard:", error);
-    if (error instanceof Error) {
-      throw new NetworkError("Failed to fetch leaderboard due to a database error.");
+    if (error instanceof NetworkError || error instanceof BadRequestError) {
+      throw error;
     }
-    throw new BadRequestError("An unexpected error occurred while fetching the leaderboard.");
+    throw new NetworkError("Failed to fetch leaderboard due to an unexpected error.", error as Error);
   }
 }

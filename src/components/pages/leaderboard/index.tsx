@@ -1,7 +1,9 @@
+'use client';
+
 import ErrorBoundary from '@/components/ErrorBoundary';
 import ErrorFallback from '@/components/common/ErrorFallback';
 import { LeaderboardEntry } from '@/actions/leaderboard/getLeaderboard/logic';
-import { exportLeaderboard } from '@/src/actions/leaderboard/exportLeaderboard/action';
+import { exportLeaderboard } from '@/actions/leaderboard/exportLeaderboard/action';
 import { LeaderboardCard } from '@/components/pages/leaderboard/components/LeaderboardCard';
 import { WeekSelector } from '@/components/pages/leaderboard/components/WeekSelector';
 import { Button } from '@/components/ui/button';
