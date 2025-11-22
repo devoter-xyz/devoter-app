@@ -48,9 +48,11 @@ export class BadRequestError extends Error {
 }
 
 export class NetworkError extends Error {
-  constructor(message = 'A network error occurred. Please check your internet connection and try again.') {
+  cause?: Error;
+  constructor(message = 'A network error occurred. Please check your internet connection and try again.', cause?: Error) {
     super(message);
     this.name = 'NetworkError';
+    this.cause = cause;
   }
 }
 
