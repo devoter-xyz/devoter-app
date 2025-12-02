@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -7,9 +8,12 @@ import { Form, FormControl, FormField, FormItem, FormMessage } from '@/component
 import { createCommentAction } from '@/actions/discussion/createComment/action';
 import { updateCommentAction } from '@/actions/discussion/updateComment/action';
 import { toast } from 'sonner';
+import { cn } from '@/lib/utils';
+
+const MAX_COMMENT_LENGTH = 1000;
 
 const formSchema = z.object({
-  content: z.string().min(1, 'Comment cannot be empty.').max(1000, 'Comment is too long.'),
+  content: z.string().min(1, 'Comment cannot be empty.').max(MAX_COMMENT_LENGTH, 'Comment is too long.'),
 });
 
 interface CommentFormProps {
@@ -28,6 +32,8 @@ export const CommentForm = ({ repositoryId, initialContent = '', commentId, onSu
     },
   });
 
+  const [charCount, setCharCount] = useState(initialContent.length);
+
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
       if (commentId) {
@@ -38,11 +44,20 @@ export const CommentForm = ({ repositoryId, initialContent = '', commentId, onSu
         toast.success('Comment added successfully.');
       }
       form.reset();
+      setCharCount(initialContent?.length ?? 0); // Reset char count after successful submission
       onSuccess();
     } catch (error: any) {
       toast.error(error.message);
     }
   };
+
+  const charCountColorClass = cn(
+    'text-sm',
+    {
+      'text-orange-500': charCount >= MAX_COMMENT_LENGTH * 0.8 && charCount < MAX_COMMENT_LENGTH,
+      'text-red-500': charCount >= MAX_COMMENT_LENGTH,
+    }
+  );
 
   return (
     <Form {...form}>
@@ -53,9 +68,22 @@ export const CommentForm = ({ repositoryId, initialContent = '', commentId, onSu
           render={({ field }) => (
             <FormItem>
               <FormControl>
-                <Textarea placeholder="Write a comment..." {...field} rows={3} />
+                <Textarea
+                  placeholder="Write a comment..."
+                  {...field}
+                  onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => {
+                    setCharCount(e.target.value.length);
+                    field.onChange(e);
+                  }}
+                  rows={3}
+                />
               </FormControl>
-              <FormMessage />
+              <div className="flex justify-between">
+                <FormMessage />
+                <span className={charCountColorClass}>
+                  {charCount}/{MAX_COMMENT_LENGTH}
+                </span>
+              </div>
             </FormItem>
           )}
         />
