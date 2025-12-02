@@ -44,16 +44,11 @@ export const CommentForm = ({ repositoryId, initialContent = '', commentId, onSu
         toast.success('Comment added successfully.');
       }
       form.reset();
-      setCharCount(0); // Reset char count after successful submission
+      setCharCount(initialContent?.length ?? 0); // Reset char count after successful submission
       onSuccess();
     } catch (error: any) {
       toast.error(error.message);
     }
-  };
-
-  const handleContentChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    setCharCount(e.target.value.length);
-    field.onChange(e);
   };
 
   const charCountColorClass = cn(
@@ -73,7 +68,15 @@ export const CommentForm = ({ repositoryId, initialContent = '', commentId, onSu
           render={({ field }) => (
             <FormItem>
               <FormControl>
-                <Textarea placeholder="Write a comment..." {...field} onChange={handleContentChange} rows={3} />
+                <Textarea
+                  placeholder="Write a comment..."
+                  {...field}
+                  onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => {
+                    setCharCount(e.target.value.length);
+                    field.onChange(e);
+                  }}
+                  rows={3}
+                />
               </FormControl>
               <div className="flex justify-between">
                 <FormMessage />
