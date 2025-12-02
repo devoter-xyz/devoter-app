@@ -58,6 +58,7 @@ model Repository {
   paymentId          String                  @unique
   payment            Payment                 @relation("RepoPayment", fields: [paymentId], references: [id], onDelete: Cascade)
   featured           Boolean                 @default(false)
+  isFlagged          Boolean                 @default(false)
   createdAt          DateTime                @default(now())
   updatedAt          DateTime                @updatedAt
   votes              Vote[]

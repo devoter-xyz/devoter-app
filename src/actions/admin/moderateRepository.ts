@@ -46,8 +46,11 @@ export async function moderateRepository(
         where: {
           id: repositoryId,
         },
-
+        data: {
+          isFlagged: false,
+        },
       });
+      break;
       break;
     default:
       throw new Error('Invalid moderation action');

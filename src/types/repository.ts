@@ -8,7 +8,7 @@ export interface Repo {
   stars?: number; // Optional, based on mockRepo
   tags: string[];
   href?: string; // Optional, based on mockRepo
-  isFeatured?: boolean; // Optional, based on mockRepo
+    featured?: boolean; // Optional, based on mockRepo
   submissionCount?: number; // Optional, based on mockRepo
   createdAt?: string; // Optional, based on mockRepo
   updatedAt?: string; // Optional, based on mockRepo
