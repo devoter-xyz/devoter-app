@@ -1,6 +1,5 @@
-import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { action } from "@/lib/safe-action";
+import { authActionClient } from "@/lib/actions";
 import { z } from "zod";
 import { getRepositoryAnalyticsLogic, RepositoryAnalytics } from "./logic";
 
@@ -8,10 +7,9 @@ const schema = z.object({
   repositoryId: z.string(),
 });
 
-export const getRepositoryAnalytics = action(schema, async ({ repositoryId }): Promise<RepositoryAnalytics> => {
-  const session = await auth();
+export const getRepositoryAnalytics = authActionClient.action(schema, async ({ parsedInput: { repositoryId }, ctx: { session } }): Promise<RepositoryAnalytics> => {
 
-  if (!session?.user?.id) {
+  if (!session?.userId) {
     throw new Error("Not authenticated.");
   }
 
@@ -20,7 +18,7 @@ export const getRepositoryAnalytics = action(schema, async ({ repositoryId }): P
       id: repositoryId,
     },
     select: {
-      ownerId: true,
+      submitterId: true,
     },
   });
 
@@ -28,7 +26,7 @@ export const getRepositoryAnalytics = action(schema, async ({ repositoryId }): P
     throw new Error("Repository not found.");
   }
 
-  if (repository.ownerId !== session.user.id) {
+  if (repository.submitterId !== session.userId) {
     throw new Error("Unauthorized: You are not the owner of this repository.");
   }
 

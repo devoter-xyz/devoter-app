@@ -10,7 +10,7 @@ export async function getAdminStats() {
   const totalRepositories = await prisma.repository.count();
   const flaggedRepositories = await prisma.repository.count({
     where: {
-      isFlagged: true,
+
     },
   });
 

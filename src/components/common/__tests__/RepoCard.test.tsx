@@ -52,7 +52,7 @@ const mockRepo: Repo = {
   stars: 100,
   tags: ['react', 'typescript'],
   href: '/repository/repo123',
-  isFeatured: false,
+      featured: false,
   submissionCount: 5,
   createdAt: new Date().toISOString(),
   updatedAt: new Date().toISOString(),

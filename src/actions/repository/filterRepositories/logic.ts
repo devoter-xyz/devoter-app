@@ -53,7 +53,7 @@ export async function filterRepositoriesLogic(filters: FilterRepositoriesSchema)
   }
 
   if (onlyFeatured) {
-    where.isFeatured = true;
+        where.featured = true;
   }
 
   const repositories = await prisma.repository.findMany({
