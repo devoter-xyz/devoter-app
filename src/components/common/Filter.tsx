@@ -10,8 +10,10 @@ import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from '
 import { Checkbox } from '@/components/ui/checkbox';
 import { cn } from '@/lib/utils';
 import { ChevronDownIcon } from 'lucide-react';
+import { Skeleton } from '@/components/ui/skeleton';
 
 export interface FilterProps {
+  isLoading?: boolean;
   onApply?: (filters: {
     selectedTags: string[];
     org: string;
@@ -34,7 +36,7 @@ export interface FilterProps {
   };
 }
 
-export function Filter({ onApply, initialFilters }: FilterProps) {
+export function Filter({ onApply, initialFilters, isLoading }: FilterProps) {
   const [selectedTags, setSelectedTags] = useState<string[]>(initialFilters?.selectedTags || []);
   const [org, setOrg] = useState(initialFilters?.org || '');
   const [maintainer, setMaintainer] = useState(initialFilters?.maintainer || '');
@@ -62,6 +64,10 @@ export function Filter({ onApply, initialFilters }: FilterProps) {
     setMinVotesError('');
     setMaxVotesError('');
   }, [initialFilters]);
+
+  if (isLoading) {
+    return <FilterSkeleton />;
+  }
 
   const tagOptions = [
     { value: 'all', label: 'All' },
@@ -199,6 +205,48 @@ export function Filter({ onApply, initialFilters }: FilterProps) {
       <Button className="w-full mt-2" onClick={handleApply} disabled={hasErrors}>
         Apply Filters
       </Button>
+    </Card>
+  );
+}
+
+export function FilterSkeleton() {
+  return (
+    <Card className="space-y-4 p-4 border-none shadow-none bg-transparent">
+      <div className="space-y-2">
+        <Skeleton className="h-4 w-1/4" />
+        <Skeleton className="h-8 w-full" />
+      </div>
+      <div className="space-y-2">
+        <Skeleton className="h-4 w-1/3" />
+        <Skeleton className="h-8 w-full" />
+      </div>
+      <div className="space-y-2">
+        <Skeleton className="h-4 w-1/3" />
+        <Skeleton className="h-8 w-full" />
+      </div>
+      <div className="space-y-2">
+        <Skeleton className="h-4 w-1/4" />
+        <Skeleton className="h-8 w-full" />
+      </div>
+      <div className="space-y-2">
+        <Skeleton className="h-4 w-1/4" />
+        <Skeleton className="h-8 w-full" />
+      </div>
+      <div className="space-y-2">
+        <Skeleton className="h-4 w-1/3" />
+        <Skeleton className="h-8 w-full" />
+      </div>
+      <div className="space-y-2">
+        <Skeleton className="h-4 w-1/3" />
+        <Skeleton className="h-8 w-full" />
+      </div>
+      <div className="flex items-center space-x-2">
+        <Skeleton className="h-4 w-4" />
+        <Skeleton className="h-4 w-1/2" />
+      </div>
+      <div className="flex justify-end mt-4">
+        <Skeleton className="h-8 w-full" />
+      </div>
     </Card>
   );
 }
