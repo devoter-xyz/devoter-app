@@ -51,7 +51,6 @@ export async function moderateRepository(
         },
       });
       break;
-      break;
     default:
       throw new Error('Invalid moderation action');
   }
