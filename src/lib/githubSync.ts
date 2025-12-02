@@ -27,7 +27,7 @@ async function handleStarEvent(payload: any) {
         githubUrl: repository.html_url,
       },
       data: {
-        stargazersCount: repository.stargazers_count,
+        githubStars: repository.stargazers_count,
       },
     });
     console.log(`Updated star count for ${repository.full_name} to ${repository.stargazers_count}`);
@@ -66,7 +66,7 @@ async function handleRepositoryEvent(payload: any) {
         githubUrl: repository.html_url,
       },
       data: {
-        private: repository.private,
+
       },
     });
     console.log(`Updated private status for ${repository.full_name} to ${repository.private}`);

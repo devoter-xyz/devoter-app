@@ -34,6 +34,15 @@ function convertToCsv(entries: any[]): string {
   const csvRows = [headers.join(',')];
 
   for (const entry of entries) {
-    const row = [
-      entry.rank,
-      `"${entry.repository.name.replace(/
+        const row = [
+          entry.rank,
+          `"${entry.repository.name.replace(/"/g, '""')}"`,
+          `"${entry.repository.owner.replace(/"/g, '""')}"`,
+          entry.voteCount,
+          entry.votingPower,
+        ];
+    csvRows.push(row.join(','));
+  }
+
+  return csvRows.join('\n');
+}

@@ -37,7 +37,7 @@ export async function moderateRepository(
           id: repositoryId,
         },
         data: {
-          isFeatured: !repository.isFeatured,
+          featured: !repository.featured,
         },
       });
       break;
@@ -46,9 +46,7 @@ export async function moderateRepository(
         where: {
           id: repositoryId,
         },
-        data: {
-          isFlagged: false,
-        },
+
       });
       break;
     default:
