@@ -147,7 +147,7 @@ export function Filter({ onApply, initialFilters }: FilterProps) {
                             ? [...selectedTags, tag]
                             : selectedTags.filter((t) => t !== tag)
                         );
-                      }}
+                      }}'''
                       className="mr-2"
                     />
                     {tag.charAt(0).toUpperCase() + tag.slice(1)}
@@ -199,6 +199,46 @@ export function Filter({ onApply, initialFilters }: FilterProps) {
       <Button className="w-full mt-2" onClick={handleApply} disabled={hasErrors}>
         Apply Filters
       </Button>
+    </Card>
+  );
+}
+
+export function FilterSkeleton() {
+  return (
+    <Card className="space-y-4 p-4 border-none shadow-none bg-transparent animate-pulse">
+      <div className="space-y-2">
+        <div className="h-4 w-1/4 bg-gray-200 rounded"></div> {/* Label placeholder */}
+        <div className="h-8 w-full bg-gray-200 rounded"></div> {/* Tags button placeholder */}
+      </div>
+      <div className="space-y-2">
+        <div className="h-4 w-1/3 bg-gray-200 rounded"></div> {/* Label placeholder */}
+        <div className="h-8 w-full bg-gray-200 rounded"></div> {/* Organization input placeholder */}
+      </div>
+      <div className="space-y-2">
+        <div className="h-4 w-1/3 bg-gray-200 rounded"></div> {/* Label placeholder */}
+        <div className="h-8 w-full bg-gray-200 rounded"></div> {/* Maintainer input placeholder */}
+      </div>
+      <div className="space-y-2">
+        <div className="h-4 w-1/4 bg-gray-200 rounded"></div> {/* Label placeholder */}
+        <div className="h-8 w-full bg-gray-200 rounded"></div> {/* Start Date input placeholder */}
+      </div>
+      <div className="space-y-2">
+        <div className="h-4 w-1/4 bg-gray-200 rounded"></div> {/* Label placeholder */}
+        <div className="h-8 w-full bg-gray-200 rounded"></div> {/* End Date input placeholder */}
+      </div>
+      <div className="space-y-2">
+        <div className="h-4 w-1/3 bg-gray-200 rounded"></div> {/* Label placeholder */}
+        <div className="h-8 w-full bg-gray-200 rounded"></div> {/* Minimum Votes input placeholder */}
+      </div>
+      <div className="space-y-2">
+        <div className="h-4 w-1/3 bg-gray-200 rounded"></div> {/* Label placeholder */}
+        <div className="h-8 w-full bg-gray-200 rounded"></div> {/* Maximum Votes input placeholder */}
+      </div>
+      <div className="flex items-center space-x-2">
+        <div className="h-4 w-4 bg-gray-200 rounded"></div> {/* Checkbox placeholder */}
+        <div className="h-4 w-1/2 bg-gray-200 rounded"></div> {/* Label placeholder */}
+      </div>
+      <div className="h-10 w-full bg-gray-200 rounded mt-2"></div> {/* Apply Filters button placeholder */}
     </Card>
   );
 }
