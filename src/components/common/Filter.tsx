@@ -10,8 +10,10 @@ import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from '
 import { Checkbox } from '@/components/ui/checkbox';
 import { cn } from '@/lib/utils';
 import { ChevronDownIcon } from 'lucide-react';
+import { Skeleton } from '@/components/ui/skeleton';
 
 export interface FilterProps {
+  isLoading?: boolean;
   onApply?: (filters: {
     selectedTags: string[];
     org: string;
@@ -34,7 +36,7 @@ export interface FilterProps {
   };
 }
 
-export function Filter({ onApply, initialFilters }: FilterProps) {
+export function Filter({ onApply, initialFilters, isLoading }: FilterProps) {
   const [selectedTags, setSelectedTags] = useState<string[]>(initialFilters?.selectedTags || []);
   const [org, setOrg] = useState(initialFilters?.org || '');
   const [maintainer, setMaintainer] = useState(initialFilters?.maintainer || '');
@@ -62,6 +64,10 @@ export function Filter({ onApply, initialFilters }: FilterProps) {
     setMinVotesError('');
     setMaxVotesError('');
   }, [initialFilters]);
+
+  if (isLoading) {
+    return <FilterSkeleton />;
+  }
 
   const tagOptions = [
     { value: 'all', label: 'All' },
@@ -147,7 +153,7 @@ export function Filter({ onApply, initialFilters }: FilterProps) {
                             ? [...selectedTags, tag]
                             : selectedTags.filter((t) => t !== tag)
                         );
-                      }}'''
+                      }}
                       className="mr-2"
                     />
                     {tag.charAt(0).toUpperCase() + tag.slice(1)}
@@ -205,40 +211,38 @@ export function Filter({ onApply, initialFilters }: FilterProps) {
 
 export function FilterSkeleton() {
   return (
-    <Card className="space-y-4 p-4 border-none shadow-none bg-transparent animate-pulse">
+    <Card className="space-y-4 p-4 border-none shadow-none bg-transparent">
       <div className="space-y-2">
-        <div className="h-4 w-1/4 bg-gray-200 rounded"></div> {/* Label placeholder */}
-        <div className="h-8 w-full bg-gray-200 rounded"></div> {/* Tags button placeholder */}
-      </div>
-      <div className="space-y-2">
-        <div className="h-4 w-1/3 bg-gray-200 rounded"></div> {/* Label placeholder */}
-        <div className="h-8 w-full bg-gray-200 rounded"></div> {/* Organization input placeholder */}
+        <Skeleton className="h-4 w-1/4" />
+        <Skeleton className="h-8 w-full" />
       </div>
       <div className="space-y-2">
-        <div className="h-4 w-1/3 bg-gray-200 rounded"></div> {/* Label placeholder */}
-        <div className="h-8 w-full bg-gray-200 rounded"></div> {/* Maintainer input placeholder */}
+        <Skeleton className="h-4 w-1/3" />
+        <Skeleton className="h-8 w-full" />
       </div>
       <div className="space-y-2">
-        <div className="h-4 w-1/4 bg-gray-200 rounded"></div> {/* Label placeholder */}
-        <div className="h-8 w-full bg-gray-200 rounded"></div> {/* Start Date input placeholder */}
+        <Skeleton className="h-4 w-1/3" />
+        <Skeleton className="h-8 w-full" />
       </div>
       <div className="space-y-2">
-        <div className="h-4 w-1/4 bg-gray-200 rounded"></div> {/* Label placeholder */}
-        <div className="h-8 w-full bg-gray-200 rounded"></div> {/* End Date input placeholder */}
+        <Skeleton className="h-4 w-1/4" />
+        <Skeleton className="h-8 w-full" />
       </div>
       <div className="space-y-2">
-        <div className="h-4 w-1/3 bg-gray-200 rounded"></div> {/* Label placeholder */}
-        <div className="h-8 w-full bg-gray-200 rounded"></div> {/* Minimum Votes input placeholder */}
+        <Skeleton className="h-4 w-1/4" />
+        <Skeleton className="h-8 w-full" />
       </div>
       <div className="space-y-2">
-        <div className="h-4 w-1/3 bg-gray-200 rounded"></div> {/* Label placeholder */}
-        <div className="h-8 w-full bg-gray-200 rounded"></div> {/* Maximum Votes input placeholder */}
+        <Skeleton className="h-4 w-1/3" />
+        <Skeleton className="h-8 w-full" />
       </div>
-      <div className="flex items-center space-x-2">
-        <div className="h-4 w-4 bg-gray-200 rounded"></div> {/* Checkbox placeholder */}
-        <div className="h-4 w-1/2 bg-gray-200 rounded"></div> {/* Label placeholder */}
+      <div className="space-y-2">
+        <Skeleton className="h-4 w-1/3" />
+        <Skeleton className="h-8 w-full" />
       </div>
-      <div className="h-10 w-full bg-gray-200 rounded mt-2"></div> {/* Apply Filters button placeholder */}
+      <div className="flex justify-end mt-4">
+        <Skeleton className="h-8 w-24" />
+      </div>
     </Card>
   );
 }
