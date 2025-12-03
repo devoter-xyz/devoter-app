@@ -6,10 +6,9 @@ import { Button } from "@/components/ui/button";
 import { Moon, Sun, Monitor } from "lucide-react"; // Import Monitor icon for system theme
 
 export function ThemeToggle() {
-  const { setTheme, theme } = useTheme();
-  // Initialize focusedTheme state to undefined to prevent SSR hydration mismatches.
-  // It will be properly set in a useEffect hook after mounting.
   const [focusedTheme, setFocusedTheme] = React.useState<"light" | "dark" | "system" | undefined>(undefined);
+  // Derived variable to ensure a non-undefined theme is always available for logic
+  const effectiveTheme = focusedTheme ?? "system";
 
   const themes = [
     { name: "light", icon: Sun, label: "Light theme" },
@@ -21,14 +20,11 @@ export function ThemeToggle() {
 
   // Update focusedTheme when the actual theme changes (e.g., from external source or initial load)
   React.useEffect(() => {
-    setFocusedTheme(theme || 'system');
+    setFocusedTheme(theme ?? 'system');
   }, [theme]);
 
   const handleKeyDown = (event: React.KeyboardEvent) => {
-    let currentFocusIndex = themes.findIndex((t) => t.name === focusedTheme);
-    if (currentFocusIndex === -1) { // Fallback if focusedTheme somehow isn't found
-      currentFocusIndex = themes.findIndex((t) => t.name === (theme || 'system'));
-    }
+    let currentFocusIndex = themes.findIndex((t) => t.name === effectiveTheme);
 
     let newFocusIndex = currentFocusIndex;
 
@@ -46,10 +42,6 @@ export function ThemeToggle() {
       setTheme(newFocusedThemeName); // Immediately update the selected theme
       // Programmatically focus the newly focused button
       buttonRefs.current[newFocusIndex]?.focus();
-    } else if (event.key === " ") { // Only Space key for activation
-      setTheme(focusedTheme as 'light' | 'dark' | 'system');
-      event.preventDefault();
-      return; // Exit early as focus doesn't need to change
     }
   };
 
@@ -63,7 +55,9 @@ export function ThemeToggle() {
       {themes.map((t, index) => {
         const Icon = t.icon;
         const isChecked = theme === t.name;
-        const isFocused = focusedTheme === t.name;
+        // The button should be focusable if it's the effectiveTheme,
+        // or if no theme is focused yet and it's the first button.
+        const isFocusable = (focusedTheme === undefined && index === 0) || (effectiveTheme === t.name);
 
         return (
           <Button
@@ -79,9 +73,7 @@ export function ThemeToggle() {
               setFocusedTheme(t.name); // Ensure focusedTheme is also updated on click
               buttonRefs.current[index]?.focus(); // Keep focus on the clicked button
             }}
-            // Only the element that *would* receive focus on tab should have tabIndex="0".
-            // This is the focusedTheme. If nothing is focused yet, the first item should be 0.
-            tabIndex={isFocused ? 0 : -1}
+            tabIndex={isFocusable ? 0 : -1}
           >
             <Icon className="h-[1.5rem] w-[1.3rem]" />
             <span className="sr-only">{t.label}</span>
