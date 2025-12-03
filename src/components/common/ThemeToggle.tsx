@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Moon, Sun, Monitor } from "lucide-react"; // Import Monitor icon for system theme
 
 export function ThemeToggle() {
+  const { theme, setTheme } = useTheme();
   const [focusedTheme, setFocusedTheme] = React.useState<"light" | "dark" | "system" | undefined>(undefined);
   // Derived variable to ensure a non-undefined theme is always available for logic
   const effectiveTheme = focusedTheme ?? "system";
