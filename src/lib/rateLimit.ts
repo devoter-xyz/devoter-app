@@ -22,7 +22,7 @@ export async function checkRateLimit(
   actionType: string,
   identifier: string,
   options: RateLimitOptions,
-): Promise<boolean> {
+): Promise<{ allowed: boolean; key: string }> {
   const key = `rate_limit:${actionType}:${identifier}`;
   const now = Date.now();
   const windowStart = now - options.window * 1000;
@@ -38,9 +38,9 @@ export async function checkRateLimit(
     await redis.zadd(key, now.toString(), now.toString());
     // Set expiration for the key to clean up old data
     await redis.expire(key, options.window);
-    return true;
+    return { allowed: true, key };
   } else {
-    return false;
+    return { allowed: false, key };
   }
 }
 
@@ -64,8 +64,6 @@ export function rateLimitMiddleware<T extends (...args: any[]) => Promise<any>>(
     // TODO: Replace with actual user ID or IP address from session/request.
     const userId = 'anonymous'; // Placeholder
 
-    const allowed = await checkRateLimit(actionType, userId, options);
-
 export class RateLimitError extends Error {
   readonly retryAfter: number; // In seconds
   constructor(message: string, retryAfter: number) {
@@ -74,6 +72,8 @@ export class RateLimitError extends Error {
     this.retryAfter = retryAfter;
   }
 }
+
+    const { allowed, key } = await checkRateLimit(actionType, userId, options);
 
     if (!allowed) {
       // Calculate how long until the next request is allowed
