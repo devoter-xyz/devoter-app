@@ -44,6 +44,15 @@ export async function checkRateLimit(
   }
 }
 
+export class RateLimitError extends Error {
+  readonly retryAfter: number; // In seconds
+  constructor(message: string, retryAfter: number) {
+    super(message);
+    this.name = 'RateLimitError';
+    this.retryAfter = retryAfter;
+  }
+}
+
 /**
  * Middleware for rate limiting server actions.
  *
@@ -64,21 +73,13 @@ export function rateLimitMiddleware<T extends (...args: any[]) => Promise<any>>(
     // TODO: Replace with actual user ID or IP address from session/request.
     const userId = 'anonymous'; // Placeholder
 
-export class RateLimitError extends Error {
-  readonly retryAfter: number; // In seconds
-  constructor(message: string, retryAfter: number) {
-    super(message);
-    this.name = 'RateLimitError';
-    this.retryAfter = retryAfter;
-  }
-}
-
     const { allowed, key } = await checkRateLimit(actionType, userId, options);
 
     if (!allowed) {
       // Calculate how long until the next request is allowed
       const timestamps = await redis.zrange(key, 0, -1, 'WITHSCORES');
-      const oldestTimestamp = timestamps.length > 0 ? parseInt(timestamps[0], 10) : Date.now();
+      // WITHSCORES returns [member, score, ...]; score is at index 1
+      const oldestTimestamp = timestamps.length > 0 ? parseInt(timestamps[1], 10) : Date.now();
       const retryAfterMs = (oldestTimestamp + options.window * 1000) - Date.now();
       const retryAfterSeconds = Math.max(0, Math.ceil(retryAfterMs / 1000));
 
