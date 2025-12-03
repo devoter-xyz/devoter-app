@@ -66,8 +66,23 @@ export function rateLimitMiddleware<T extends (...args: any[]) => Promise<any>>(
 
     const allowed = await checkRateLimit(actionType, userId, options);
 
+export class RateLimitError extends Error {
+  readonly retryAfter: number; // In seconds
+  constructor(message: string, retryAfter: number) {
+    super(message);
+    this.name = 'RateLimitError';
+    this.retryAfter = retryAfter;
+  }
+}
+
     if (!allowed) {
-      throw new Error(`Rate limit exceeded for ${actionType}. Please try again later.`);
+      // Calculate how long until the next request is allowed
+      const timestamps = await redis.zrange(key, 0, -1, 'WITHSCORES');
+      const oldestTimestamp = timestamps.length > 0 ? parseInt(timestamps[0], 10) : Date.now();
+      const retryAfterMs = (oldestTimestamp + options.window * 1000) - Date.now();
+      const retryAfterSeconds = Math.ceil(retryAfterMs / 1000);
+
+      throw new RateLimitError(`Rate limit exceeded for ${actionType}. Please try again in ${retryAfterSeconds} seconds.`, retryAfterSeconds);
     }
 
     return action(...args);
