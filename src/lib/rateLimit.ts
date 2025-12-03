@@ -16,13 +16,13 @@ interface RateLimitOptions {
  * @param actionType A string identifying the type of action (e.g., 'vote', 'create_repo').
  * @param identifier A unique string identifying the user or client (e.g., user ID, IP address).
  * @param options Rate limiting options: limit and window size in seconds.
- * @returns A promise that resolves to `true` if the request is allowed, `false` otherwise.
+ * @returns A promise that resolves to an object containing: - allowed: whether the request is allowed. - retryAfterSeconds: optional, the number of seconds to wait before retrying.
  */
 export async function checkRateLimit(
   actionType: string,
   identifier: string,
   options: RateLimitOptions,
-): Promise<{ allowed: boolean; key: string }> {
+): Promise<{ allowed: boolean; retryAfterSeconds?: number }> {
   const key = `rate_limit:${actionType}:${identifier}`;
   const now = Date.now();
   const windowStart = now - options.window * 1000;
@@ -38,9 +38,14 @@ export async function checkRateLimit(
     await redis.zadd(key, now.toString(), now.toString());
     // Set expiration for the key to clean up old data
     await redis.expire(key, options.window);
-    return { allowed: true, key };
+    return { allowed: true };
   } else {
-    return { allowed: false, key };
+    // Calculate how long until the next request is allowed
+    const timestamps = await redis.zrange(key, 0, 0, 'WITHSCORES');
+    const oldestTimestamp = timestamps.length > 0 ? parseInt(timestamps[1], 10) : Date.now();
+    const retryAfterMs = (oldestTimestamp + options.window * 1000) - Date.now();
+    const retryAfterSeconds = Math.max(0, Math.ceil(retryAfterMs / 1000));
+    return { allowed: false, retryAfterSeconds };
   }
 }
 
@@ -73,17 +78,10 @@ export function rateLimitMiddleware<T extends (...args: any[]) => Promise<any>>(
     // TODO: Replace with actual user ID or IP address from session/request.
     const userId = 'anonymous'; // Placeholder
 
-    const { allowed, key } = await checkRateLimit(actionType, userId, options);
+    const { allowed, retryAfterSeconds } = await checkRateLimit(actionType, userId, options);
 
     if (!allowed) {
-      // Calculate how long until the next request is allowed
-      const timestamps = await redis.zrange(key, 0, -1, 'WITHSCORES');
-      // WITHSCORES returns [member, score, ...]; score is at index 1
-      const oldestTimestamp = timestamps.length > 0 ? parseInt(timestamps[1], 10) : Date.now();
-      const retryAfterMs = (oldestTimestamp + options.window * 1000) - Date.now();
-      const retryAfterSeconds = Math.max(0, Math.ceil(retryAfterMs / 1000));
-
-      throw new RateLimitError(`Rate limit exceeded for ${actionType}. Please try again in ${retryAfterSeconds} seconds.`, retryAfterSeconds);
+      throw new RateLimitError(`Rate limit exceeded for ${actionType}. Please try again in ${retryAfterSeconds} seconds.`, retryAfterSeconds || 0);
     }
 
     return action(...args);
