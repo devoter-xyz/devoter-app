@@ -7,8 +7,9 @@ import { Moon, Sun, Monitor } from "lucide-react"; // Import Monitor icon for sy
 
 export function ThemeToggle() {
   const { setTheme, theme } = useTheme();
-  // Initialize focusedTheme to the current theme, or 'system' as a fallback
-  const [focusedTheme, setFocusedTheme] = React.useState(theme || 'system');
+  // Initialize focusedTheme state to undefined to prevent SSR hydration mismatches.
+  // It will be properly set in a useEffect hook after mounting.
+  const [focusedTheme, setFocusedTheme] = React.useState<"light" | "dark" | "system" | undefined>(undefined);
 
   const themes = [
     { name: "light", icon: Sun, label: "Light theme" },
@@ -37,18 +38,18 @@ export function ThemeToggle() {
     } else if (event.key === "ArrowLeft" || event.key === "ArrowUp") {
       newFocusIndex = (currentFocusIndex - 1 + themes.length) % themes.length;
       event.preventDefault(); // Prevent page scrolling
-    } else if (event.key === "Enter" || event.key === " ") {
-      // If Enter or Space is pressed, set the theme to the currently focused one
-      setTheme(focusedTheme);
-      event.preventDefault();
-      return; // Exit early as focus doesn't need to change
     }
 
     if (newFocusIndex !== currentFocusIndex) {
       const newFocusedThemeName = themes[newFocusIndex].name;
       setFocusedTheme(newFocusedThemeName);
+      setTheme(newFocusedThemeName); // Immediately update the selected theme
       // Programmatically focus the newly focused button
       buttonRefs.current[newFocusIndex]?.focus();
+    } else if (event.key === " ") { // Only Space key for activation
+      setTheme(focusedTheme as 'light' | 'dark' | 'system');
+      event.preventDefault();
+      return; // Exit early as focus doesn't need to change
     }
   };
 
