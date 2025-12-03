@@ -80,7 +80,7 @@ export class RateLimitError extends Error {
       const timestamps = await redis.zrange(key, 0, -1, 'WITHSCORES');
       const oldestTimestamp = timestamps.length > 0 ? parseInt(timestamps[0], 10) : Date.now();
       const retryAfterMs = (oldestTimestamp + options.window * 1000) - Date.now();
-      const retryAfterSeconds = Math.ceil(retryAfterMs / 1000);
+      const retryAfterSeconds = Math.max(0, Math.ceil(retryAfterMs / 1000));
 
       throw new RateLimitError(`Rate limit exceeded for ${actionType}. Please try again in ${retryAfterSeconds} seconds.`, retryAfterSeconds);
     }

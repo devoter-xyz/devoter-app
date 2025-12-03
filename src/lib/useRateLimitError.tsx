@@ -26,7 +26,7 @@ export function useRateLimitError() {
       toast.custom((t) => (
         <div className="bg-destructive text-destructive-foreground p-3 rounded-md shadow-lg flex items-center justify-between w-full">
           <span>Rate limit exceeded. Retrying in {retryCountdown} seconds.</span>
-          <button onClick={() => toast.dismiss(t.id)} className="ml-4 text-sm font-medium">Dismiss</button>
+          <button onClick={() => toast.dismiss(t.id)} className="ml-4 text-sm font-medium" aria-label="Dismiss notification">Dismiss</button>
         </div>
       ), { id: toastIdRef.current, duration: retryCountdown * 1000 + 1000 });
     }
@@ -46,7 +46,7 @@ export function useRateLimitError() {
       toastIdRef.current = toast.custom((t) => (
         <div className="bg-destructive text-destructive-foreground p-3 rounded-md shadow-lg flex items-center justify-between w-full">
           <span>Rate limit exceeded. Retrying in {error.retryAfter} seconds.</span>
-          <button onClick={() => toast.dismiss(t.id)} className="ml-4 text-sm font-medium">Dismiss</button>
+          <button onClick={() => toast.dismiss(t.id)} className="ml-4 text-sm font-medium" aria-label="Dismiss notification">Dismiss</button>
         </div>
       ), { duration: error.retryAfter * 1000 + 1000 }); // +1 second to show "You can try again now!"
 
