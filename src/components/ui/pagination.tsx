@@ -56,76 +56,47 @@ function PaginationContent({
   React.useLayoutEffect(() => {
     if (contentRef.current) {
       const focusableLinks = Array.from(
-        contentRef.current.querySelectorAll('[data-slot="pagination-link"]')
+        contentRef.current.querySelectorAll('[data-slot="pagination-link"]:not([disabled])')
       ) as HTMLAnchorElement[];
 
       linksRef.current = focusableLinks;
 
-      const activeLinkIndex = focusableLinks.findIndex(link => link.dataset.active === 'true');
-      if (activeLinkIndex !== -1) {
-        setFocusedIndex(activeLinkIndex);
-      } else if (focusableLinks.length > 0) {
+      // Always set focusedIndex to 0 initially if there are focusable links
+      if (focusableLinks.length > 0) {
         setFocusedIndex(0);
       }
     }
   }, [props.children]);
 
-    const handleKeyDown = React.useCallback((event: React.KeyboardEvent<HTMLUListElement>) => {
+  const handleKeyDown = React.useCallback((event: React.KeyboardEvent<HTMLUListElement>) => {
+    const focusableLinks = Array.from(
+      contentRef.current?.querySelectorAll('[data-slot="pagination-link"]:not([disabled])') || []
+    ) as HTMLAnchorElement[];
 
-      const focusableLinks = Array.from(
+    // Guard: do nothing if no focusable links exist
+    if (focusableLinks.length === 0) return;
 
-        contentRef.current?.querySelectorAll('[data-slot="pagination-link"]') || []
+    let newFocusedIndex = focusedIndex;
 
-      ) as HTMLAnchorElement[];
+    if (event.key === "ArrowRight") {
+      event.preventDefault();
+      newFocusedIndex = (focusedIndex + 1) % focusableLinks.length;
+    } else if (event.key === "ArrowLeft") {
+      event.preventDefault();
+      newFocusedIndex = (focusedIndex - 1 + focusableLinks.length) % focusableLinks.length;
+    } else if (event.key === "Home") {
+      event.preventDefault();
+      newFocusedIndex = 0;
+    } else if (event.key === "End") {
+      event.preventDefault();
+      newFocusedIndex = focusableLinks.length - 1;
+    } else {
+      return; // Do not update focusedIndex or focus if not a navigation key
+    }
 
-  
-
-      // Guard: do nothing if no focusable links exist
-
-      if (focusableLinks.length === 0) return;
-
-  
-
-      let newFocusedIndex = focusedIndex;
-
-  
-
-      if (event.key === "ArrowRight") {
-
-        event.preventDefault();
-
-        newFocusedIndex = (focusedIndex + 1) % focusableLinks.length;
-
-      } else if (event.key === "ArrowLeft") {
-
-        event.preventDefault();
-
-        newFocusedIndex = (focusedIndex - 1 + focusableLinks.length) % focusableLinks.length;
-
-      } else if (event.key === "Home") {
-
-        event.preventDefault();
-
-        newFocusedIndex = 0;
-
-      } else if (event.key === "End") {
-
-        event.preventDefault();
-
-        newFocusedIndex = focusableLinks.length - 1;
-
-      } else {
-
-        return; // Do not update focusedIndex or focus if not a navigation key
-
-      }
-
-  
-
-      setFocusedIndex(newFocusedIndex);
-      focusLink(newFocusedIndex);
-
-    }, [focusedIndex, focusLink]);
+    setFocusedIndex(newFocusedIndex);
+    focusLink(newFocusedIndex);
+  }, [focusedIndex, focusLink]);
 
   return (
     <PaginationContext.Provider value={{ focusedIndex, setFocusedIndex, registerLink, unregisterLink, focusLink }}>
@@ -147,51 +118,50 @@ function PaginationItem({ ...props }: React.ComponentProps<"li">) {
 }
 
 type PaginationLinkProps = {
-  isActive?: boolean
+  isActive?: boolean;
+  disabled?: boolean;
 } & Pick<React.ComponentProps<typeof Button>, "size"> &
-  React.ComponentProps<"a">
+  Omit<React.ComponentProps<"a">, "ref">;
 
-function PaginationLink({
-  className,
-  isActive,
-  size = "icon",
-  ...props
-}: PaginationLinkProps) {
-  const context = React.useContext(PaginationContext);
-  const linkRef = React.useRef<HTMLAnchorElement>(null);
-  const [linkIndex, setLinkIndex] = React.useState<number>(-1);
+const PaginationLink = React.forwardRef<HTMLAnchorElement, PaginationLinkProps>(
+  ({ className, isActive, size = "icon", disabled, ...props }, ref) => {
+    const context = React.useContext(PaginationContext);
+    const linkRef = React.useRef<HTMLAnchorElement>(null);
+    const [linkIndex, setLinkIndex] = React.useState<number>(-1);
 
-  React.useEffect(() => {
-    if (context && linkRef.current) {
-      const index = context.registerLink(linkRef.current);
-      setLinkIndex(index);
-      return () => {
-        context.unregisterLink(index);
-      };
-    }
-    return undefined;
-  }, [context]);
+    React.useEffect(() => {
+      if (context && linkRef.current) {
+        const index = context.registerLink(linkRef.current);
+        setLinkIndex(index);
+        return () => {
+          context.unregisterLink(index);
+        };
+      }
+      return undefined;
+    }, [context]);
 
-  const tabIndex = context && linkIndex === context.focusedIndex ? 0 : -1;
+    const tabIndex = context && linkIndex === context.focusedIndex && !disabled ? 0 : -1;
 
-  return (
-    <a
-      ref={linkRef}
-      aria-current={isActive ? "page" : undefined}
-      data-slot="pagination-link"
-      data-active={isActive}
-      tabIndex={tabIndex}
-      className={cn(
-        buttonVariants({
-          variant: isActive ? "outline" : "ghost",
-          size,
-        }),
-        className
-      )}
-      {...props}
-    />
-  )
-}
+    return (
+      <a
+        ref={ref || linkRef}
+        aria-current={isActive ? "page" : undefined}
+        data-slot="pagination-link"
+        className={cn(
+          buttonVariants({
+            variant: isActive ? "outline" : "ghost",
+            size,
+          }),
+          className
+        )}
+        disabled={disabled}
+        tabIndex={tabIndex}
+        {...props}
+      />
+    );
+  }
+);
+PaginationLink.displayName = "PaginationLink";
 
 function PaginationPrevious({
   className,
