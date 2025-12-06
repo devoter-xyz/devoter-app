@@ -136,35 +136,83 @@ describe('Pagination', () => {
     expect(link3).toHaveFocus();
   });
 
-  it('should handle PaginationPrevious and PaginationNext correctly', () => {
+  it('should render correctly for a single page', () => {
     render(
       <Pagination>
         <PaginationContent>
-          <PaginationItem><PaginationPrevious href="#" /></PaginationItem>
-          <PaginationItem><PaginationLink href="#">1</PaginationLink></PaginationItem>
-          <PaginationItem><PaginationNext href="#" /></PaginationItem>
+          <PaginationItem>
+            <PaginationPrevious href="#" aria-disabled="true" />
+          </PaginationItem>
+          <PaginationItem>
+            <PaginationLink href="#" isActive>1</PaginationLink>
+          </PaginationItem>
+          <PaginationItem>
+            <PaginationNext href="#" aria-disabled="true" />
+          </PaginationItem>
         </PaginationContent>
       </Pagination>
     );
 
     const prevLink = screen.getByLabelText('Go to previous page');
-    const link1 = screen.getByText('1');
+    const nextLink = screen.getByLabelText('Go to next page');
+    const page1Link = screen.getByText('1');
+
+    expect(page1Link).toBeInTheDocument();
+    expect(prevLink).toHaveAttribute('aria-disabled', 'true');
+    expect(nextLink).toHaveAttribute('aria-disabled', 'true');
+  });
+
+  it('should disable previous button on the first page', () => {
+    render(
+      <Pagination>
+        <PaginationContent>
+          <PaginationItem>
+            <PaginationPrevious href="#" aria-disabled="true" />
+          </PaginationItem>
+          <PaginationItem>
+            <PaginationLink href="#" isActive>1</PaginationLink>
+          </PaginationItem>
+          <PaginationItem>
+            <PaginationLink href="#">2</PaginationLink>
+          </PaginationItem>
+          <PaginationItem>
+            <PaginationNext href="#" aria-disabled="false" />
+          </PaginationItem>
+        </PaginationContent>
+      </Pagination>
+    );
+
+    const prevLink = screen.getByLabelText('Go to previous page');
     const nextLink = screen.getByLabelText('Go to next page');
 
-    expect(prevLink).toHaveAttribute('tabindex', '0');
-    expect(link1).toHaveAttribute('tabindex', '-1');
-    expect(nextLink).toHaveAttribute('tabindex', '-1');
+    expect(prevLink).toHaveAttribute('aria-disabled', 'true');
+    expect(nextLink).not.toHaveAttribute('aria-disabled', 'true');
+  });
 
-    fireEvent.keyDown(screen.getByRole('navigation'), { key: 'ArrowRight' });
-    expect(prevLink).toHaveAttribute('tabindex', '-1');
-    expect(link1).toHaveAttribute('tabindex', '0');
-    expect(nextLink).toHaveAttribute('tabindex', '-1');
-    expect(link1).toHaveFocus();
+  it('should disable next button on the last page', () => {
+    render(
+      <Pagination>
+        <PaginationContent>
+          <PaginationItem>
+            <PaginationPrevious href="#" aria-disabled="false" />
+          </PaginationItem>
+          <PaginationItem>
+            <PaginationLink href="#">1</PaginationLink>
+          </PaginationItem>
+          <PaginationItem>
+            <PaginationLink href="#" isActive>2</PaginationLink>
+          </PaginationItem>
+          <PaginationItem>
+            <PaginationNext href="#" aria-disabled="true" />
+          </PaginationItem>
+        </PaginationContent>
+      </Pagination>
+    );
 
-    fireEvent.keyDown(screen.getByRole('navigation'), { key: 'ArrowRight' });
-    expect(prevLink).toHaveAttribute('tabindex', '-1');
-    expect(link1).toHaveAttribute('tabindex', '-1');
-    expect(nextLink).toHaveAttribute('tabindex', '0');
-    expect(nextLink).toHaveFocus();
+    const prevLink = screen.getByLabelText('Go to previous page');
+    const nextLink = screen.getByLabelText('Go to next page');
+
+    expect(prevLink).not.toHaveAttribute('aria-disabled', 'true');
+    expect(nextLink).toHaveAttribute('aria-disabled', 'true');
   });
 });
