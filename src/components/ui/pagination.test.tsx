@@ -141,13 +141,13 @@ describe('Pagination', () => {
       <Pagination>
         <PaginationContent>
           <PaginationItem>
-            <PaginationPrevious href="#" />
+            <PaginationPrevious href="#" aria-disabled="true" />
           </PaginationItem>
           <PaginationItem>
             <PaginationLink href="#" isActive>1</PaginationLink>
           </PaginationItem>
           <PaginationItem>
-            <PaginationNext href="#" />
+            <PaginationNext href="#" aria-disabled="true" />
           </PaginationItem>
         </PaginationContent>
       </Pagination>
@@ -167,7 +167,7 @@ describe('Pagination', () => {
       <Pagination>
         <PaginationContent>
           <PaginationItem>
-            <PaginationPrevious href="#" />
+            <PaginationPrevious href="#" aria-disabled="true" />
           </PaginationItem>
           <PaginationItem>
             <PaginationLink href="#" isActive>1</PaginationLink>
@@ -176,7 +176,7 @@ describe('Pagination', () => {
             <PaginationLink href="#">2</PaginationLink>
           </PaginationItem>
           <PaginationItem>
-            <PaginationNext href="#" />
+            <PaginationNext href="#" aria-disabled="false" />
           </PaginationItem>
         </PaginationContent>
       </Pagination>
@@ -194,7 +194,7 @@ describe('Pagination', () => {
       <Pagination>
         <PaginationContent>
           <PaginationItem>
-            <PaginationPrevious href="#" />
+            <PaginationPrevious href="#" aria-disabled="false" />
           </PaginationItem>
           <PaginationItem>
             <PaginationLink href="#">1</PaginationLink>
@@ -203,7 +203,7 @@ describe('Pagination', () => {
             <PaginationLink href="#" isActive>2</PaginationLink>
           </PaginationItem>
           <PaginationItem>
-            <PaginationNext href="#" />
+            <PaginationNext href="#" aria-disabled="true" />
           </PaginationItem>
         </PaginationContent>
       </Pagination>
