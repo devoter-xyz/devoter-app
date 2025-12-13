@@ -8,7 +8,6 @@ const updateNotificationPreferencesSchema = z.object({
   leaderboardNotification: z.boolean().optional(),
   newRepoNotification: z.boolean().optional(),
   favoriteTagNotification: z.boolean().optional(),
-  email: z.string().email().optional(),
 });
 
 export async function updateNotificationPreferences(formData: FormData) {
@@ -24,7 +23,6 @@ export async function updateNotificationPreferences(formData: FormData) {
     leaderboardNotification: data.leaderboardNotification === 'on',
     newRepoNotification: data.newRepoNotification === 'on',
     favoriteTagNotification: data.favoriteTagNotification === 'on',
-    email: data.email || undefined,
   });
 
   try {
