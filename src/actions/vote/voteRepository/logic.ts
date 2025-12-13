@@ -8,8 +8,12 @@ import { getTokenBalance } from '../../user/getTokenBalance/logic';
 import { VoteRepositoryInput } from './schema';
 import { publicClient } from '@/lib/viem';
 import { InvalidTransactionError } from '@/lib/errors';
+import { validateTransactionHash } from '@/lib/utils/validateTransactionHash';
 
 export const voteRepository = async (input: VoteRepositoryInput, userId: string): Promise<{ tokenAmount: Decimal }> => {
+  if (!validateTransactionHash(input.txHash)) {
+    throw new InvalidTransactionError('Invalid transaction hash format.');
+  }
   const currentWeek = getWeek(new Date());
 
   const transaction = await publicClient.getTransaction({
