@@ -67,12 +67,20 @@ async function emptyDatabase(options) {
           const tempDir = process.env.GEMINI_TEMP_DIR || path.join(__dirname, '..', 'tmp');
           const backupFilePath = path.join(tempDir, backupFileName);
 
+          const fs = require('fs');
+          if (!fs.existsSync(tempDir)) {
+              fs.mkdirSync(tempDir, { recursive: true });
+          }
+
           console.log(`ℹ️ Backing up database "${dbName}" to "${backupFilePath}"`);
           // Note: pg_dump does not take password directly on command line for security reasons.
           // It relies on environment variable PGPASSWORD or .pgpass file.
           // For simplicity in this script, we'll assume PGPASSWORD is set in the environment or
           // it's not required (e.g., local setup with trust authentication).
-          execSync(`PGPASSWORD="${db.password}" pg_dump -h ${dbHost} -p ${dbPort} -U ${dbUser} -d ${dbName} > "${backupFilePath}"`, { stdio: 'inherit' });
+          execSync(`pg_dump -h ${dbHost} -p ${dbPort} -U ${dbUser} -d ${dbName} > "${backupFilePath}"`, {
+              stdio: 'inherit',
+              env: { ...process.env, PGPASSWORD: db.password },
+          });
           console.log(`✅ Database backup created at: ${backupFilePath}`);
         } catch (e) {
           console.error('❌ Error creating database backup:', e.message);
