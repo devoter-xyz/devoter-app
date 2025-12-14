@@ -65,6 +65,7 @@
     "viem": "^2.31.3",
     "wagmi": "^2.15.6",
     "recharts": "^2.12.7",
+    "yargs": "^18.0.0",
     "zod": "^3.25.51"
   },
   "devDependencies": {
