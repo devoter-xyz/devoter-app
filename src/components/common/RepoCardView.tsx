@@ -9,6 +9,30 @@ import VerifiedIcon from './VerifiedIcon';
 import { Badge } from '@/components/ui/badge';
 import { CustomBadge, BadgeProps } from '@/components/common/Badge';
 
+interface RepoCardErrorFallbackProps {
+  resetError: () => void;
+}
+
+const RepoCardErrorFallback: React.FC<RepoCardErrorFallbackProps> = ({ resetError }) => {
+  return (
+    <Card className='h-full w-full rounded-2xl border-border bg-card p-6 shadow-lg flex flex-col items-center justify-center text-center'>
+      <CardHeader>
+        <p className='text-lg font-semibold text-red-500'>Error rendering repository card.</p>
+      </CardHeader>
+      <CardContent>
+        <p className='text-sm text-muted-foreground'>
+          Something went wrong. Please try again.
+        </p>
+      </CardContent>
+      <CardFooter>
+        <Button onClick={resetError} variant='outline'>
+          Retry
+        </Button>
+      </CardFooter>
+    </Card>
+  );
+};
+
 const cardVariants = cva('h-full w-full rounded-2xl', {
   variants: {
     variant: {
