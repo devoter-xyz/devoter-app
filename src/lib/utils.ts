@@ -49,17 +49,29 @@ export async function checkGithubRepoExists(owner: string, repo: string): Promis
         }
       }
       
-      /**
-       * Returns the base URL of the application.
-       * @returns The base URL string.
-       */
-      export function getBaseUrl(): string {
-        if (process.env.NEXT_PUBLIC_APP_URL) {
-          return process.env.NEXT_PUBLIC_APP_URL;
-        }
-        if (process.env.VERCEL_URL) {
-          return `https://${process.env.VERCEL_URL}`;
-        }
-        return 'http://localhost:3000';
-      }
-      
+/**
+ * Returns the base URL of the application.
+ * @returns The base URL string.
+*/
+export function getBaseUrl(): string {
+  if (process.env.NEXT_PUBLIC_APP_URL) {
+    return process.env.NEXT_PUBLIC_APP_URL;
+  }
+  if (process.env.VERCEL_URL) {
+    return `https://${process.env.VERCEL_URL}`;
+  }
+  return 'http://localhost:3000';
+}
+
+/**
+ * Masks an API key, showing only the first and last four characters.
+ * If the key is too short, it shows the entire key.
+ * @param apiKey - The API key to mask.
+ * @returns The masked API key string.
+*/
+export function maskApiKey(apiKey: string): string {
+  if (apiKey.length <= 8) {
+    return apiKey;
+  }
+  return `${apiKey.substring(0, 4)}...${apiKey.substring(apiKey.length - 4)}`;
+}
